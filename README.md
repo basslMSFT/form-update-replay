@@ -22,17 +22,11 @@ Choose **Calculate** as the value source to work out the value when the recordin
 | Text, multi-line text | **Add after**, **add before** or **replace** the current text, with no separator, a space or a new line. Placeholders: `{{today}}`, `{{now}}`, `{{user}}` and `{{column_name}}` for any other column on the form. |
 | Whole number, decimal, float, currency | Add, subtract, multiply or add a percentage, with a fixed number or another column. Whole-number columns are rounded; decimal and currency columns are rounded to their precision. |
 
-A calculation sees what earlier steps of the same replay set, so a later step can build on an earlier one. The preview shows the calculated value, and a step is skipped with a reason when a column it needs is missing, empty or of the wrong type. Working days count Monday to Friday only; public holidays are not taken into account.
-
-| | |
-|---|---|
-| ![Calculate dates](docs/images/16-calculate-dates.png) **16. Dates and working days** | ![Calculate text](docs/images/17-calculate-text.png) **17. Text with placeholders** |
-| ![Calculate numbers](docs/images/18-calculate-numbers.png) **18. Numbers and percentages** | ![Preview of calculated values](docs/images/19-calculate-preview.png) **19. Preview of calculated values** |
-| ![Calculated values applied](docs/images/20-calculate-applied.png) **20. Applied to the form** | ![Numbers preview](docs/images/21-calculate-numbers-preview.png) **21. The same for numbers** |
+A calculation sees what earlier steps of the same replay set, so a later step can build on an earlier one. The preview shows the calculated value, and a step is skipped with a reason when a column it needs is missing, empty or of the wrong type. Working days count Monday to Friday only; public holidays are not taken into account. Screenshots 10 to 15 below show Calculate.
 
 ## Screenshots
 
-A narrated walkthrough (3.5 minutes, including Calculate) is in [docs/media/form-update-replay-demo.mp4](docs/media/form-update-replay-demo.mp4). The screenshots use dummy data. Calculate is covered in its own section above.
+A narrated walkthrough (3.5 minutes, including Calculate) is in [docs/media/form-update-replay-demo.mp4](docs/media/form-update-replay-demo.mp4). The screenshots use dummy data.
 
 | | |
 |---|---|
@@ -40,10 +34,13 @@ A narrated walkthrough (3.5 minutes, including Calculate) is in [docs/media/form
 | ![Recording changes on the form](docs/images/03-recording-changes.png) **3. Recording changes** | ![Reviewing the recorded changes](docs/images/04-review-changes.png) **4. Review the changes** |
 | ![Ask when replaying](docs/images/05-ask-when-replaying.png) **5. Ask when replaying** | ![Preview with questions](docs/images/06-preview-questions.png) **6. Preview with questions** |
 | ![Questions answered](docs/images/07-preview-answered.png) **7. Typed answers** | ![Applied to the form](docs/images/08-applied-to-form.png) **8. Applied to the form** |
-| ![Copy from column](docs/images/09-copy-from-column.png) **9. Copy from column** | ![Manage recordings](docs/images/10-manage-recordings.png) **10. Manage recordings** |
-| ![Selecting several recordings](docs/images/11-multi-select.png) **11. Multi-select actions** | ![Share dialog](docs/images/12-share-dialog.png) **12. Share** |
-| ![Shared with a team](docs/images/13-shared-with-team.png) **13. Shared with a team** | ![Recording detail](docs/images/14-recording-detail.png) **14. Recording detail** |
-| ![Dutch user interface](docs/images/15-dutch.png) **15. Dutch interface** | |
+| ![Copy from column](docs/images/09-copy-from-column.png) **9. Copy from column** | ![Calculate dates](docs/images/10-calculate-dates.png) **10. Calculate: dates and working days** |
+| ![Calculate text](docs/images/11-calculate-text.png) **11. Calculate: text with placeholders** | ![Calculate numbers](docs/images/12-calculate-numbers.png) **12. Calculate: numbers and percentages** |
+| ![Preview of calculated values](docs/images/13-calculate-preview.png) **13. Preview of calculated values** | ![Calculated values applied](docs/images/14-calculate-applied.png) **14. Calculated values applied** |
+| ![Numbers preview](docs/images/15-calculate-numbers-preview.png) **15. The same for numbers** | ![Manage recordings](docs/images/16-manage-recordings.png) **16. Manage recordings** |
+| ![Selecting several recordings](docs/images/17-multi-select.png) **17. Multi-select actions** | ![Share dialog](docs/images/18-share-dialog.png) **18. Share** |
+| ![Shared with a team](docs/images/19-shared-with-team.png) **19. Shared with a team** | ![Recording detail](docs/images/20-recording-detail.png) **20. Recording detail** |
+| ![Dutch user interface](docs/images/21-dutch.png) **21. Dutch interface** | |
 
 ## Install
 
