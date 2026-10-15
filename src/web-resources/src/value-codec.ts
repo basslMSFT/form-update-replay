@@ -1,5 +1,14 @@
 import { StoredLookup, StoredValue } from "./model";
 
+/** A form control, its section and its tab; each can be hidden on its own. */
+export interface ControlLike {
+  getDisabled?(): boolean;
+  getVisible?(): boolean;
+  getLabel?(): string;
+  getEntityTypes?(): string[];
+  getParent?(): { getVisible?(): boolean; getParent?(): { getVisible?(): boolean } | null } | null;
+}
+
 /** The subset of the Xrm attribute API that the engine uses; keeps the logic testable without a form. */
 export interface AttrLike {
   getName(): string;
@@ -15,7 +24,7 @@ export interface AttrLike {
   getPrecision?(): number;
   addOnChange(handler: (ctx: unknown) => void): void;
   removeOnChange(handler: (ctx: unknown) => void): void;
-  controls?: { get(): Array<{ getDisabled?(): boolean; getLabel?(): string; getEntityTypes?(): string[] }> };
+  controls?: { get(): ControlLike[] };
   getUserPrivilege?(): { canRead: boolean; canUpdate: boolean; canCreate: boolean };
 }
 

@@ -68,7 +68,7 @@ The solution adds two roles. Assign them next to the role people already have; t
 | Form Update Replay User | Create, read, edit, delete, assign and share own recordings, and use recordings shared with them or their teams. |
 | Form Update Replay Admin | The same rights across the whole organization, and the *All recordings* tab. |
 
-Replaying never grants more access than the user already has: values are set on the open form, so read-only and secured columns are skipped and the normal save rules apply.
+Replaying never grants more access than the user already has: values are set on the open form, so read-only and secured columns are skipped and the normal save rules apply. Columns that are hidden on the form (hidden field, section or tab) or not on it at all count as not available: they are skipped as target, as copy source and as input of a calculation.
 
 ## What is stored
 

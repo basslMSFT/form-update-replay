@@ -53,17 +53,28 @@ function displayText(attr: AttrLike, value: StoredValue): string {
   }
 }
 
+/** A column is available when at least one of its controls is shown; hidden controls, sections and tabs count as not on the form. */
+export function isAvailable(attr: AttrLike): boolean {
+  const controls = attr.controls?.get() ?? [];
+  return controls.some((c) => {
+    if (c.getVisible?.() === false) return false;
+    const section = c.getParent?.();
+    if (!section) return true;
+    if (section.getVisible?.() === false) return false;
+    return section.getParent?.()?.getVisible?.() !== false;
+  });
+}
+
 function isReadOnly(attr: AttrLike): boolean {
   const priv = attr.getUserPrivilege?.();
   if (priv && !priv.canUpdate && !priv.canCreate) return true;
-  const controls = attr.controls?.get() ?? [];
-  if (controls.length === 0) return true;
-  return controls.every((c) => c.getDisabled?.() === true);
+  return (attr.controls?.get() ?? []).every((c) => c.getDisabled?.() === true);
 }
 
 /** Works out what replaying the steps would do on this form, without changing anything. */
 export function plan(form: FormLike, steps: Step[], options: PlayOptions = {}): PlanItem[] {
-  const byName = new Map(form.attributes.map((a) => [a.getName(), a]));
+  // Hidden columns are left out, so they are "not on this form" as target, copy source and calculation input alike.
+  const byName = new Map(form.attributes.filter(isAvailable).map((a) => [a.getName(), a]));
   const items: PlanItem[] = [];
   // Values that earlier steps will set, so a later "copy from column" step sees them instead of the old form value.
   const pending = new Map<string, StoredValue>();
@@ -136,6 +147,7 @@ export function apply(form: FormLike, items: PlanItem[]): ApplyResult {
   for (const item of items) {
     if (item.status !== "apply") continue;
     const attr = byName.get(item.step.column)!;
+    if (!isAvailable(attr)) { result.failed.push({ column: item.step.column, message: t("skipMissing") }); continue; }
     try {
       attr.setValue(toXrmValue(attr, item.next));
       attr.fireOnChange();

@@ -4,6 +4,15 @@ All notable changes to this solution will be documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/), and this project adheres to [Semantic Versioning](https://semver.org/).
 
+## [1.0.2] - 2026-10-16
+
+### Fixed
+- Hidden columns were still updated. A column that is hidden on the form (its field, section or tab) now counts as not on the form: the step is skipped in the preview with "Column is not on this form", and a copy or calculation that reads a hidden column is skipped as well. Apply also refuses a column that was hidden after the preview.
+
+### Changed
+- The full copyright notices and license texts of the bundled third-party packages are in `THIRD-PARTY-NOTICES.md` and at the end of the shipped `furep.hub.js`.
+- README: disclaimer and a note about the shared form-context approach.
+
 ## [1.0.1] - 2026-10-16
 
 ### Changed

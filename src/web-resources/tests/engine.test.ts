@@ -6,7 +6,16 @@ import { Step } from "../src/model";
 
 class FakeAttr implements AttrLike {
   private handlers: Array<(c: unknown) => void> = [];
-  controls = { get: () => [{ getDisabled: () => this.disabled }] };
+  hidden = false;
+  sectionHidden = false;
+  tabHidden = false;
+  controls = {
+    get: () => [{
+      getDisabled: () => this.disabled,
+      getVisible: () => !this.hidden,
+      getParent: () => ({ getVisible: () => !this.sectionHidden, getParent: () => ({ getVisible: () => !this.tabHidden }) }),
+    }],
+  };
   constructor(private name: string, private type: string, private value: unknown = null, public disabled = false, private format: string | null = null) {}
   getName() { return this.name; }
   getAttributeType() { return this.type; }
@@ -124,6 +133,38 @@ describe("player", () => {
       set("p", "string", undefined, { sortOrder: 4, valueMode: "prompt" }),
     ]);
     expect(items.map((i) => i.reason)).toEqual(["missing", "readonly", "typeMismatch", "needsInput"]);
+  });
+
+  it("treats hidden columns as not on the form, also as copy source and calculation input", () => {
+    const byControl = new FakeAttr("a", "string", "x"); byControl.hidden = true;
+    const bySection = new FakeAttr("b", "string", "x"); bySection.sectionHidden = true;
+    const byTab = new FakeAttr("c", "string", "x"); byTab.tabHidden = true;
+    const shown = new FakeAttr("d", "string", "x");
+    const noControl = new FakeAttr("e", "string", "x"); noControl.controls = { get: () => [] } as never;
+    const copy = new FakeAttr("f", "string", "");
+    const calc = new FakeAttr("g", "memo", "");
+    const f = form(byControl, bySection, byTab, shown, noControl, copy, calc);
+    const items = plan(f, [
+      set("a", "string", "v", { sortOrder: 1 }),
+      set("b", "string", "v", { sortOrder: 2 }),
+      set("c", "string", "v", { sortOrder: 3 }),
+      set("d", "string", "v", { sortOrder: 4 }),
+      set("e", "string", "v", { sortOrder: 5 }),
+      set("f", "string", undefined, { sortOrder: 6, valueMode: "copy", sourceColumn: "a" }),
+      set("g", "memo", undefined, { sortOrder: 7, valueMode: "calculate", calc: { kind: "text", mode: "replace", separator: "none", text: "{{a}}" } }),
+    ]);
+    expect(items.map((i) => i.reason ?? i.status)).toEqual(["missing", "missing", "missing", "apply", "missing", "sourceMissing", "sourceMissing"]);
+  });
+
+  it("does not apply to a column that was hidden after the preview", () => {
+    const a = new FakeAttr("a", "string", "old");
+    const f = form(a);
+    const items = plan(f, [set("a", "string", "new")]);
+    a.hidden = true;
+    const res = apply(f, items);
+    expect(res.applied).toEqual([]);
+    expect(res.failed.map((x) => x.column)).toEqual(["a"]);
+    expect(a.getValue()).toBe("old");
   });
 
   it("uses prompt answers and copies from another column", () => {
