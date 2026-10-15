@@ -2,7 +2,7 @@ import { ReactElement, useCallback, useEffect, useMemo, useState } from "react";
 import { Button, Field, Input, MessageBar, MessageBarBody, Select, Spinner, Text, Title3, makeStyles, tokens } from "@fluentui/react-components";
 import { Play20Filled, Record20Filled, Stop20Filled, Open20Regular } from "@fluentui/react-icons";
 import { FormEntry, currentForm, toFormLike } from "../registry";
-import { discardRecording, isRecording, recordedCount, startRecording, stopRecording } from "../controller";
+import { discardRecording, isRecording, picker, recordedCount, startRecording, stopRecording } from "../controller";
 import { RecordingRow, createRecording, getRecording, listRecordings } from "../store";
 import { PlanItem, apply, plan } from "../player";
 import { Step, StoredValue, isSupportedType } from "../model";
@@ -42,6 +42,7 @@ export function Pane(): ReactElement {
   useEffect(() => {
     const timer = window.setInterval(() => {
       const cur = currentForm();
+      if (!cur && picker.active) return;
       setEntry((prev) => (prev?.key === cur?.key ? prev : cur));
       if (cur) {
         setRecording(isRecording(cur));

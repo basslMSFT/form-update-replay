@@ -2,7 +2,7 @@ import { ReactElement } from "react";
 import { Badge, Button, Checkbox, Field, Input, Select, Text, Textarea, makeStyles, tokens } from "@fluentui/react-components";
 import { PlanItem, SkipReason } from "../player";
 import { StoredLookup, StoredValue } from "../model";
-import { describeValue, labelFor } from "../controller";
+import { describeValue, labelFor, picker } from "../controller";
 import { StringKey, t } from "../i18n";
 import { useApp } from "./context";
 
@@ -107,9 +107,14 @@ function PromptInput({ item, fc, value, onChange }: InputProps): ReactElement {
       const types = attr?.controls.get(0)?.getEntityTypes?.() ?? [];
       const picked = value && typeof value === "object" && !Array.isArray(value) ? (value as StoredLookup) : null;
       const pick = async (): Promise<void> => {
-        const res = await xrm.Utility.lookupObjects({ allowMultiSelect: false, defaultEntityType: types[0] ?? "", entityTypes: types });
-        const r = res?.[0];
-        if (r) onChange({ entityType: r.entityType, id: r.id.replace(/[{}]/g, "").toLowerCase(), ...(r.name ? { name: r.name } : {}) });
+        picker.active = true;
+        try {
+          const res = await xrm.Utility.lookupObjects({ allowMultiSelect: false, defaultEntityType: types[0] ?? "", entityTypes: types });
+          const r = res?.[0];
+          if (r) onChange({ entityType: r.entityType, id: r.id.replace(/[{}]/g, "").toLowerCase(), ...(r.name ? { name: r.name } : {}) });
+        } finally {
+          picker.active = false;
+        }
       };
       return (
         <Field label={label} size="small">

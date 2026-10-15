@@ -17,6 +17,9 @@ export function getXrm(): typeof Xrm {
 
 const NOTIFICATION_ID = "msftnl_furep_recording";
 
+/** True while the native record picker is open; the form is not the current page then, which must not reset the pane. */
+export const picker = { active: false };
+
 export function isRecording(entry: FormEntry): boolean {
   return getRegistry().recorders[entry.key]?.isRecording ?? false;
 }

@@ -97,6 +97,7 @@ export function StepsEditor({ steps, onChange, fc, labels, optionLabels, columns
                   <Field label={t("sourceColumn")} size="small" required validationMessage={step.sourceColumn ? undefined : t("chooseSource")} validationState={step.sourceColumn ? "none" : "warning"} hint={t("copyHint")}>
                     <Select size="small" value={step.sourceColumn ?? ""} onChange={(_, d) => update(i, { sourceColumn: d.value || undefined })}>
                       <option value="">{sources.length ? t("chooseSource") : t("noCompatibleSource")}</option>
+                      {step.sourceColumn && !sources.some((c) => c.name === step.sourceColumn) ? <option value={step.sourceColumn}>{step.sourceColumn} ({t("sourceUnavailable")})</option> : null}
                       {sources.map((c) => <option key={c.name} value={c.name}>{c.label} ({c.name})</option>)}
                     </Select>
                   </Field>
