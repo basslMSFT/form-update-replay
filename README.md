@@ -24,11 +24,15 @@ Choose **Calculate** as the value source to work out the value when the recordin
 
 A calculation sees what earlier steps of the same replay set, so a later step can build on an earlier one. The preview shows the calculated value, and a step is skipped with a reason when a column it needs is missing, empty or of the wrong type. Working days count Monday to Friday only; public holidays are not taken into account.
 
-![Calculate steps in the recording editor](docs/images/calculate-editor.png)
+| | |
+|---|---|
+| ![Calculate dates](docs/images/16-calculate-dates.png) **16. Dates and working days** | ![Calculate text](docs/images/17-calculate-text.png) **17. Text with placeholders** |
+| ![Calculate numbers](docs/images/18-calculate-numbers.png) **18. Numbers and percentages** | ![Preview of calculated values](docs/images/19-calculate-preview.png) **19. Preview of calculated values** |
+| ![Calculated values applied](docs/images/20-calculate-applied.png) **20. Applied to the form** | ![Numbers preview](docs/images/21-calculate-numbers-preview.png) **21. The same for numbers** |
 
 ## Screenshots
 
-A narrated walkthrough is in [docs/media/form-update-replay-demo.mp4](docs/media/form-update-replay-demo.mp4). The screenshots use dummy data.
+A narrated walkthrough (3.5 minutes, including Calculate) is in [docs/media/form-update-replay-demo.mp4](docs/media/form-update-replay-demo.mp4). The screenshots use dummy data. Calculate is covered in its own section above.
 
 | | |
 |---|---|

@@ -1,6 +1,6 @@
 {
   "name": "form-update-replay-webresources",
-  "version": "0.2.0",
+  "version": "1.0.0",
   "private": true,
   "license": "MIT",
   "description": "Recorder, player and hub UI web resources for Form Update Replay",

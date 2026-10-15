@@ -12,7 +12,7 @@ const useStyles = makeStyles({
   card: { border: `1px solid ${tokens.colorNeutralStroke2}`, borderRadius: tokens.borderRadiusMedium, padding: tokens.spacingHorizontalS, display: "flex", flexDirection: "column", gap: tokens.spacingVerticalXS, minWidth: 0 },
   head: { display: "flex", justifyContent: "space-between", alignItems: "flex-start", flexWrap: "wrap", gap: tokens.spacingHorizontalXS },
   title: { minWidth: 0, overflowWrap: "anywhere" },
-  text: { overflowWrap: "anywhere" },
+  text: { overflowWrap: "anywhere", whiteSpace: "pre-wrap" },
   actions: { display: "flex", flexWrap: "wrap", gap: tokens.spacingHorizontalS, marginTop: tokens.spacingVerticalM },
   inline: { display: "flex", flexWrap: "wrap", gap: tokens.spacingHorizontalS, alignItems: "center" },
   checks: { display: "flex", flexDirection: "column" },

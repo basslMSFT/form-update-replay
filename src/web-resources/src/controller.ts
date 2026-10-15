@@ -102,8 +102,13 @@ export function describeValue(
     }
     case "datetime": {
       const s = String(value);
-      return /^\d{4}-\d{2}-\d{2}$/.test(s) ? s : new Date(s).toLocaleString();
+      return /^\d{4}-\d{2}-\d{2}$/.test(s) ? new Date(`${s}T00:00:00`).toLocaleDateString() : new Date(s).toLocaleString();
     }
+    case "integer":
+    case "decimal":
+    case "double":
+    case "money":
+      return typeof value === "number" ? value.toLocaleString(undefined, { maximumFractionDigits: 10 }) : String(value);
     default:
       return String(value);
   }

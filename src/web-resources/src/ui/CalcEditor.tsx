@@ -44,8 +44,8 @@ export function describeCalc(spec: CalcSpec, labelOf: (column: string) => string
   }
   const base = spec.base.source === "current" ? t("calcBaseCurrent") : spec.base.source === "column" ? labelOf(spec.base.column) : String(spec.base.value);
   const operand = spec.operand.source === "column" ? labelOf(spec.operand.column) : String(spec.operand.value);
-  const sign = spec.op === "add" ? "+" : spec.op === "subtract" ? "-" : spec.op === "multiply" ? "×" : "+ %";
-  return `${base} ${sign} ${operand}`;
+  const sign = spec.op === "add" ? "+" : spec.op === "subtract" ? "-" : spec.op === "multiply" ? "×" : "+";
+  return spec.op === "percent" ? `${base} ${sign} ${operand}%` : `${base} ${sign} ${operand}`;
 }
 
 /** Editor for the settings of a Calculate step; the kind of calculation follows the type of the column. */

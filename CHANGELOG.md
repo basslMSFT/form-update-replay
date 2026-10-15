@@ -4,7 +4,9 @@ All notable changes to this solution will be documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/), and this project adheres to [Semantic Versioning](https://semver.org/).
 
-## [0.2.0] - 2026-10-16
+## [1.0.0] - 2026-10-16
+
+First stable release. Everything from 0.1.0 plus Calculate.
 
 ### Added
 - **Calculate** as a fourth value source. It is a structured step, not a formula language, so it needs no extra components:
@@ -13,7 +15,13 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/), and this
   - Number columns: add, subtract, multiply or add a percentage, with a fixed number or another column, rounded to the column precision.
   - Calculations see what earlier steps of the same replay set. The preview shows the result, and a step is skipped with a clear reason when an input is missing or invalid.
 - New column `msftnl_calculation` and option *Calculate* (Berekenen) on `msftnl_updaterecordingstep`. Existing recordings keep working unchanged.
-- Narrated demo video with a natural neural voice instead of the robotic one.
+- Six new screenshots and a new 3.5 minute narrated demo video that covers Calculate, with a natural neural voice instead of the robotic one.
+
+### Changed
+- The preview shows date-only values as dates in your regional format, numbers with digit grouping, and keeps line breaks in text.
+
+### Fixed
+- Working-day calculations could hang when the start date was midnight on the day daylight saving time ends; they now step by calendar day.
 
 ## [0.1.0] - 2026-10-15
 
