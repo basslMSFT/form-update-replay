@@ -241,16 +241,25 @@ export async function updateRecordingHeader(api: Api, id: string, fields: { name
   await api.request("PATCH", `${SET}(${id})`, body);
 }
 
-/** Replaces all steps of a recording: deletes the old rows, then creates the new ones. */
+/** Replaces all steps of a recording. The new rows are created first, so a failure never leaves the recording without steps. */
 export async function replaceSteps(api: Api, id: string, steps: Step[]): Promise<void> {
   const old = await readAll(api, `msftnl_updaterecordingsteps?$select=msftnl_updaterecordingstepid&$filter=_msftnl_recordingid_value eq ${id}`);
-  for (const o of old) await api.request("DELETE", `msftnl_updaterecordingsteps(${bare(o.msftnl_updaterecordingstepid)})`);
-  for (const s of steps) {
-    await api.request("POST", "msftnl_updaterecordingsteps", {
-      ...stepToPayload(s),
-      "msftnl_RecordingId@odata.bind": `/${SET}(${id})`,
-    });
+  const created: string[] = [];
+  try {
+    for (const s of steps) {
+      const res = await api.request(
+        "POST",
+        "msftnl_updaterecordingsteps",
+        { ...stepToPayload(s), "msftnl_RecordingId@odata.bind": `/${SET}(${id})` },
+        { Prefer: "return=representation" },
+      );
+      created.push(bare(res.data.msftnl_updaterecordingstepid));
+    }
+  } catch (e) {
+    for (const c of created) await api.request("DELETE", `msftnl_updaterecordingsteps(${c})`).catch(() => undefined);
+    throw e;
   }
+  for (const o of old) await api.request("DELETE", `msftnl_updaterecordingsteps(${bare(o.msftnl_updaterecordingstepid)})`);
 }
 
 export async function deleteRecording(api: Api, id: string): Promise<void> {
@@ -264,7 +273,8 @@ export interface Principal {
 }
 
 export async function searchPrincipals(api: Api, text: string, ownerTeamsOnly = false): Promise<Principal[]> {
-  const q = text.replace(/'/g, "''");
+  // Quotes are doubled for OData; the whole value is URL-encoded so typed characters can never add query options.
+  const q = encodeURIComponent(text.replace(/'/g, "''"));
   const teamType = ownerTeamsOnly ? "teamtype eq 0" : "(teamtype eq 0 or teamtype eq 1)";
   const [users, teams] = await Promise.all([
     ownerTeamsOnly ? Promise.resolve({ data: { value: [] as any[] } }) : api.request("GET", `systemusers?$select=systemuserid,fullname&$filter=isdisabled eq false and contains(fullname,'${q}')&$top=10`),

@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { Api, Identity, RecordingRow, classify, getShares, listRecordings, recordingToPayload, stepFromRow, stepToPayload } from "../src/store";
+import { Api, Identity, RecordingRow, classify, getShares, listRecordings, recordingToPayload, replaceSteps, searchPrincipals, stepFromRow, stepToPayload } from "../src/store";
 import { OPTION, Step } from "../src/model";
 
 const me = "11111111-1111-1111-1111-111111111111";
@@ -96,5 +96,54 @@ describe("tab placement", () => {
     expect((await listRecordings(api, who, "mine")).map((r) => r.name)).toEqual(["mine"]);
     expect((await listRecordings(api, who, "shared")).map((r) => r.name)).toEqual(["theirs"]);
     expect((await listRecordings(api, who, "all")).length).toBe(2);
+  });
+});
+
+describe("safe requests", () => {
+  const ok = (value: unknown[]) => ({ data: { value }, headers: { get: () => null } });
+
+  it("URL-encodes the search text so it cannot add query options", async () => {
+    const paths: string[] = [];
+    const api: Api = { async request(_m, path) { paths.push(path); return ok([]); } };
+    await searchPrincipals(api, "a') or true&$top=5000#", false);
+    for (const p of paths) {
+      expect(p).not.toContain("&$top=5000");
+      expect(p).toContain("%26%24top%3D5000");
+    }
+  });
+
+  it("keeps the old steps when creating the new ones fails", async () => {
+    const calls: string[] = [];
+    let posts = 0;
+    const api: Api = {
+      async request(method, path) {
+        calls.push(`${method} ${path.split("?")[0]}`);
+        if (method === "GET") return ok([{ msftnl_updaterecordingstepid: "old1" }]);
+        if (method === "POST") {
+          posts++;
+          if (posts === 2) throw new Error("boom");
+          return { data: { msftnl_updaterecordingstepid: `new${posts}` }, headers: { get: () => null } };
+        }
+        return { data: null, headers: { get: () => null } };
+      },
+    };
+    const step = (n: number): Step => ({ sortOrder: n, operation: "set", valueMode: "fixed", column: "title", columnType: "string", value: "x" });
+    await expect(replaceSteps(api, "rec", [step(10), step(20)])).rejects.toThrow("boom");
+    expect(calls).toContain("DELETE msftnl_updaterecordingsteps(new1)");
+    expect(calls).not.toContain("DELETE msftnl_updaterecordingsteps(old1)");
+  });
+
+  it("removes the old steps only after the new ones exist", async () => {
+    const calls: string[] = [];
+    const api: Api = {
+      async request(method, path) {
+        calls.push(`${method} ${path.split("?")[0]}`);
+        if (method === "GET") return ok([{ msftnl_updaterecordingstepid: "old1" }]);
+        if (method === "POST") return { data: { msftnl_updaterecordingstepid: "new1" }, headers: { get: () => null } };
+        return { data: null, headers: { get: () => null } };
+      },
+    };
+    await replaceSteps(api, "rec", [{ sortOrder: 10, operation: "set", valueMode: "fixed", column: "title", columnType: "string", value: "x" }]);
+    expect(calls.indexOf("POST msftnl_updaterecordingsteps")).toBeLessThan(calls.indexOf("DELETE msftnl_updaterecordingsteps(old1)"));
   });
 });
