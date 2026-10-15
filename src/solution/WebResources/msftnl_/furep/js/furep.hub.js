@@ -1,4 +1,4 @@
-/*! Form Update Replay - MIT License. Third-party license notices are listed at the end of this file and in THIRD-PARTY-NOTICES.md. */
+/*! Form Update Replay - MIT License. Third-party license notices are at the end of this file and in THIRD-PARTY-NOTICES.md. */
 "use strict";(()=>{var XA=Object.create;var Zr=Object.defineProperty;var YA=Object.getOwnPropertyDescriptor;var JA=Object.getOwnPropertyNames;var ZA=Object.getPrototypeOf,az=Object.prototype.hasOwnProperty;var p5=(a,e)=>()=>{try{return e||a((e={exports:{}}).exports,e),e.exports}catch(l){throw e=0,l}},ez=(a,e)=>{for(var l in e)Zr(a,l,{get:e[l],enumerable:!0})},lz=(a,e,l,o)=>{if(e&&typeof e=="object"||typeof e=="function")for(let t of JA(e))!az.call(a,t)&&t!==l&&Zr(a,t,{get:()=>e[t],enumerable:!(o=YA(e,t))||o.enumerable});return a};var V=(a,e,l)=>(l=a!=null?XA(ZA(a)):{},lz(e||!a||!a.__esModule?Zr(l,"default",{value:a,enumerable:!0}):l,a));var qh=p5(o1=>{"use strict";var O4=Symbol.for("react.element"),oz=Symbol.for("react.portal"),tz=Symbol.for("react.fragment"),rz=Symbol.for("react.strict_mode"),cz=Symbol.for("react.profiler"),nz=Symbol.for("react.provider"),iz=Symbol.for("react.context"),sz=Symbol.for("react.forward_ref"),hz=Symbol.for("react.suspense"),dz=Symbol.for("react.memo"),pz=Symbol.for("react.lazy"),fh=Symbol.iterator;function uz(a){return a===null||typeof a!="object"?null:(a=fh&&a[fh]||a["@@iterator"],typeof a=="function"?a:null)}var gh={isMounted:function(){return!1},enqueueForceUpdate:function(){},enqueueReplaceState:function(){},enqueueSetState:function(){}},Ah=Object.assign,zh={};function M3(a,e,l){this.props=a,this.context=e,this.refs=zh,this.updater=l||gh}M3.prototype.isReactComponent={};M3.prototype.setState=function(a,e){if(typeof a!="object"&&typeof a!="function"&&a!=null)throw Error("setState(...): takes an object of state variables to update or a function which returns an object of state variables.");this.updater.enqueueSetState(this,a,e,"setState")};M3.prototype.forceUpdate=function(a){this.updater.enqueueForceUpdate(this,a,"forceUpdate")};function Ch(){}Ch.prototype=M3.prototype;function ec(a,e,l){this.props=a,this.context=e,this.refs=zh,this.updater=l||gh}var lc=ec.prototype=new Ch;lc.constructor=ec;Ah(lc,M3.prototype);lc.isPureReactComponent=!0;var _h=Array.isArray,xh=Object.prototype.hasOwnProperty,oc={current:null},Hh={key:!0,ref:!0,__self:!0,__source:!0};function Rh(a,e,l){var o,t={},r=null,c=null;if(e!=null)for(o in e.ref!==void 0&&(c=e.ref),e.key!==void 0&&(r=""+e.key),e)xh.call(e,o)&&!Hh.hasOwnProperty(o)&&(t[o]=e[o]);var n=arguments.length-2;if(n===1)t.children=l;else if(1<n){for(var i=Array(n),s=0;s<n;s++)i[s]=arguments[s+2];t.children=i}if(a&&a.defaultProps)for(o in n=a.defaultProps,n)t[o]===void 0&&(t[o]=n[o]);return{$$typeof:O4,type:a,key:r,ref:c,props:t,_owner:oc.current}}function vz(a,e){return{$$typeof:O4,type:a.type,key:e,ref:a.ref,props:a.props,_owner:a._owner}}function tc(a){return typeof a=="object"&&a!==null&&a.$$typeof===O4}function mz(a){var e={"=":"=0",":":"=2"};return"$"+a.replace(/[=:]/g,function(l){return e[l]})}var Mh=/\/+/g;function ac(a,e){return typeof a=="object"&&a!==null&&a.key!=null?mz(""+a.key):e.toString(36)}function wl(a,e,l,o,t){var r=typeof a;(r==="undefined"||r==="boolean")&&(a=null);var c=!1;if(a===null)c=!0;else switch(r){case"string":case"number":c=!0;break;case"object":switch(a.$$typeof){case O4:case oz:c=!0}}if(c)return c=a,t=t(c),a=o===""?"."+ac(c,0):o,_h(t)?(l="",a!=null&&(l=a.replace(Mh,"$&/")+"/"),wl(t,e,l,"",function(s){return s})):t!=null&&(tc(t)&&(t=vz(t,l+(!t.key||c&&c.key===t.key?"":(""+t.key).replace(Mh,"$&/")+"/")+a)),e.push(t)),1;if(c=0,o=o===""?".":o+":",_h(a))for(var n=0;n<a.length;n++){r=a[n];var i=o+ac(r,n);c+=wl(r,e,l,i,t)}else if(i=uz(a),typeof i=="function")for(a=i.call(a),n=0;!(r=a.next()).done;)r=r.value,i=o+ac(r,n++),c+=wl(r,e,l,i,t);else if(r==="object")throw e=String(a),Error("Objects are not valid as a React child (found: "+(e==="[object Object]"?"object with keys {"+Object.keys(a).join(", ")+"}":e)+"). If you meant to render a collection of children, use an array instead.");return c}function yl(a,e,l){if(a==null)return a;var o=[],t=0;return wl(a,o,"","",function(r){return e.call(l,r,t++)}),o}function fz(a){if(a._status===-1){var e=a._result;e=e(),e.then(function(l){(a._status===0||a._status===-1)&&(a._status=1,a._result=l)},function(l){(a._status===0||a._status===-1)&&(a._status=2,a._result=l)}),a._status===-1&&(a._status=0,a._result=e)}if(a._status===1)return a._result.default;throw a._result}var f0={current:null},kl={transition:null},_z={ReactCurrentDispatcher:f0,ReactCurrentBatchConfig:kl,ReactCurrentOwner:oc};function Vh(){throw Error("act(...) is not supported in production builds of React.")}o1.Children={map:yl,forEach:function(a,e,l){yl(a,function(){e.apply(this,arguments)},l)},count:function(a){var e=0;return yl(a,function(){e++}),e},toArray:function(a){return yl(a,function(e){return e})||[]},only:function(a){if(!tc(a))throw Error("React.Children.only expected to receive a single React element child.");return a}};o1.Component=M3;o1.Fragment=tz;o1.Profiler=cz;o1.PureComponent=ec;o1.StrictMode=rz;o1.Suspense=hz;o1.__SECRET_INTERNALS_DO_NOT_USE_OR_YOU_WILL_BE_FIRED=_z;o1.act=Vh;o1.cloneElement=function(a,e,l){if(a==null)throw Error("React.cloneElement(...): The argument must be a React element, but you passed "+a+".");var o=Ah({},a.props),t=a.key,r=a.ref,c=a._owner;if(e!=null){if(e.ref!==void 0&&(r=e.ref,c=oc.current),e.key!==void 0&&(t=""+e.key),a.type&&a.type.defaultProps)var n=a.type.defaultProps;for(i in e)xh.call(e,i)&&!Hh.hasOwnProperty(i)&&(o[i]=e[i]===void 0&&n!==void 0?n[i]:e[i])}var i=arguments.length-2;if(i===1)o.children=l;else if(1<i){n=Array(i);for(var s=0;s<i;s++)n[s]=arguments[s+2];o.children=n}return{$$typeof:O4,type:a.type,key:t,ref:r,props:o,_owner:c}};o1.createContext=function(a){return a={$$typeof:iz,_currentValue:a,_currentValue2:a,_threadCount:0,Provider:null,Consumer:null,_defaultValue:null,_globalName:null},a.Provider={$$typeof:nz,_context:a},a.Consumer=a};o1.createElement=Rh;o1.createFactory=function(a){var e=Rh.bind(null,a);return e.type=a,e};o1.createRef=function(){return{current:null}};o1.forwardRef=function(a){return{$$typeof:sz,render:a}};o1.isValidElement=tc;o1.lazy=function(a){return{$$typeof:pz,_payload:{_status:-1,_result:a},_init:fz}};o1.memo=function(a,e){return{$$typeof:dz,type:a,compare:e===void 0?null:e}};o1.startTransition=function(a){var e=kl.transition;kl.transition={};try{a()}finally{kl.transition=e}};o1.unstable_act=Vh;o1.useCallback=function(a,e){return f0.current.useCallback(a,e)};o1.useContext=function(a){return f0.current.useContext(a)};o1.useDebugValue=function(){};o1.useDeferredValue=function(a){return f0.current.useDeferredValue(a)};o1.useEffect=function(a,e){return f0.current.useEffect(a,e)};o1.useId=function(){return f0.current.useId()};o1.useImperativeHandle=function(a,e,l){return f0.current.useImperativeHandle(a,e,l)};o1.useInsertionEffect=function(a,e){return f0.current.useInsertionEffect(a,e)};o1.useLayoutEffect=function(a,e){return f0.current.useLayoutEffect(a,e)};o1.useMemo=function(a,e){return f0.current.useMemo(a,e)};o1.useReducer=function(a,e,l){return f0.current.useReducer(a,e,l)};o1.useRef=function(a){return f0.current.useRef(a)};o1.useState=function(a){return f0.current.useState(a)};o1.useSyncExternalStore=function(a,e,l){return f0.current.useSyncExternalStore(a,e,l)};o1.useTransition=function(){return f0.current.useTransition()};o1.version="18.3.1"});var q=p5((zb,Fh)=>{"use strict";Fh.exports=qh()});var Oh=p5(f1=>{"use strict";function ic(a,e){var l=a.length;a.push(e);a:for(;0<l;){var o=l-1>>>1,t=a[o];if(0<Tl(t,e))a[o]=e,a[l]=t,l=o;else break a}}function u5(a){return a.length===0?null:a[0]}function Ul(a){if(a.length===0)return null;var e=a[0],l=a.pop();if(l!==e){a[0]=l;a:for(var o=0,t=a.length,r=t>>>1;o<r;){var c=2*(o+1)-1,n=a[c],i=c+1,s=a[i];if(0>Tl(n,l))i<t&&0>Tl(s,n)?(a[o]=s,a[i]=l,o=i):(a[o]=n,a[c]=l,o=c);else if(i<t&&0>Tl(s,l))a[o]=s,a[i]=l,o=i;else break a}}return e}function Tl(a,e){var l=a.sortIndex-e.sortIndex;return l!==0?l:a.id-e.id}typeof performance=="object"&&typeof performance.now=="function"?(bh=performance,f1.unstable_now=function(){return bh.now()}):(rc=Date,Lh=rc.now(),f1.unstable_now=function(){return rc.now()-Lh});var bh,rc,Lh,U5=[],P2=[],Mz=1,$0=null,r0=3,Ol=!1,x7=!1,D4=!1,wh=typeof setTimeout=="function"?setTimeout:null,kh=typeof clearTimeout=="function"?clearTimeout:null,Sh=typeof setImmediate!="undefined"?setImmediate:null;typeof navigator!="undefined"&&navigator.scheduling!==void 0&&navigator.scheduling.isInputPending!==void 0&&navigator.scheduling.isInputPending.bind(navigator.scheduling);function sc(a){for(var e=u5(P2);e!==null;){if(e.callback===null)Ul(P2);else if(e.startTime<=a)Ul(P2),e.sortIndex=e.expirationTime,ic(U5,e);else break;e=u5(P2)}}function hc(a){if(D4=!1,sc(a),!x7)if(u5(U5)!==null)x7=!0,pc(dc);else{var e=u5(P2);e!==null&&uc(hc,e.startTime-a)}}function dc(a,e){x7=!1,D4&&(D4=!1,kh(G4),G4=-1),Ol=!0;var l=r0;try{for(sc(e),$0=u5(U5);$0!==null&&(!($0.expirationTime>e)||a&&!Uh());){var o=$0.callback;if(typeof o=="function"){$0.callback=null,r0=$0.priorityLevel;var t=o($0.expirationTime<=e);e=f1.unstable_now(),typeof t=="function"?$0.callback=t:$0===u5(U5)&&Ul(U5),sc(e)}else Ul(U5);$0=u5(U5)}if($0!==null)var r=!0;else{var c=u5(P2);c!==null&&uc(hc,c.startTime-e),r=!1}return r}finally{$0=null,r0=l,Ol=!1}}var Bl=!1,Pl=null,G4=-1,Th=5,Ph=-1;function Uh(){return!(f1.unstable_now()-Ph<Th)}function cc(){if(Pl!==null){var a=f1.unstable_now();Ph=a;var e=!0;try{e=Pl(!0,a)}finally{e?B4():(Bl=!1,Pl=null)}}else Bl=!1}var B4;typeof Sh=="function"?B4=function(){Sh(cc)}:typeof MessageChannel!="undefined"?(nc=new MessageChannel,yh=nc.port2,nc.port1.onmessage=cc,B4=function(){yh.postMessage(null)}):B4=function(){wh(cc,0)};var nc,yh;function pc(a){Pl=a,Bl||(Bl=!0,B4())}function uc(a,e){G4=wh(function(){a(f1.unstable_now())},e)}f1.unstable_IdlePriority=5;f1.unstable_ImmediatePriority=1;f1.unstable_LowPriority=4;f1.unstable_NormalPriority=3;f1.unstable_Profiling=null;f1.unstable_UserBlockingPriority=2;f1.unstable_cancelCallback=function(a){a.callback=null};f1.unstable_continueExecution=function(){x7||Ol||(x7=!0,pc(dc))};f1.unstable_forceFrameRate=function(a){0>a||125<a?console.error("forceFrameRate takes a positive int between 0 and 125, forcing frame rates higher than 125 fps is not supported"):Th=0<a?Math.floor(1e3/a):5};f1.unstable_getCurrentPriorityLevel=function(){return r0};f1.unstable_getFirstCallbackNode=function(){return u5(U5)};f1.unstable_next=function(a){switch(r0){case 1:case 2:case 3:var e=3;break;default:e=r0}var l=r0;r0=e;try{return a()}finally{r0=l}};f1.unstable_pauseExecution=function(){};f1.unstable_requestPaint=function(){};f1.unstable_runWithPriority=function(a,e){switch(a){case 1:case 2:case 3:case 4:case 5:break;default:a=3}var l=r0;r0=a;try{return e()}finally{r0=l}};f1.unstable_scheduleCallback=function(a,e,l){var o=f1.unstable_now();switch(typeof l=="object"&&l!==null?(l=l.delay,l=typeof l=="number"&&0<l?o+l:o):l=o,a){case 1:var t=-1;break;case 2:t=250;break;case 5:t=1073741823;break;case 4:t=1e4;break;default:t=5e3}return t=l+t,a={id:Mz++,callback:e,priorityLevel:a,startTime:l,expirationTime:t,sortIndex:-1},l>o?(a.sortIndex=l,ic(P2,a),u5(U5)===null&&a===u5(P2)&&(D4?(kh(G4),G4=-1):D4=!0,uc(hc,l-o))):(a.sortIndex=t,ic(U5,a),x7||Ol||(x7=!0,pc(dc))),a};f1.unstable_shouldYield=Uh;f1.unstable_wrapCallback=function(a){var e=r0;return function(){var l=r0;r0=e;try{return a.apply(this,arguments)}finally{r0=l}}}});var Dh=p5((xb,Bh)=>{"use strict";Bh.exports=Oh()});var Nu=p5(D0=>{"use strict";var gz=q(),O0=Dh();function P(a){for(var e="https://reactjs.org/docs/error-decoder.html?invariant="+a,l=1;l<arguments.length;l++)e+="&args[]="+encodeURIComponent(arguments[l]);return"Minified React error #"+a+"; visit "+e+" for the full message or use the non-minified dev environment for full errors and additional helpful warnings."}var Qd=new Set,sa={};function P7(a,e){B3(a,e),B3(a+"Capture",e)}function B3(a,e){for(sa[a]=e,a=0;a<e.length;a++)Qd.add(e[a])}var h2=!(typeof window=="undefined"||typeof window.document=="undefined"||typeof window.document.createElement=="undefined"),Pc=Object.prototype.hasOwnProperty,Az=/^[:A-Z_a-z\u00C0-\u00D6\u00D8-\u00F6\u00F8-\u02FF\u0370-\u037D\u037F-\u1FFF\u200C-\u200D\u2070-\u218F\u2C00-\u2FEF\u3001-\uD7FF\uF900-\uFDCF\uFDF0-\uFFFD][:A-Z_a-z\u00C0-\u00D6\u00D8-\u00F6\u00F8-\u02FF\u0370-\u037D\u037F-\u1FFF\u200C-\u200D\u2070-\u218F\u2C00-\u2FEF\u3001-\uD7FF\uF900-\uFDCF\uFDF0-\uFFFD\-.0-9\u00B7\u0300-\u036F\u203F-\u2040]*$/,Gh={},Eh={};function zz(a){return Pc.call(Eh,a)?!0:Pc.call(Gh,a)?!1:Az.test(a)?Eh[a]=!0:(Gh[a]=!0,!1)}function Cz(a,e,l,o){if(l!==null&&l.type===0)return!1;switch(typeof e){case"function":case"symbol":return!0;case"boolean":return o?!1:l!==null?!l.acceptsBooleans:(a=a.toLowerCase().slice(0,5),a!=="data-"&&a!=="aria-");default:return!1}}function xz(a,e,l,o){if(e===null||typeof e=="undefined"||Cz(a,e,l,o))return!0;if(o)return!1;if(l!==null)switch(l.type){case 3:return!e;case 4:return e===!1;case 5:return isNaN(e);case 6:return isNaN(e)||1>e}return!1}function g0(a,e,l,o,t,r,c){this.acceptsBooleans=e===2||e===3||e===4,this.attributeName=o,this.attributeNamespace=t,this.mustUseProperty=l,this.propertyName=a,this.type=e,this.sanitizeURL=r,this.removeEmptyString=c}var l0={};"children dangerouslySetInnerHTML defaultValue defaultChecked innerHTML suppressContentEditableWarning suppressHydrationWarning style".split(" ").forEach(function(a){l0[a]=new g0(a,0,!1,a,null,!1,!1)});[["acceptCharset","accept-charset"],["className","class"],["htmlFor","for"],["httpEquiv","http-equiv"]].forEach(function(a){var e=a[0];l0[e]=new g0(e,1,!1,a[1],null,!1,!1)});["contentEditable","draggable","spellCheck","value"].forEach(function(a){l0[a]=new g0(a,2,!1,a.toLowerCase(),null,!1,!1)});["autoReverse","externalResourcesRequired","focusable","preserveAlpha"].forEach(function(a){l0[a]=new g0(a,2,!1,a,null,!1,!1)});"allowFullScreen async autoFocus autoPlay controls default defer disabled disablePictureInPicture disableRemotePlayback formNoValidate hidden loop noModule noValidate open playsInline readOnly required reversed scoped seamless itemScope".split(" ").forEach(function(a){l0[a]=new g0(a,3,!1,a.toLowerCase(),null,!1,!1)});["checked","multiple","muted","selected"].forEach(function(a){l0[a]=new g0(a,3,!0,a,null,!1,!1)});["capture","download"].forEach(function(a){l0[a]=new g0(a,4,!1,a,null,!1,!1)});["cols","rows","size","span"].forEach(function(a){l0[a]=new g0(a,6,!1,a,null,!1,!1)});["rowSpan","start"].forEach(function(a){l0[a]=new g0(a,5,!1,a.toLowerCase(),null,!1,!1)});var F9=/[\-:]([a-z])/g;function b9(a){return a[1].toUpperCase()}"accent-height alignment-baseline arabic-form baseline-shift cap-height clip-path clip-rule color-interpolation color-interpolation-filters color-profile color-rendering dominant-baseline enable-background fill-opacity fill-rule flood-color flood-opacity font-family font-size font-size-adjust font-stretch font-style font-variant font-weight glyph-name glyph-orientation-horizontal glyph-orientation-vertical horiz-adv-x horiz-origin-x image-rendering letter-spacing lighting-color marker-end marker-mid marker-start overline-position overline-thickness paint-order panose-1 pointer-events rendering-intent shape-rendering stop-color stop-opacity strikethrough-position strikethrough-thickness stroke-dasharray stroke-dashoffset stroke-linecap stroke-linejoin stroke-miterlimit stroke-opacity stroke-width text-anchor text-decoration text-rendering underline-position underline-thickness unicode-bidi unicode-range units-per-em v-alphabetic v-hanging v-ideographic v-mathematical vector-effect vert-adv-y vert-origin-x vert-origin-y word-spacing writing-mode xmlns:xlink x-height".split(" ").forEach(function(a){var e=a.replace(F9,b9);l0[e]=new g0(e,1,!1,a,null,!1,!1)});"xlink:actuate xlink:arcrole xlink:role xlink:show xlink:title xlink:type".split(" ").forEach(function(a){var e=a.replace(F9,b9);l0[e]=new g0(e,1,!1,a,"http://www.w3.org/1999/xlink",!1,!1)});["xml:base","xml:lang","xml:space"].forEach(function(a){var e=a.replace(F9,b9);l0[e]=new g0(e,1,!1,a,"http://www.w3.org/XML/1998/namespace",!1,!1)});["tabIndex","crossOrigin"].forEach(function(a){l0[a]=new g0(a,1,!1,a.toLowerCase(),null,!1,!1)});l0.xlinkHref=new g0("xlinkHref",1,!1,"xlink:href","http://www.w3.org/1999/xlink",!0,!1);["src","href","action","formAction"].forEach(function(a){l0[a]=new g0(a,1,!1,a.toLowerCase(),null,!0,!0)});function L9(a,e,l,o){var t=l0.hasOwnProperty(e)?l0[e]:null;(t!==null?t.type!==0:o||!(2<e.length)||e[0]!=="o"&&e[0]!=="O"||e[1]!=="n"&&e[1]!=="N")&&(xz(e,l,t,o)&&(l=null),o||t===null?zz(e)&&(l===null?a.removeAttribute(e):a.setAttribute(e,""+l)):t.mustUseProperty?a[t.propertyName]=l===null?t.type===3?!1:"":l:(e=t.attributeName,o=t.attributeNamespace,l===null?a.removeAttribute(e):(t=t.type,l=t===3||t===4&&l===!0?"":""+l,o?a.setAttributeNS(o,e,l):a.setAttribute(e,l))))}var v2=gz.__SECRET_INTERNALS_DO_NOT_USE_OR_YOU_WILL_BE_FIRED,Dl=Symbol.for("react.element"),z3=Symbol.for("react.portal"),C3=Symbol.for("react.fragment"),S9=Symbol.for("react.strict_mode"),Uc=Symbol.for("react.profiler"),$d=Symbol.for("react.provider"),Kd=Symbol.for("react.context"),y9=Symbol.for("react.forward_ref"),Oc=Symbol.for("react.suspense"),Bc=Symbol.for("react.suspense_list"),w9=Symbol.for("react.memo"),O2=Symbol.for("react.lazy"),Xd=Symbol.for("react.offscreen"),Ih=Symbol.iterator;function E4(a){return a===null||typeof a!="object"?null:(a=Ih&&a[Ih]||a["@@iterator"],typeof a=="function"?a:null)}var q1=Object.assign,vc;function X4(a){if(vc===void 0)try{throw Error()}catch(l){var e=l.stack.trim().match(/\n( *(at )?)/);vc=e&&e[1]||""}return`
 `+vc+a}var mc=!1;function fc(a,e){if(!a||mc)return"";mc=!0;var l=Error.prepareStackTrace;Error.prepareStackTrace=void 0;try{if(e)if(e=function(){throw Error()},Object.defineProperty(e.prototype,"props",{set:function(){throw Error()}}),typeof Reflect=="object"&&Reflect.construct){try{Reflect.construct(e,[])}catch(s){var o=s}Reflect.construct(a,[],e)}else{try{e.call()}catch(s){o=s}a.call(e.prototype)}else{try{throw Error()}catch(s){o=s}a()}}catch(s){if(s&&o&&typeof s.stack=="string"){for(var t=s.stack.split(`
 `),r=o.stack.split(`
@@ -139,4 +139,673 @@ keyborg/dist/index.js:
   * Copyright (c) Microsoft Corporation. All rights reserved.
   * Licensed under the MIT License.
   *)
+*/
+/*! Third-party notices
+# Third-party notices
+
+The web resources bundle the open-source packages below. Each package is used under its own license; the copyright notices and license texts follow the package list.
+This file is generated by `node scripts/generate-notices.mjs`.
+
+## Summary
+
+- 0BSD: 1
+- Apache-2.0: 1
+- MIT: 95
+
+## Packages
+
+| Package | License |
+|---------|---------|
+| @babel/runtime@7.29.10 | MIT |
+| @emotion/hash@0.9.2 | MIT |
+| @floating-ui/core@1.8.0 | MIT |
+| @floating-ui/devtools@0.2.3 | MIT |
+| @floating-ui/dom@1.8.0 | MIT |
+| @floating-ui/utils@0.2.12 | MIT |
+| @fluentui/keyboard-keys@9.0.9 | MIT |
+| @fluentui/priority-overflow@9.4.3 | MIT |
+| @fluentui/react-accordion@9.12.4 | MIT |
+| @fluentui/react-alert@9.0.2-beta.1 | MIT |
+| @fluentui/react-aria@9.17.15 | MIT |
+| @fluentui/react-avatar@9.11.8 | MIT |
+| @fluentui/react-badge@9.5.6 | MIT |
+| @fluentui/react-breadcrumb@9.4.6 | MIT |
+| @fluentui/react-button@9.11.1 | MIT |
+| @fluentui/react-card@9.7.3 | MIT |
+| @fluentui/react-carousel@9.9.14 | MIT |
+| @fluentui/react-checkbox@9.6.5 | MIT |
+| @fluentui/react-color-picker@9.3.1 | MIT |
+| @fluentui/react-combobox@9.17.7 | MIT |
+| @fluentui/react-components@9.74.9 | MIT |
+| @fluentui/react-context-selector@9.2.20 | MIT |
+| @fluentui/react-dialog@9.18.5 | MIT |
+| @fluentui/react-divider@9.7.5 | MIT |
+| @fluentui/react-drawer@9.13.4 | MIT |
+| @fluentui/react-field@9.5.5 | MIT |
+| @fluentui/react-icons@2.0.344 | MIT |
+| @fluentui/react-image@9.4.5 | MIT |
+| @fluentui/react-infobutton@9.0.1-beta.1 | MIT |
+| @fluentui/react-infolabel@9.4.27 | MIT |
+| @fluentui/react-input@9.8.7 | MIT |
+| @fluentui/react-jsx-runtime@9.4.6 | MIT |
+| @fluentui/react-label@9.4.5 | MIT |
+| @fluentui/react-link@9.8.5 | MIT |
+| @fluentui/react-list@9.6.19 | MIT |
+| @fluentui/react-menu@9.25.6 | MIT |
+| @fluentui/react-message-bar@9.7.7 | MIT |
+| @fluentui/react-motion-components-preview@0.15.9 | MIT |
+| @fluentui/react-motion@9.16.4 | MIT |
+| @fluentui/react-nav@9.4.7 | MIT |
+| @fluentui/react-overflow@9.9.4 | MIT |
+| @fluentui/react-persona@9.7.10 | MIT |
+| @fluentui/react-popover@9.14.9 | MIT |
+| @fluentui/react-portal@9.8.16 | MIT |
+| @fluentui/react-positioning@9.23.3 | MIT |
+| @fluentui/react-progress@9.5.6 | MIT |
+| @fluentui/react-provider@9.22.21 | MIT |
+| @fluentui/react-radio@9.6.6 | MIT |
+| @fluentui/react-rating@9.4.6 | MIT |
+| @fluentui/react-search@9.4.7 | MIT |
+| @fluentui/react-select@9.5.6 | MIT |
+| @fluentui/react-shared-contexts@9.26.4 | MIT |
+| @fluentui/react-skeleton@9.7.6 | MIT |
+| @fluentui/react-slider@9.6.6 | MIT |
+| @fluentui/react-spinbutton@9.6.7 | MIT |
+| @fluentui/react-spinner@9.8.6 | MIT |
+| @fluentui/react-swatch-picker@9.6.2 | MIT |
+| @fluentui/react-switch@9.7.6 | MIT |
+| @fluentui/react-table@9.19.22 | MIT |
+| @fluentui/react-tabs@9.12.5 | MIT |
+| @fluentui/react-tabster@9.26.18 | MIT |
+| @fluentui/react-tag-picker@9.10.5 | MIT |
+| @fluentui/react-tags@9.9.7 | MIT |
+| @fluentui/react-teaching-popover@9.7.7 | MIT |
+| @fluentui/react-text@9.6.20 | MIT |
+| @fluentui/react-textarea@9.7.7 | MIT |
+| @fluentui/react-theme@9.2.2 | MIT |
+| @fluentui/react-toast@9.8.4 | MIT |
+| @fluentui/react-toolbar@9.8.5 | MIT |
+| @fluentui/react-tooltip@9.10.7 | MIT |
+| @fluentui/react-tree@9.16.8 | MIT |
+| @fluentui/react-utilities@9.26.7 | MIT |
+| @fluentui/react-virtualizer@9.0.0-alpha.116 | MIT |
+| @fluentui/tokens@1.0.0-alpha.24 | MIT |
+| @griffel/core@1.21.4 | MIT |
+| @griffel/react@1.7.8 | MIT |
+| @griffel/style-types@1.4.3 | MIT |
+| @swc/helpers@0.5.23 | Apache-2.0 |
+| @types/prop-types@15.7.15 | MIT |
+| @types/react@18.3.31 | MIT |
+| csstype@3.2.3 | MIT |
+| embla-carousel-autoplay@8.6.0 | MIT |
+| embla-carousel-fade@8.6.0 | MIT |
+| embla-carousel@8.6.0 | MIT |
+| js-tokens@4.0.0 | MIT |
+| keyborg@2.14.1 | MIT |
+| keyborg@3.498.0 | MIT |
+| loose-envify@1.4.0 | MIT |
+| react-dom@18.3.1 | MIT |
+| react@18.3.1 | MIT |
+| rtl-css-js@1.16.1 | MIT |
+| scheduler@0.23.2 | MIT |
+| scheduler@0.28.0 | MIT |
+| stylis@4.4.0 | MIT |
+| tabster@8.8.1 | MIT |
+| tslib@2.8.1 | 0BSD |
+| use-sync-external-store@1.7.0 | MIT |
+
+## License texts
+
+### MIT: @fluentui/keyboard-keys@9.0.9, @fluentui/priority-overflow@9.4.3, @fluentui/react-accordion@9.12.4, @fluentui/react-alert@9.0.2-beta.1, @fluentui/react-aria@9.17.15, @fluentui/react-avatar@9.11.8, @fluentui/react-badge@9.5.6, @fluentui/react-breadcrumb@9.4.6, @fluentui/react-button@9.11.1, @fluentui/react-card@9.7.3, @fluentui/react-carousel@9.9.14, @fluentui/react-checkbox@9.6.5, @fluentui/react-color-picker@9.3.1, @fluentui/react-combobox@9.17.7, @fluentui/react-components@9.74.9, @fluentui/react-context-selector@9.2.20, @fluentui/react-dialog@9.18.5, @fluentui/react-divider@9.7.5, @fluentui/react-drawer@9.13.4, @fluentui/react-field@9.5.5, @fluentui/react-icons@2.0.344, @fluentui/react-image@9.4.5, @fluentui/react-infobutton@9.0.1-beta.1, @fluentui/react-infolabel@9.4.27, @fluentui/react-input@9.8.7, @fluentui/react-jsx-runtime@9.4.6, @fluentui/react-label@9.4.5, @fluentui/react-link@9.8.5, @fluentui/react-list@9.6.19, @fluentui/react-menu@9.25.6, @fluentui/react-message-bar@9.7.7, @fluentui/react-motion-components-preview@0.15.9, @fluentui/react-motion@9.16.4, @fluentui/react-nav@9.4.7, @fluentui/react-overflow@9.9.4, @fluentui/react-persona@9.7.10, @fluentui/react-popover@9.14.9, @fluentui/react-portal@9.8.16, @fluentui/react-positioning@9.23.3, @fluentui/react-progress@9.5.6, @fluentui/react-provider@9.22.21, @fluentui/react-radio@9.6.6, @fluentui/react-rating@9.4.6, @fluentui/react-search@9.4.7, @fluentui/react-select@9.5.6, @fluentui/react-shared-contexts@9.26.4, @fluentui/react-skeleton@9.7.6, @fluentui/react-slider@9.6.6, @fluentui/react-spinbutton@9.6.7, @fluentui/react-spinner@9.8.6, @fluentui/react-swatch-picker@9.6.2, @fluentui/react-switch@9.7.6, @fluentui/react-table@9.19.22, @fluentui/react-tabs@9.12.5, @fluentui/react-tabster@9.26.18, @fluentui/react-tag-picker@9.10.5, @fluentui/react-tags@9.9.7, @fluentui/react-teaching-popover@9.7.7, @fluentui/react-text@9.6.20, @fluentui/react-textarea@9.7.7, @fluentui/react-theme@9.2.2, @fluentui/react-toast@9.8.4, @fluentui/react-toolbar@9.8.5, @fluentui/react-tooltip@9.10.7, @fluentui/react-tree@9.16.8, @fluentui/react-utilities@9.26.7, @fluentui/react-virtualizer@9.0.0-alpha.116, @fluentui/tokens@1.0.0-alpha.24
+
+```text
+@fluentui/keyboard-keys
+
+Copyright (c) Microsoft Corporation
+
+All rights reserved.
+
+MIT License
+
+Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files (the ""Software""), to deal in the Software without restriction, including without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of the Software, and to permit persons to whom the Software is furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED *AS IS*, WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+
+Note: Usage of the fonts and icons referenced in Fluent UI React is subject to the terms listed at https://aka.ms/fluentui-assets-license
+```
+
+### MIT: @griffel/core@1.21.4, @griffel/react@1.7.8, @griffel/style-types@1.4.3, @types/prop-types@15.7.15, @types/react@18.3.31, keyborg@2.14.1, keyborg@3.498.0, tabster@8.8.1
+
+```text
+MIT License
+
+    Copyright (c) Microsoft Corporation.
+
+    Permission is hereby granted, free of charge, to any person obtaining a copy
+    of this software and associated documentation files (the "Software"), to deal
+    in the Software without restriction, including without limitation the rights
+    to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+    copies of the Software, and to permit persons to whom the Software is
+    furnished to do so, subject to the following conditions:
+
+    The above copyright notice and this permission notice shall be included in all
+    copies or substantial portions of the Software.
+
+    THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+    IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+    FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+    AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+    LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+    OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+    SOFTWARE
+```
+
+### MIT: @floating-ui/core@1.8.0, @floating-ui/devtools@0.2.3, @floating-ui/dom@1.8.0, @floating-ui/utils@0.2.12
+
+```text
+MIT License
+
+Copyright (c) 2021-present Floating UI contributors
+
+Permission is hereby granted, free of charge, to any person obtaining a copy of
+this software and associated documentation files (the "Software"), to deal in
+the Software without restriction, including without limitation the rights to
+use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of
+the Software, and to permit persons to whom the Software is furnished to do so,
+subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in all
+copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS
+FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR
+COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER
+IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
+CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+```
+
+### MIT: embla-carousel-autoplay@8.6.0, embla-carousel-fade@8.6.0, embla-carousel@8.6.0
+
+```text
+MIT License
+
+Copyright (c) David Jerleke
+
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in all
+copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+SOFTWARE.
+```
+
+### MIT: react-dom@18.3.1, react@18.3.1, scheduler@0.23.2
+
+```text
+MIT License
+
+Copyright (c) Facebook, Inc. and its affiliates.
+
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in all
+copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+SOFTWARE.
+```
+
+### MIT: scheduler@0.28.0, use-sync-external-store@1.7.0
+
+```text
+MIT License
+
+Copyright (c) Meta Platforms, Inc. and affiliates.
+
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in all
+copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+SOFTWARE.
+```
+
+### MIT: @babel/runtime@7.29.10
+
+```text
+MIT License
+
+Copyright (c) 2014-present Sebastian McKenzie and other contributors
+
+Permission is hereby granted, free of charge, to any person obtaining
+a copy of this software and associated documentation files (the
+"Software"), to deal in the Software without restriction, including
+without limitation the rights to use, copy, modify, merge, publish,
+distribute, sublicense, and/or sell copies of the Software, and to
+permit persons to whom the Software is furnished to do so, subject to
+the following conditions:
+
+The above copyright notice and this permission notice shall be
+included in all copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
+EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
+MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
+NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE
+LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION
+OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
+WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+```
+
+### MIT: @emotion/hash@0.9.2
+
+```text
+MIT License
+
+Copyright (c) Emotion team and other contributors
+
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in all
+copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+SOFTWARE.
+```
+
+### Apache-2.0: @swc/helpers@0.5.23
+
+```text
+Apache License
+                        Version 2.0, January 2004
+                     http://www.apache.org/licenses/
+
+TERMS AND CONDITIONS FOR USE, REPRODUCTION, AND DISTRIBUTION
+
+1. Definitions.
+
+   "License" shall mean the terms and conditions for use, reproduction,
+   and distribution as defined by Sections 1 through 9 of this document.
+
+   "Licensor" shall mean the copyright owner or entity authorized by
+   the copyright owner that is granting the License.
+
+   "Legal Entity" shall mean the union of the acting entity and all
+   other entities that control, are controlled by, or are under common
+   control with that entity. For the purposes of this definition,
+   "control" means (i) the power, direct or indirect, to cause the
+   direction or management of such entity, whether by contract or
+   otherwise, or (ii) ownership of fifty percent (50%) or more of the
+   outstanding shares, or (iii) beneficial ownership of such entity.
+
+   "You" (or "Your") shall mean an individual or Legal Entity
+   exercising permissions granted by this License.
+
+   "Source" form shall mean the preferred form for making modifications,
+   including but not limited to software source code, documentation
+   source, and configuration files.
+
+   "Object" form shall mean any form resulting from mechanical
+   transformation or translation of a Source form, including but
+   not limited to compiled object code, generated documentation,
+   and conversions to other media types.
+
+   "Work" shall mean the work of authorship, whether in Source or
+   Object form, made available under the License, as indicated by a
+   copyright notice that is included in or attached to the work
+   (an example is provided in the Appendix below).
+
+   "Derivative Works" shall mean any work, whether in Source or Object
+   form, that is based on (or derived from) the Work and for which the
+   editorial revisions, annotations, elaborations, or other modifications
+   represent, as a whole, an original work of authorship. For the purposes
+   of this License, Derivative Works shall not include works that remain
+   separable from, or merely link (or bind by name) to the interfaces of,
+   the Work and Derivative Works thereof.
+
+   "Contribution" shall mean any work of authorship, including
+   the original version of the Work and any modifications or additions
+   to that Work or Derivative Works thereof, that is intentionally
+   submitted to Licensor for inclusion in the Work by the copyright owner
+   or by an individual or Legal Entity authorized to submit on behalf of
+   the copyright owner. For the purposes of this definition, "submitted"
+   means any form of electronic, verbal, or written communication sent
+   to the Licensor or its representatives, including but not limited to
+   communication on electronic mailing lists, source code control systems,
+   and issue tracking systems that are managed by, or on behalf of, the
+   Licensor for the purpose of discussing and improving the Work, but
+   excluding communication that is conspicuously marked or otherwise
+   designated in writing by the copyright owner as "Not a Contribution."
+
+   "Contributor" shall mean Licensor and any individual or Legal Entity
+   on behalf of whom a Contribution has been received by Licensor and
+   subsequently incorporated within the Work.
+
+2. Grant of Copyright License. Subject to the terms and conditions of
+   this License, each Contributor hereby grants to You a perpetual,
+   worldwide, non-exclusive, no-charge, royalty-free, irrevocable
+   copyright license to reproduce, prepare Derivative Works of,
+   publicly display, publicly perform, sublicense, and distribute the
+   Work and such Derivative Works in Source or Object form.
+
+3. Grant of Patent License. Subject to the terms and conditions of
+   this License, each Contributor hereby grants to You a perpetual,
+   worldwide, non-exclusive, no-charge, royalty-free, irrevocable
+   (except as stated in this section) patent license to make, have made,
+   use, offer to sell, sell, import, and otherwise transfer the Work,
+   where such license applies only to those patent claims licensable
+   by such Contributor that are necessarily infringed by their
+   Contribution(s) alone or by combination of their Contribution(s)
+   with the Work to which such Contribution(s) was submitted. If You
+   institute patent litigation against any entity (including a
+   cross-claim or counterclaim in a lawsuit) alleging that the Work
+   or a Contribution incorporated within the Work constitutes direct
+   or contributory patent infringement, then any patent licenses
+   granted to You under this License for that Work shall terminate
+   as of the date such litigation is filed.
+
+4. Redistribution. You may reproduce and distribute copies of the
+   Work or Derivative Works thereof in any medium, with or without
+   modifications, and in Source or Object form, provided that You
+   meet the following conditions:
+
+   (a) You must give any other recipients of the Work or
+       Derivative Works a copy of this License; and
+
+   (b) You must cause any modified files to carry prominent notices
+       stating that You changed the files; and
+
+   (c) You must retain, in the Source form of any Derivative Works
+       that You distribute, all copyright, patent, trademark, and
+       attribution notices from the Source form of the Work,
+       excluding those notices that do not pertain to any part of
+       the Derivative Works; and
+
+   (d) If the Work includes a "NOTICE" text file as part of its
+       distribution, then any Derivative Works that You distribute must
+       include a readable copy of the attribution notices contained
+       within such NOTICE file, excluding those notices that do not
+       pertain to any part of the Derivative Works, in at least one
+       of the following places: within a NOTICE text file distributed
+       as part of the Derivative Works; within the Source form or
+       documentation, if provided along with the Derivative Works; or,
+       within a display generated by the Derivative Works, if and
+       wherever such third-party notices normally appear. The contents
+       of the NOTICE file are for informational purposes only and
+       do not modify the License. You may add Your own attribution
+       notices within Derivative Works that You distribute, alongside
+       or as an addendum to the NOTICE text from the Work, provided
+       that such additional attribution notices cannot be construed
+       as modifying the License.
+
+   You may add Your own copyright statement to Your modifications and
+   may provide additional or different license terms and conditions
+   for use, reproduction, or distribution of Your modifications, or
+   for any such Derivative Works as a whole, provided Your use,
+   reproduction, and distribution of the Work otherwise complies with
+   the conditions stated in this License.
+
+5. Submission of Contributions. Unless You explicitly state otherwise,
+   any Contribution intentionally submitted for inclusion in the Work
+   by You to the Licensor shall be under the terms and conditions of
+   this License, without any additional terms or conditions.
+   Notwithstanding the above, nothing herein shall supersede or modify
+   the terms of any separate license agreement you may have executed
+   with Licensor regarding such Contributions.
+
+6. Trademarks. This License does not grant permission to use the trade
+   names, trademarks, service marks, or product names of the Licensor,
+   except as required for reasonable and customary use in describing the
+   origin of the Work and reproducing the content of the NOTICE file.
+
+7. Disclaimer of Warranty. Unless required by applicable law or
+   agreed to in writing, Licensor provides the Work (and each
+   Contributor provides its Contributions) on an "AS IS" BASIS,
+   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or
+   implied, including, without limitation, any warranties or conditions
+   of TITLE, NON-INFRINGEMENT, MERCHANTABILITY, or FITNESS FOR A
+   PARTICULAR PURPOSE. You are solely responsible for determining the
+   appropriateness of using or redistributing the Work and assume any
+   risks associated with Your exercise of permissions under this License.
+
+8. Limitation of Liability. In no event and under no legal theory,
+   whether in tort (including negligence), contract, or otherwise,
+   unless required by applicable law (such as deliberate and grossly
+   negligent acts) or agreed to in writing, shall any Contributor be
+   liable to You for damages, including any direct, indirect, special,
+   incidental, or consequential damages of any character arising as a
+   result of this License or out of the use or inability to use the
+   Work (including but not limited to damages for loss of goodwill,
+   work stoppage, computer failure or malfunction, or any and all
+   other commercial damages or losses), even if such Contributor
+   has been advised of the possibility of such damages.
+
+9. Accepting Warranty or Additional Liability. While redistributing
+   the Work or Derivative Works thereof, You may choose to offer,
+   and charge a fee for, acceptance of support, warranty, indemnity,
+   or other liability obligations and/or rights consistent with this
+   License. However, in accepting such obligations, You may act only
+   on Your own behalf and on Your sole responsibility, not on behalf
+   of any other Contributor, and only if You agree to indemnify,
+   defend, and hold each Contributor harmless for any liability
+   incurred by, or claims asserted against, such Contributor by reason
+   of your accepting any such warranty or additional liability.
+
+END OF TERMS AND CONDITIONS
+
+APPENDIX: How to apply the Apache License to your work.
+
+   To apply the Apache License to your work, attach the following
+   boilerplate notice, with the fields enclosed by brackets "[]"
+   replaced with your own identifying information. (Don't include
+   the brackets!)  The text should be enclosed in the appropriate
+   comment syntax for the file format. We also recommend that a
+   file or class name and description of purpose be included on the
+   same "printed page" as the copyright notice for easier
+   identification within third-party archives.
+
+Copyright 2024 SWC contributors.
+
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+
+	http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
+```
+
+### MIT: csstype@3.2.3
+
+```text
+Copyright (c) 2017-2018 Fredrik Nicol
+
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in all
+copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+SOFTWARE.
+```
+
+### MIT: js-tokens@4.0.0
+
+```text
+The MIT License (MIT)
+
+Copyright (c) 2014, 2015, 2016, 2017, 2018 Simon Lydell
+
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in
+all copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+THE SOFTWARE.
+```
+
+### MIT: loose-envify@1.4.0
+
+```text
+The MIT License (MIT)
+
+Copyright (c) 2015 Andres Suarez <zertosh@gmail.com>
+
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in
+all copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+THE SOFTWARE.
+```
+
+### MIT: rtl-css-js@1.16.1
+
+```text
+The MIT License (MIT)
+Copyright (c) 2017 Kent C. Dodds
+
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in all
+copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+SOFTWARE.
+```
+
+### MIT: stylis@4.4.0
+
+```text
+MIT License
+
+Copyright (c) 2016-present Sultan Tarimo
+
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in all
+copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+SOFTWARE.
+```
+
+### 0BSD: tslib@2.8.1
+
+```text
+Copyright (c) Microsoft Corporation.
+
+Permission to use, copy, modify, and/or distribute this software for any
+purpose with or without fee is hereby granted.
+
+THE SOFTWARE IS PROVIDED "AS IS" AND THE AUTHOR DISCLAIMS ALL WARRANTIES WITH
+REGARD TO THIS SOFTWARE INCLUDING ALL IMPLIED WARRANTIES OF MERCHANTABILITY
+AND FITNESS. IN NO EVENT SHALL THE AUTHOR BE LIABLE FOR ANY SPECIAL, DIRECT,
+INDIRECT, OR CONSEQUENTIAL DAMAGES OR ANY DAMAGES WHATSOEVER RESULTING FROM
+LOSS OF USE, DATA OR PROFITS, WHETHER IN AN ACTION OF CONTRACT, NEGLIGENCE OR
+OTHER TORTIOUS ACTION, ARISING OUT OF OR IN CONNECTION WITH THE USE OR
+PERFORMANCE OF THIS SOFTWARE.
+```
+
 */
