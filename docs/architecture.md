@@ -26,6 +26,7 @@ Form Update Replay records the column changes a user makes on a model-driven for
 | 7 | The UI follows the Fluent look and feel of the Copilot Service admin center quality screens. |
 | 8 | UI languages: Dutch and English, chosen from the user's language setting. |
 | 9 | Publisher prefix `msftnl_`. License: MIT. |
+| 10 | Computed values use a structured *Calculate* step (JSON in `msftnl_calculation`, evaluated by the pure functions in `calc.ts`) instead of Power Fx: there is no supported way to run Power Fx from a web resource, and a structured step needs no extra runtime or package, validates in the editor and previews safely. |
 
 ## How the pieces fit
 
@@ -41,6 +42,9 @@ Form Update Replay records the column changes a user makes on a model-driven for
 - The side pane belongs to the app, not to a session. A collapsed pane never loads its content, so the command expands it before selecting it.
 - Records in the workspace autosave. Applying a recording to an open record therefore saves it shortly afterwards; the preview step exists for that reason.
 - Lookup values on forms often have no display name; the name is looked up when the recording is stopped.
+
+- Calculations are evaluated in the user's browser time zone. A working-day step moves by calendar day, so the time of day survives a daylight saving change, and weekends are skipped without holiday calendars.
+- A Calculate step stores only the calculation (no value). Replaying it reads other columns from the open form, so a column the target form does not have is reported as a reason instead of guessed.
 
 ## Known limitations
 

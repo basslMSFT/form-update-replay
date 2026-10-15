@@ -1,9 +1,11 @@
 /** Shared types for recordings and steps. */
 
+import type { CalcSpec } from "./calc";
+
 export const SCHEMA_VERSION = 1;
 
 export type Operation = "set" | "clear";
-export type ValueMode = "fixed" | "copy" | "prompt";
+export type ValueMode = "fixed" | "copy" | "prompt" | "calculate";
 
 export interface StoredLookup {
   entityType: string;
@@ -24,6 +26,8 @@ export interface Step {
   value?: StoredValue;
   sourceColumn?: string;
   promptText?: string;
+  /** Only for valueMode "calculate". */
+  calc?: CalcSpec;
 }
 
 export interface Recording {
@@ -37,7 +41,7 @@ export interface Recording {
 /** Option set values used by the Dataverse tables (publisher option value prefix 10000). */
 export const OPTION = {
   operation: { set: 100000000, clear: 100000001 },
-  valueMode: { fixed: 100000000, copy: 100000001, prompt: 100000002 },
+  valueMode: { fixed: 100000000, copy: 100000001, prompt: 100000002, calculate: 100000003 },
 } as const;
 
 export const SUPPORTED_TYPES = [

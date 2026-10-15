@@ -6,11 +6,25 @@ Record the column changes you make on a Dynamics 365 form and replay them on oth
 
 1. Open a record and click **Replay** in the command bar (use the "..." menu if it is not visible). A side pane opens.
 2. Click **Start recording**, change columns on the form, then click **Stop recording**.
-3. Review the changes. For each change choose where the value comes from: the **fixed value** you recorded, **ask when replaying** (you pick or type a value that fits the column, for example a choice list for an option set or a record picker for a lookup), or **copy from column** (only columns of a compatible type are offered). Give the recording a name and save it.
+3. Review the changes. For each change choose where the value comes from: the **fixed value** you recorded, **ask when replaying** (you pick or type a value that fits the column, for example a choice list for an option set or a record picker for a lookup), **copy from column** (only columns of a compatible type are offered), or **calculate** (see below). Give the recording a name and save it.
 4. On another record of the same table, open the pane, choose the recording and click **Preview**. You see what will change and why anything is skipped. **Apply to form** sets the values on the open form; you save the form yourself.
 5. **Manage recordings** opens a dialog with *My recordings*, *Shared by me*, *Shared with me*, *Team recordings* and (for admins) *All recordings*. The grid shows whether a recording is shared and with how many people or teams, for example *Yes (3)*. Open a recording to change the order of its changes, edit them, see who it is shared with and stop sharing. Select one or more rows with the round control to enable the actions: open and rename need exactly one row; share, assign to a team and delete work on several.
 
 Recordings are private to their owner until you share them or assign them to a team.
+
+## Calculate
+
+Choose **Calculate** as the value source to work out the value when the recording is replayed, from the form it is replayed on. No formula language: you pick the options.
+
+| Column type | What you can do |
+|---|---|
+| Date and time, date only | Start from today or now, the current value of the column, another column on the form, or a fixed date. Add or subtract days, weeks, months, years or **working days (Mon-Fri)**. Months are clamped to the end of a shorter month (31 January + 1 month = 28 or 29 February). |
+| Text, multi-line text | **Add after**, **add before** or **replace** the current text, with no separator, a space or a new line. Placeholders: `{{today}}`, `{{now}}`, `{{user}}` and `{{column_name}}` for any other column on the form. |
+| Whole number, decimal, float, currency | Add, subtract, multiply or add a percentage, with a fixed number or another column. Whole-number columns are rounded; decimal and currency columns are rounded to their precision. |
+
+A calculation sees what earlier steps of the same replay set, so a later step can build on an earlier one. The preview shows the calculated value, and a step is skipped with a reason when a column it needs is missing, empty or of the wrong type. Working days count Monday to Friday only; public holidays are not taken into account.
+
+![Calculate steps in the recording editor](docs/images/calculate-editor.png)
 
 ## Screenshots
 

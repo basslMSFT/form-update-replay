@@ -306,6 +306,47 @@
             <Description description="Unieke id van de gemachtigde gebruiker die de record heeft gewijzigd." languagecode="1043" />
           </Descriptions>
         </attribute>
+        <attribute PhysicalName="msftnl_Calculation">
+          <Type>ntext</Type>
+          <Name>msftnl_calculation</Name>
+          <LogicalName>msftnl_calculation</LogicalName>
+          <RequiredLevel>none</RequiredLevel>
+          <DisplayMask>ValidForAdvancedFind|ValidForForm|ValidForGrid</DisplayMask>
+          <ImeMode>auto</ImeMode>
+          <ValidForUpdateApi>1</ValidForUpdateApi>
+          <ValidForReadApi>1</ValidForReadApi>
+          <ValidForCreateApi>1</ValidForCreateApi>
+          <IsCustomField>1</IsCustomField>
+          <IsAuditEnabled>1</IsAuditEnabled>
+          <IsSecured>0</IsSecured>
+          <IntroducedVersion>0.1.0.0</IntroducedVersion>
+          <IsCustomizable>1</IsCustomizable>
+          <IsRenameable>1</IsRenameable>
+          <CanModifySearchSettings>1</CanModifySearchSettings>
+          <CanModifyRequirementLevelSettings>1</CanModifyRequirementLevelSettings>
+          <CanModifyAdditionalSettings>1</CanModifyAdditionalSettings>
+          <SourceType>0</SourceType>
+          <IsGlobalFilterEnabled>0</IsGlobalFilterEnabled>
+          <IsSortableEnabled>0</IsSortableEnabled>
+          <CanModifyGlobalFilterSettings>1</CanModifyGlobalFilterSettings>
+          <CanModifyIsSortableSettings>1</CanModifyIsSortableSettings>
+          <IsDataSourceSecret>0</IsDataSourceSecret>
+          <AutoNumberFormat></AutoNumberFormat>
+          <IsSearchable>0</IsSearchable>
+          <IsFilterable>0</IsFilterable>
+          <IsRetrievable>0</IsRetrievable>
+          <IsLocalizable>0</IsLocalizable>
+          <Format>textarea</Format>
+          <MaxLength>4000</MaxLength>
+          <displaynames>
+            <displayname description="Calculation" languagecode="1033" />
+            <displayname description="Berekening" languagecode="1043" />
+          </displaynames>
+          <Descriptions>
+            <Description description="JSON description of the calculation applied when the value mode is Calculate." languagecode="1033" />
+            <Description description="JSON-beschrijving van de berekening die wordt toegepast bij waardemodus Berekenen." languagecode="1043" />
+          </Descriptions>
+        </attribute>
         <attribute PhysicalName="msftnl_ColumnLogicalName">
           <Type>nvarchar</Type>
           <Name>msftnl_columnlogicalname</Name>
@@ -794,6 +835,12 @@
                 <labels>
                   <label description="Fixed value" languagecode="1033" />
                   <label description="Vaste waarde" languagecode="1043" />
+                </labels>
+              </option>
+              <option value="100000003" IsHidden="0">
+                <labels>
+                  <label description="Calculate" languagecode="1033" />
+                  <label description="Berekenen" languagecode="1043" />
                 </labels>
               </option>
               <option value="100000001" ExternalValue="" IsHidden="0">

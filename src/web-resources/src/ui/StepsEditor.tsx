@@ -3,6 +3,8 @@ import { Button, Field, Input, Select, Text, makeStyles, tokens } from "@fluentu
 import { ArrowDown20Regular, ArrowUp20Regular, Delete20Regular } from "@fluentui/react-icons";
 import { Step, StoredValue } from "../model";
 import { ColumnInfo, copyCandidates } from "../compat";
+import { calcValid, defaultCalc, isCalculable } from "../calc";
+import { CalcEditor } from "./CalcEditor";
 import { describeValue, labelFor } from "../controller";
 import { t } from "../i18n";
 
@@ -26,9 +28,9 @@ interface Props {
   columns?: ColumnInfo[];
 }
 
-/** Every "copy" step needs a source column before the recording can be saved. */
+/** Every "copy" step needs a source column and every "calculate" step a complete calculation before the recording can be saved. */
 export function stepsValid(steps: Step[]): boolean {
-  return steps.length > 0 && steps.every((x) => x.operation === "clear" || x.valueMode !== "copy" || !!x.sourceColumn);
+  return steps.length > 0 && steps.every((x) => x.operation === "clear" || (x.valueMode === "copy" ? !!x.sourceColumn : x.valueMode === "calculate" ? calcValid(x.calc) : true));
 }
 
 /** Editable list of recorded changes, used both when reviewing a new recording and when editing a saved one. */
@@ -78,14 +80,18 @@ export function StepsEditor({ steps, onChange, fc, labels, optionLabels, columns
                     value={step.valueMode}
                     onChange={(_, d) => {
                       const mode = d.value as Step["valueMode"];
-                      update(i, { valueMode: mode, ...(mode === "copy" ? {} : { sourceColumn: undefined }) });
+                      update(i, { valueMode: mode, ...(mode === "copy" ? {} : { sourceColumn: undefined }), ...(mode === "calculate" ? { calc: step.calc ?? defaultCalc(step.columnType) ?? undefined } : {}) });
                     }}
                   >
                     {canFixed ? <option value="fixed">{t("modeFixed")}</option> : null}
                     <option value="prompt">{t("modePrompt")}</option>
                     {canCopy ? <option value="copy">{t("modeCopy")}</option> : null}
+                    {columns !== undefined && isCalculable(step.columnType) ? <option value="calculate">{t("modeCalculate")}</option> : null}
                   </Select>
                 </Field>
+                {step.valueMode === "calculate" && step.calc ? (
+                  <CalcEditor column={step.column} columnType={step.columnType} spec={step.calc} columns={columns ?? []} onChange={(calc) => update(i, { calc })} />
+                ) : null}
                 {step.valueMode === "prompt" ? (
                   <>
                     <Field label={t("promptText")} size="small">

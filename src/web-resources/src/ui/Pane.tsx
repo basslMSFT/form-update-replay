@@ -11,7 +11,7 @@ import { StepsEditor, stepsValid } from "./StepsEditor";
 import { PreviewPanel } from "./PreviewPanel";
 import { Msg, Notice } from "./Notice";
 import { errorText, useApp } from "./context";
-import { t } from "../i18n";
+import { getLang, t } from "../i18n";
 
 const useStyles = makeStyles({
   root: { display: "flex", flexDirection: "column", gap: tokens.spacingVerticalS, padding: tokens.spacingHorizontalS, minWidth: 0, boxSizing: "border-box" },
@@ -121,7 +121,8 @@ export function Pane(): ReactElement {
     }
   };
 
-  const buildPlan = (steps: Step[], given: Record<string, StoredValue>): PlanItem[] => plan(toFormLike(entry!.fc), steps, { answers: given });
+  const buildPlan = (steps: Step[], given: Record<string, StoredValue>): PlanItem[] =>
+    plan(toFormLike(entry!.fc), steps, { answers: given, now: new Date(), userName: xrm.Utility.getGlobalContext().userSettings.userName, locale: getLang() });
 
   const onPreview = async (): Promise<void> => {
     if (!entry || !selected) return;

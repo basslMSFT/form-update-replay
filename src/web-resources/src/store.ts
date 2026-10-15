@@ -1,4 +1,5 @@
 import { OPTION, Recording, Step, StoredValue } from "./model";
+import type { CalcSpec } from "./calc";
 
 /** Thin HTTP layer so the store can be unit tested without a browser. */
 export interface Api {
@@ -63,7 +64,7 @@ const bare = (id: string): string => id.replace(/[{}]/g, "").toLowerCase();
 
 const optionToOp = (v: number): Step["operation"] => (v === OPTION.operation.clear ? "clear" : "set");
 const optionToMode = (v: number): Step["valueMode"] =>
-  v === OPTION.valueMode.copy ? "copy" : v === OPTION.valueMode.prompt ? "prompt" : "fixed";
+  v === OPTION.valueMode.copy ? "copy" : v === OPTION.valueMode.prompt ? "prompt" : v === OPTION.valueMode.calculate ? "calculate" : "fixed";
 
 export function stepToPayload(step: Step): Record<string, unknown> {
   const label = step.operation === "clear" ? "Clear" : "Set";
@@ -78,6 +79,7 @@ export function stepToPayload(step: Step): Record<string, unknown> {
     msftnl_value: step.valueMode !== "fixed" || step.operation === "clear" || step.value === undefined ? null : JSON.stringify(step.value),
     msftnl_sourcecolumnlogicalname: step.valueMode === "copy" ? step.sourceColumn ?? null : null,
     msftnl_prompttext: step.valueMode === "prompt" ? step.promptText ?? null : null,
+    msftnl_calculation: step.valueMode === "calculate" && step.calc ? JSON.stringify(step.calc) : null,
   };
 }
 
@@ -96,6 +98,9 @@ export function stepFromRow(row: any): Step {
   if (value !== undefined) step.value = value;
   if (row.msftnl_sourcecolumnlogicalname) step.sourceColumn = row.msftnl_sourcecolumnlogicalname;
   if (row.msftnl_prompttext) step.promptText = row.msftnl_prompttext;
+  if (row.msftnl_calculation) {
+    try { step.calc = JSON.parse(row.msftnl_calculation) as CalcSpec; } catch { /* a damaged calculation leaves the step without one; replay skips it */ }
+  }
   return step;
 }
 

@@ -27,6 +27,8 @@ const REASON: Record<SkipReason, StringKey> = {
   sourceMissing: "skipSourceMissing",
   sourceIncompatible: "skipSourceIncompatible",
   valueNotAllowed: "skipValueNotAllowed",
+  calcInputMissing: "skipCalcInputMissing",
+  calcInvalid: "skipCalcInvalid",
 };
 
 type PromptAttr = {

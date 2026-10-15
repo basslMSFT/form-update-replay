@@ -1,9 +1,13 @@
 import { FormLike } from "./recorder";
 import { AttrLike, readValue, toXrmValue, valuesEqual } from "./value-codec";
-import { Step, StoredValue, isSupportedType } from "./model";
+import { Step, StoredLookup, StoredValue, isSupportedType } from "./model";
 import { columnInfoFromAttr, isCopyCompatible, isValueAllowed } from "./compat";
+import { CalcContext, CalcSpec, calcColumns, calcKindFor, evaluateCalc } from "./calc";
+import { t } from "./i18n";
 
-export type SkipReason = "missing" | "readonly" | "unsupported" | "typeMismatch" | "needsInput" | "sourceMissing" | "sourceIncompatible" | "valueNotAllowed";
+export type SkipReason =
+  | "missing" | "readonly" | "unsupported" | "typeMismatch" | "needsInput" | "sourceMissing" | "sourceIncompatible" | "valueNotAllowed"
+  | "calcInputMissing" | "calcInvalid";
 
 export interface PlanItem {
   step: Step;
@@ -16,6 +20,37 @@ export interface PlanItem {
 export interface PlayOptions {
   /** Answers for steps with valueMode "prompt", keyed by column logical name. */
   answers?: Record<string, StoredValue>;
+  /** For Calculate steps: the clock, the signed-in user's name and the locale used for placeholders. */
+  now?: Date;
+  userName?: string;
+  locale?: string;
+}
+
+const NUMERIC = ["integer", "decimal", "double", "money"];
+
+/** Whether the other columns a calculation reads have a type it can use. */
+function calcColumnsUsable(spec: CalcSpec, typeOf: (column: string) => string): boolean {
+  if (spec.kind === "date") return spec.base.source !== "column" || typeOf(spec.base.column) === "datetime";
+  if (spec.kind === "number") {
+    return (spec.base.source !== "column" || NUMERIC.includes(typeOf(spec.base.column))) && (spec.operand.source !== "column" || NUMERIC.includes(typeOf(spec.operand.column)));
+  }
+  return true;
+}
+
+/** Readable text of a stored value, used when a column is placed inside text. */
+function displayText(attr: AttrLike, value: StoredValue): string {
+  if (value === null || value === undefined) return "";
+  switch (attr.getAttributeType()) {
+    case "lookup": return (value as StoredLookup).name ?? "";
+    case "optionset": return attr.getOptions?.().find((o) => o.value === value)?.text ?? String(value);
+    case "multiselectoptionset": return (value as number[]).map((v) => attr.getOptions?.().find((o) => o.value === v)?.text ?? String(v)).join(", ");
+    case "boolean": return value === true ? t("yes") : t("no");
+    case "datetime": {
+      const s = String(value);
+      return /^\d{4}-\d{2}-\d{2}$/.test(s) ? new Date(`${s}T00:00:00`).toLocaleDateString() : new Date(s).toLocaleString();
+    }
+    default: return String(value);
+  }
 }
 
 function isReadOnly(attr: AttrLike): boolean {
@@ -56,6 +91,27 @@ export function plan(form: FormLike, steps: Step[], options: PlayOptions = {}): 
     } else if (step.valueMode === "prompt") {
       if (!options.answers || !(step.column in options.answers)) { items.push({ ...base, current, status: "skip", reason: "needsInput" }); continue; }
       next = options.answers[step.column] ?? null;
+    } else if (step.valueMode === "calculate") {
+      const spec = step.calc;
+      if (!spec || calcKindFor(type) !== spec.kind) { items.push({ ...base, current, status: "skip", reason: "calcInvalid" }); continue; }
+      const used = calcColumns(spec);
+      if (used.some((c) => !byName.has(c))) { items.push({ ...base, current, status: "skip", reason: "sourceMissing" }); continue; }
+      if (!calcColumnsUsable(spec, (c) => byName.get(c)!.getAttributeType())) { items.push({ ...base, current, status: "skip", reason: "sourceIncompatible" }); continue; }
+      const valueOf = (c: string): StoredValue => (pending.has(c) ? pending.get(c)! : byName.has(c) ? readValue(byName.get(c)!) : null);
+      const ctx: CalcContext = {
+        now: options.now ?? new Date(),
+        userName: options.userName ?? "",
+        locale: options.locale,
+        target: step.column,
+        dateOnly: type === "datetime" && attr.getFormat?.() === "date",
+        integer: type === "integer",
+        precision: type === "decimal" || type === "money" ? attr.getPrecision?.() : undefined,
+        value: valueOf,
+        text: (c) => (byName.has(c) ? displayText(byName.get(c)!, valueOf(c)) : ""),
+      };
+      const res = evaluateCalc(spec, ctx);
+      if (!res.ok) { items.push({ ...base, current, status: "skip", reason: res.reason === "inputMissing" ? "calcInputMissing" : "calcInvalid" }); continue; }
+      next = res.value;
     } else {
       if (step.value === undefined) { items.push({ ...base, current, status: "skip", reason: "needsInput" }); continue; }
       next = step.value;
