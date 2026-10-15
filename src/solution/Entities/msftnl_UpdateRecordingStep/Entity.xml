@@ -462,6 +462,7 @@
           <IsFilterable>0</IsFilterable>
           <IsRetrievable>0</IsRetrievable>
           <IsLocalizable>0</IsLocalizable>
+          <AppDefaultValue>-1</AppDefaultValue>
           <optionset Name="msftnl_updaterecordingstep_msftnl_operation">
             <OptionSetType>picklist</OptionSetType>
             <IntroducedVersion>0.1.0.0</IntroducedVersion>
@@ -546,6 +547,7 @@
           <LogicalName>msftnl_recordingid</LogicalName>
           <RequiredLevel>required</RequiredLevel>
           <DisplayMask>ValidForAdvancedFind|ValidForForm|ValidForGrid</DisplayMask>
+          <ImeMode>auto</ImeMode>
           <ValidForUpdateApi>1</ValidForUpdateApi>
           <ValidForReadApi>1</ValidForReadApi>
           <ValidForCreateApi>1</ValidForCreateApi>
@@ -774,6 +776,7 @@
           <IsFilterable>0</IsFilterable>
           <IsRetrievable>0</IsRetrievable>
           <IsLocalizable>0</IsLocalizable>
+          <AppDefaultValue>-1</AppDefaultValue>
           <optionset Name="msftnl_updaterecordingstep_msftnl_valuemode">
             <OptionSetType>picklist</OptionSetType>
             <IntroducedVersion>0.1.0.0</IntroducedVersion>
