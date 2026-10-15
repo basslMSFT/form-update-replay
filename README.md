@@ -12,6 +12,21 @@ Record the column changes you make on a Dynamics 365 form and replay them on oth
 
 Recordings are private to their owner until you share them or assign them to a team.
 
+## Screenshots
+
+A narrated walkthrough is in [docs/media/form-update-replay-demo.mp4](docs/media/form-update-replay-demo.mp4). The screenshots use dummy data.
+
+| | |
+|---|---|
+| ![The Replay command in the command bar](docs/images/01-replay-command.png) **1. The Replay command** | ![The side pane next to the form](docs/images/02-side-pane.png) **2. The side pane** |
+| ![Recording changes on the form](docs/images/03-recording-changes.png) **3. Recording changes** | ![Reviewing the recorded changes](docs/images/04-review-changes.png) **4. Review the changes** |
+| ![Ask when replaying](docs/images/05-ask-when-replaying.png) **5. Ask when replaying** | ![Preview with questions](docs/images/06-preview-questions.png) **6. Preview with questions** |
+| ![Questions answered](docs/images/07-preview-answered.png) **7. Typed answers** | ![Applied to the form](docs/images/08-applied-to-form.png) **8. Applied to the form** |
+| ![Copy from column](docs/images/09-copy-from-column.png) **9. Copy from column** | ![Manage recordings](docs/images/10-manage-recordings.png) **10. Manage recordings** |
+| ![Selecting several recordings](docs/images/11-multi-select.png) **11. Multi-select actions** | ![Share dialog](docs/images/12-share-dialog.png) **12. Share** |
+| ![Shared with a team](docs/images/13-shared-with-team.png) **13. Shared with a team** | ![Recording detail](docs/images/14-recording-detail.png) **14. Recording detail** |
+| ![Dutch user interface](docs/images/15-dutch.png) **15. Dutch interface** | |
+
 ## Install
 
 1. Download the latest managed solution zip from the [Releases](../../releases) page.
