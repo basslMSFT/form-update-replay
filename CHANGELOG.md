@@ -4,6 +4,11 @@ All notable changes to this solution will be documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/), and this project adheres to [Semantic Versioning](https://semver.org/).
 
+## [1.0.3] - 2026-10-16
+
+### Changed
+- The side pane no longer depends on the deprecated `Xrm.Page`. The record on screen now comes from the documented `Xrm.Utility.getPageContext`, and the form from the Replay command. `Xrm.Page` is only used while it still exists, to follow you to records where Replay was not used yet. Without it, the pane shows "Select Replay in the command bar on this record to use it here" instead of a stale or empty form.
+
 ## [1.0.2] - 2026-10-16
 
 ### Fixed

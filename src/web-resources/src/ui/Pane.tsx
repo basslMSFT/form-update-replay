@@ -1,7 +1,7 @@
 import { ReactElement, useCallback, useEffect, useMemo, useState } from "react";
 import { Button, Input, MessageBar, MessageBarBody, Select, Spinner, Text, Title3, makeStyles, tokens } from "@fluentui/react-components";
 import { Play20Filled, Record20Filled, Stop20Filled, Open20Regular } from "@fluentui/react-icons";
-import { FormEntry, currentForm, toFormLike } from "../registry";
+import { FormEntry, currentForm, recordOnScreen, toFormLike } from "../registry";
 import { discardRecording, isRecording, picker, recordedCount, startRecording, stopRecording } from "../controller";
 import { RecordingRow, createRecording, getRecording, listRecordings } from "../store";
 import { PlanItem, apply, plan } from "../player";
@@ -28,6 +28,7 @@ export function Pane(): ReactElement {
   const s = useStyles();
   const { api, identity, xrm } = useApp();
   const [entry, setEntry] = useState<FormEntry | null>(() => currentForm());
+  const [needsCommand, setNeedsCommand] = useState(false);
   const [recording, setRecording] = useState(false);
   const [count, setCount] = useState(0);
   const [draft, setDraft] = useState<Step[] | null>(null);
@@ -45,6 +46,7 @@ export function Pane(): ReactElement {
       const cur = currentForm();
       if (!cur && picker.active) return;
       setEntry((prev) => (prev?.key === cur?.key ? prev : cur));
+      setNeedsCommand(!cur && recordOnScreen() !== null);
       if (cur) {
         setRecording(isRecording(cur));
         setCount(recordedCount(cur));
@@ -175,7 +177,7 @@ export function Pane(): ReactElement {
       <Notice message={message} onDismiss={() => setMessage(null)} />
 
       {!entry ? (
-        <Text className={s.muted}>{t("paneNoForm")}</Text>
+        <Text className={s.muted}>{t(needsCommand ? "paneSelectReplay" : "paneNoForm")}</Text>
       ) : (
         <>
           <div className={s.card}>

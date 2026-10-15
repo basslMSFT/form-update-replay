@@ -81,7 +81,7 @@ Text, multi-line text, whole number, decimal, float, currency, yes/no, date and 
 - Many apps, including the Copilot Service workspace, autosave. Applied values are then saved shortly after you apply them, so look at the preview first.
 - Lookups are replayed by record, so the target record must exist in the environment.
 - A recording only applies to forms of the table it was recorded on.
-- The side pane reaches the form of the command that opened it through a registry on the top window, and falls back to the deprecated `Xrm.Page`. Both are the only way for a pane to see the active form, but they are not documented patterns and could stop working in a future release of Dynamics 365. See [docs/architecture.md](docs/architecture.md).
+- The side pane learns which record is on screen from the documented `Xrm.Utility.getPageContext` and gets the form from the Replay command. On a record where Replay was not used yet, the pane follows you only while the deprecated `Xrm.Page` still exists; once Microsoft removes it, the pane asks you to select Replay on that record. Nothing else breaks. See [docs/architecture.md](docs/architecture.md).
 
 ## For developers
 

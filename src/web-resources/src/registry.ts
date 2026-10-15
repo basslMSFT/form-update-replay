@@ -52,21 +52,46 @@ export function toFormLike(fc: Xrm.FormContext): FormLike {
   };
 }
 
-/**
- * The form the user is looking at right now. Prefers the context captured by the command for this session and record,
- * and falls back to the page context so the pane keeps following the user to other records.
- */
-export function currentForm(top: Window = window.top as Window): FormEntry | null {
-  const reg = getRegistry(top);
-  let page: Xrm.FormContext | undefined;
+type PageInput = { pageType?: string; entityName?: string; entityId?: string };
+
+/** Which record is on screen, from the documented `Xrm.Utility.getPageContext` (Unified Interface). */
+export function recordOnScreen(top: Window = window.top as Window): { entity: string; id: string } | null {
   try {
-    const x = (top as unknown as { Xrm?: { Page?: Xrm.FormContext } }).Xrm;
-    if (x?.Page?.data?.entity) page = x.Page;
+    const x = (top as unknown as { Xrm?: { Utility?: { getPageContext?: () => { input?: PageInput } | undefined } } }).Xrm;
+    const input = x?.Utility?.getPageContext?.()?.input;
+    if (input?.pageType === "entityrecord" && input.entityName) return { entity: input.entityName, id: (input.entityId ?? "").replace(/[{}]/g, "").toLowerCase() };
+  } catch {
+    // no page context available
+  }
+  return null;
+}
+
+/** The deprecated `Xrm.Page`, used only when it still exists. Nothing breaks when Microsoft removes it. */
+function legacyFormContext(top: Window): Xrm.FormContext | undefined {
+  try {
+    const page = (top as unknown as { Xrm?: { Page?: Xrm.FormContext } }).Xrm?.Page;
+    if (page?.data?.entity) return page;
   } catch {
     // no form on screen
   }
-  if (!page) return null;
-  const live = entryFromForm(page, top);
-  const captured = reg.forms[live.key];
-  return captured ? { ...captured, seenAt: Date.now() } : live;
+  return undefined;
+}
+
+/**
+ * The form the user is looking at right now. The documented page context says which record is on screen, and the
+ * context captured by the Replay command for that session and record supplies the form. Where the deprecated
+ * `Xrm.Page` still exists it also lets the pane follow the user to records where the command was not used yet.
+ */
+export function currentForm(top: Window = window.top as Window): FormEntry | null {
+  const reg = getRegistry(top);
+  const page = legacyFormContext(top);
+  if (page) {
+    const live = entryFromForm(page, top);
+    const captured = reg.forms[live.key];
+    return captured ? { ...captured, seenAt: Date.now() } : live;
+  }
+  const shown = recordOnScreen(top);
+  if (!shown) return null;
+  const captured = reg.forms[formKey(focusedSessionId(top), shown.entity, shown.id)];
+  return captured ? { ...captured, seenAt: Date.now() } : null;
 }
