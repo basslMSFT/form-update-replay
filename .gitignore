@@ -1,0 +1,69 @@
+# Helper scripts — never commit these
+helpers/
+*.ps1
+
+# Local AI development harness (personal tooling, not part of the public repo)
+.github/agents/
+.github/hooks/
+.github/instructions/
+.github/prompts/
+.github/skills/
+.github/AGENTS.md
+
+# Python scripts in /scripts/ are committed (auth, utilities)
+!scripts/*.py
+
+# Temp and local files
+temp/
+tmp/
+*.tmp
+*.log
+
+# Environment-specific config
+.env
+.env.*
+local.settings.json
+
+# Dataverse Skills plugin / MCP config
+.token_cache.bin
+.claude/mcp_settings.json
+solutions/*.zip
+plugins/**/bin/
+plugins/**/obj/
+__pycache__/
+*.pyc
+*.snk
+
+# IDE
+.vs/
+.vscode/settings.json
+*.suo
+*.user
+*.userosscache
+
+# Build outputs
+bin/
+obj/
+out/
+dist/
+node_modules/
+*.nupkg
+
+# PCF control build artifacts
+**/generated/
+**/bundle.js
+**/bundle.js.map
+**/pcfconfig.json
+**/featureconfig.json
+
+# Power Pages local cache
+**/portalcontrols/
+
+# OS files
+Thumbs.db
+.DS_Store
+desktop.ini
+
+# Solution export temp
+**/AppModule/
+**/CanvasApps/*.msapp.entropy/

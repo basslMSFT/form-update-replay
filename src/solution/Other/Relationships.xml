@@ -1,0 +1,16 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<EntityRelationships xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+  <EntityRelationship Name="business_unit_msftnl_updaterecording" />
+  <EntityRelationship Name="business_unit_msftnl_updaterecordingstep" />
+  <EntityRelationship Name="lk_msftnl_updaterecording_createdby" />
+  <EntityRelationship Name="lk_msftnl_updaterecording_modifiedby" />
+  <EntityRelationship Name="lk_msftnl_updaterecordingstep_createdby" />
+  <EntityRelationship Name="lk_msftnl_updaterecordingstep_modifiedby" />
+  <EntityRelationship Name="msftnl_updaterecording_updaterecordingstep" />
+  <EntityRelationship Name="owner_msftnl_updaterecording" />
+  <EntityRelationship Name="owner_msftnl_updaterecordingstep" />
+  <EntityRelationship Name="team_msftnl_updaterecording" />
+  <EntityRelationship Name="team_msftnl_updaterecordingstep" />
+  <EntityRelationship Name="user_msftnl_updaterecording" />
+  <EntityRelationship Name="user_msftnl_updaterecordingstep" />
+</EntityRelationships>

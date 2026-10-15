@@ -1,0 +1,26 @@
+{
+  "name": "form-update-replay-webresources",
+  "version": "0.1.0",
+  "private": true,
+  "license": "MIT",
+  "description": "Recorder, player and hub UI web resources for Form Update Replay",
+  "scripts": {
+    "typecheck": "tsc --noEmit",
+    "test": "vitest run",
+    "build": "node scripts/build.mjs"
+  },
+  "devDependencies": {
+    "@types/react": "^18.3.31",
+    "@types/react-dom": "^18.3.7",
+    "@types/xrm": "^9.0.0",
+    "esbuild": "^0.25.0",
+    "typescript": "^5.6.0",
+    "vitest": "^3.0.0"
+  },
+  "dependencies": {
+    "@fluentui/react-components": "^9.74.9",
+    "@fluentui/react-icons": "^2.0.344",
+    "react": "^18.3.1",
+    "react-dom": "^18.3.1"
+  }
+}

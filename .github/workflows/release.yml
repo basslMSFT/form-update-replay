@@ -1,0 +1,45 @@
+name: Release
+
+on:
+  push:
+    tags: ["v*"]
+
+permissions:
+  contents: write
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+          cache-dependency-path: src/web-resources/package-lock.json
+      - uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: 8.0.x
+      - name: Install Power Platform CLI
+        run: dotnet tool install --global Microsoft.PowerApps.CLI.Tool
+      - name: Build web resources
+        working-directory: src/web-resources
+        run: |
+          npm ci
+          npm run typecheck
+          npm test
+          npm run build
+      - name: Check versions match the tag
+        run: |
+          node scripts/check-version.mjs
+          test "v$(node -p "require('./src/web-resources/package.json').version")" = "${GITHUB_REF_NAME}"
+      - name: Pack solution
+        run: |
+          node scripts/sync-webresources.mjs
+          mkdir -p out
+          pac solution pack --zipfile out/FormUpdateReplay_${GITHUB_REF_NAME}_unmanaged.zip --folder src/solution --packagetype Unmanaged
+          pac solution pack --zipfile out/FormUpdateReplay_${GITHUB_REF_NAME}_managed.zip --folder src/solution --packagetype Managed
+      - uses: softprops/action-gh-release@v2
+        with:
+          files: out/*.zip
+          generate_release_notes: true
