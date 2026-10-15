@@ -4,7 +4,7 @@ All notable changes to this solution will be documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/), and this project adheres to [Semantic Versioning](https://semver.org/).
 
-## [Unreleased]
+## [1.0.1] - 2026-10-16
 
 ### Changed
 - Clearer look for the recordings overview and the recording editor: gradient header, grey panels for settings, numbered step cards with an accent bar, bold field labels, a tinted calculation summary and a tinted table header and selection.
