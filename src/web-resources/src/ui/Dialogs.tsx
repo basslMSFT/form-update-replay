@@ -1,9 +1,10 @@
 import { ReactElement, useEffect, useState } from "react";
 import {
-  Button, Checkbox, Dialog, DialogActions, DialogBody, DialogContent, DialogSurface, DialogTitle, Field, Input, MessageBar, MessageBarBody,
+  Button, Checkbox, Dialog, DialogActions, DialogBody, DialogContent, DialogSurface, DialogTitle, Input, MessageBar, MessageBarBody,
   Radio, RadioGroup, Spinner, Text, makeStyles, tokens,
 } from "@fluentui/react-components";
 import { Principal, RecordingRow, assignToTeam, deleteRecording, grantAccess, searchPrincipals, updateRecordingHeader } from "../store";
+import { Field } from "./fields";
 import { errorText, useApp } from "./context";
 import { t } from "../i18n";
 

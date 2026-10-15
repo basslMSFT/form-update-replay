@@ -1,6 +1,6 @@
 import { KeyboardEvent, ReactElement, useCallback, useEffect, useMemo, useState } from "react";
 import {
-  Badge, Button, Field, Input, Spinner, Tab, TabList, Table, TableBody, TableCell, TableCellLayout, TableHeader, TableHeaderCell, TableRow,
+  Badge, Button, Input, Spinner, Tab, TabList, Table, TableBody, TableCell, TableCellLayout, TableHeader, TableHeaderCell, TableRow,
   TableRowId, TableSelectionCell, Text, Textarea, Title2, createTableColumn, makeStyles, mergeClasses, tokens, useTableFeatures, useTableSelection,
 } from "@fluentui/react-components";
 import { ArrowLeft20Regular, ArrowSync20Regular, Delete20Regular, Edit20Regular, Open20Regular, PeopleTeam20Regular, Person20Regular, Search20Regular, Share20Regular } from "@fluentui/react-icons";
@@ -10,20 +10,41 @@ import { ColumnInfo, loadColumns } from "../compat";
 import { StepsEditor, stepsValid } from "./StepsEditor";
 import { AssignDialog, DeleteDialog, DoneHandler, RenameDialog, ShareDialog } from "./Dialogs";
 import { Msg, Notice } from "./Notice";
+import { Field } from "./fields";
 import { errorText, useApp } from "./context";
 import { getLang, t } from "../i18n";
 
 const useStyles = makeStyles({
-  root: { display: "flex", flexDirection: "column", gap: tokens.spacingVerticalM, padding: tokens.spacingHorizontalXXL, height: "100vh", boxSizing: "border-box", overflow: "auto" },
+  root: {
+    display: "flex", flexDirection: "column", gap: tokens.spacingVerticalM, padding: tokens.spacingHorizontalXXL, height: "100vh", boxSizing: "border-box", overflow: "auto",
+    backgroundImage: `linear-gradient(180deg, ${tokens.colorBrandBackground2} 0px, ${tokens.colorNeutralBackground1} 220px)`,
+  },
   toolbar: { display: "flex", gap: tokens.spacingHorizontalM, alignItems: "center", flexWrap: "wrap" },
-  commands: { display: "flex", alignItems: "center", flexWrap: "wrap", gap: tokens.spacingHorizontalXS, borderBottom: `1px solid ${tokens.colorNeutralStroke2}`, paddingBottom: tokens.spacingVerticalXS },
+  commands: {
+    display: "flex", alignItems: "center", flexWrap: "wrap", gap: tokens.spacingHorizontalXS,
+    backgroundColor: tokens.colorNeutralBackground3, border: `1px solid ${tokens.colorNeutralStroke2}`, borderRadius: tokens.borderRadiusMedium,
+    padding: `${tokens.spacingVerticalXS} ${tokens.spacingHorizontalS}`,
+  },
   grow: { flexGrow: 1 },
   muted: { color: tokens.colorNeutralForeground3 },
   detail: { display: "flex", flexDirection: "column", gap: tokens.spacingVerticalM, maxWidth: "900px" },
+  hero: {
+    display: "flex", flexDirection: "column", gap: tokens.spacingVerticalXXS,
+    padding: `${tokens.spacingVerticalM} ${tokens.spacingHorizontalL}`,
+    backgroundImage: `linear-gradient(90deg, ${tokens.colorBrandBackground2} 0%, ${tokens.colorNeutralBackground1} 100%)`,
+    borderLeft: `4px solid ${tokens.colorBrandBackground}`, borderRadius: tokens.borderRadiusMedium, boxShadow: tokens.shadow4,
+  },
+  panel: {
+    display: "flex", flexDirection: "column", gap: tokens.spacingVerticalS,
+    backgroundColor: tokens.colorNeutralBackground3, border: `1px solid ${tokens.colorNeutralStroke2}`, borderRadius: tokens.borderRadiusMedium,
+    padding: tokens.spacingHorizontalM,
+  },
+  section: { display: "flex", alignItems: "center", gap: tokens.spacingHorizontalS, paddingBottom: tokens.spacingVerticalXXS, borderBottom: `2px solid ${tokens.colorBrandBackground}` },
   shareRow: { display: "flex", alignItems: "center", gap: tokens.spacingHorizontalS, padding: `${tokens.spacingVerticalXS} 0` },
-  headCell: { fontWeight: tokens.fontWeightSemibold },
-  row: { backgroundColor: tokens.colorNeutralBackground1, ":hover": { backgroundColor: tokens.colorNeutralBackground1Hover } },
-  rowSelected: { backgroundColor: tokens.colorNeutralBackground1Selected, ":hover": { backgroundColor: tokens.colorNeutralBackground1Selected } },
+  headCell: { fontWeight: tokens.fontWeightSemibold, color: tokens.colorBrandForeground1 },
+  thead: { backgroundImage: `linear-gradient(90deg, ${tokens.colorBrandBackground2} 0%, ${tokens.colorNeutralBackground1} 100%)` },
+  row: { backgroundColor: tokens.colorNeutralBackground1, ":hover": { backgroundColor: tokens.colorBrandBackground2Hover } },
+  rowSelected: { backgroundColor: tokens.colorBrandBackground2, ":hover": { backgroundColor: tokens.colorBrandBackground2Hover } },
   link: {
     color: tokens.colorBrandForegroundLink,
     cursor: "pointer",
@@ -137,7 +158,7 @@ export function Hub(): ReactElement {
         <Text className={s.muted}>{t("empty")}</Text>
       ) : (
         <Table aria-label={t("recordingsTitle")}>
-          <TableHeader>
+          <TableHeader className={s.thead}>
             <TableRow>
               <TableSelectionCell
                 checked={selection.allRowsSelected ? true : selection.someRowsSelected ? "mixed" : false}
@@ -276,16 +297,21 @@ function Detail({ id, onBack }: { id: string; onBack: () => void }): ReactElemen
     <div className={s.root}>
       <div><Button appearance="subtle" icon={<ArrowLeft20Regular />} onClick={onBack}>{t("back")}</Button></div>
       <div className={s.detail}>
-        <Title2>{row.name}</Title2>
-        <Text className={s.muted}>{row.table} · {steps.length} {t("colSteps").toLowerCase()} · {t("colOwner")}: {row.ownerId === identity.userId ? t("you") : row.ownerName}</Text>
+        <div className={s.hero}>
+          <Title2>{row.name}</Title2>
+          <Text className={s.muted}>{row.table} · {steps.length} {t("colSteps").toLowerCase()} · {t("colOwner")}: {row.ownerId === identity.userId ? t("you") : row.ownerName}</Text>
+        </div>
         <Notice message={message} onDismiss={() => setMessage(null)} />
-        <Field label={t("fieldName")} required><Input value={name} onChange={(_, d) => setName(d.value)} /></Field>
-        <Field label={t("fieldDescription")}><Textarea value={description} onChange={(_, d) => setDescription(d.value)} /></Field>
-        <Text weight="semibold">{t("stepsTitle")}</Text>
+        <div className={s.panel}>
+          <Field label={t("fieldName")} required><Input value={name} onChange={(_, d) => setName(d.value)} /></Field>
+          <Field label={t("fieldDescription")}><Textarea value={description} onChange={(_, d) => setDescription(d.value)} /></Field>
+        </div>
+        <div className={s.section}><Text weight="semibold" size={500}>{t("stepsTitle")}</Text><Badge appearance="filled" color="brand" shape="circular">{steps.length}</Badge></div>
         <StepsEditor steps={steps} onChange={setSteps} labels={labels} optionLabels={optionLabels} columns={columns} />
         <div><Button appearance="primary" disabled={saving || !name.trim() || !stepsValid(steps)} onClick={() => void save()}>{t("save")}</Button></div>
 
-        <Text weight="semibold">{t("sharedWithTitle")}</Text>
+        <div className={s.section}><Text weight="semibold" size={500}>{t("sharedWithTitle")}</Text></div>
+        <div className={s.panel}>
         {shares.length === 0 ? <Text className={s.muted}>{t("notShared")}</Text> : shares.map((e) => (
           <div key={`${e.principal.type}:${e.principal.id}`} className={s.shareRow}>
             {e.principal.type === "team" ? <PeopleTeam20Regular /> : <Person20Regular />}
@@ -295,6 +321,7 @@ function Detail({ id, onBack }: { id: string; onBack: () => void }): ReactElemen
           </div>
         ))}
         {canManageSharing ? <div><Button icon={<Share20Regular />} onClick={() => setSharing(true)}>{t("share")}</Button></div> : null}
+        </div>
       </div>
       {sharing ? <ShareDialog rows={[row]} onClose={() => setSharing(false)} onDone={(text, intent = "success") => { setSharing(false); setMessage({ intent, text }); void loadShares(row.ownerId); }} /> : null}
     </div>

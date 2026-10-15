@@ -1,15 +1,21 @@
 import { ReactElement } from "react";
-import { Badge, Button, Checkbox, Field, Input, Select, Text, Textarea, makeStyles, tokens } from "@fluentui/react-components";
+import { Badge, Button, Checkbox, Input, Select, Text, Textarea, makeStyles, tokens } from "@fluentui/react-components";
 import { PlanItem, SkipReason } from "../player";
 import { StoredLookup, StoredValue } from "../model";
 import { describeValue, labelFor, picker } from "../controller";
 import { StringKey, t } from "../i18n";
 import { useApp } from "./context";
+import { Field } from "./fields";
 
 const useStyles = makeStyles({
   muted: { color: tokens.colorNeutralForeground3 },
   list: { display: "flex", flexDirection: "column", gap: tokens.spacingVerticalS, marginTop: tokens.spacingVerticalS },
-  card: { border: `1px solid ${tokens.colorNeutralStroke2}`, borderRadius: tokens.borderRadiusMedium, padding: tokens.spacingHorizontalS, display: "flex", flexDirection: "column", gap: tokens.spacingVerticalXS, minWidth: 0 },
+  card: {
+    display: "flex", flexDirection: "column", gap: tokens.spacingVerticalXS, minWidth: 0, padding: tokens.spacingHorizontalS,
+    backgroundColor: tokens.colorNeutralBackground3,
+    borderTop: `1px solid ${tokens.colorNeutralStroke2}`, borderRight: `1px solid ${tokens.colorNeutralStroke2}`, borderBottom: `1px solid ${tokens.colorNeutralStroke2}`,
+    borderLeft: `3px solid ${tokens.colorBrandBackground}`, borderRadius: tokens.borderRadiusMedium,
+  },
   head: { display: "flex", justifyContent: "space-between", alignItems: "flex-start", flexWrap: "wrap", gap: tokens.spacingHorizontalXS },
   title: { minWidth: 0, overflowWrap: "anywhere" },
   text: { overflowWrap: "anywhere", whiteSpace: "pre-wrap" },

@@ -1,14 +1,19 @@
 import { ReactElement } from "react";
-import { Field, Input, Select, Text, Textarea, makeStyles, tokens } from "@fluentui/react-components";
+import { Input, Select, Text, Textarea, makeStyles, tokens } from "@fluentui/react-components";
 import { CalcSpec, DateUnit, NumberOp, calcKindFor } from "../calc";
 import { ColumnInfo } from "../compat";
+import { Field } from "./fields";
 import { t } from "../i18n";
 
 const useStyles = makeStyles({
-  box: { display: "flex", flexDirection: "column", gap: tokens.spacingVerticalXS },
+  box: { display: "flex", flexDirection: "column", gap: tokens.spacingVerticalS },
   row: { display: "flex", flexWrap: "wrap", gap: tokens.spacingHorizontalS },
   grow: { flexGrow: 1, minWidth: "120px" },
   muted: { color: tokens.colorNeutralForeground3 },
+  summary: {
+    backgroundColor: tokens.colorBrandBackground2, borderLeft: `3px solid ${tokens.colorBrandBackground}`, borderRadius: tokens.borderRadiusSmall,
+    padding: `${tokens.spacingVerticalXS} ${tokens.spacingHorizontalS}`,
+  },
 });
 
 const UNITS: Array<{ value: DateUnit; key: "unitDays" | "unitWeeks" | "unitMonths" | "unitYears" | "unitWorkdays" }> = [
@@ -105,7 +110,7 @@ export function CalcEditor({ column, columnType, spec, onChange, columns }: Prop
             </Select>
           </Field>
         </div>
-        <Text size={200} className={s.muted}>{describeCalc(spec, labelOf)}. {t("calcNote")}</Text>
+        <div className={s.summary}><Text size={200} weight="semibold">{describeCalc(spec, labelOf)}.</Text> <Text size={200}>{t("calcNote")}</Text></div>
       </div>
     );
   }
@@ -145,7 +150,7 @@ export function CalcEditor({ column, columnType, spec, onChange, columns }: Prop
             {textColumns.map((c) => <option key={c.name} value={c.name}>{c.label} ({c.name})</option>)}
           </Select>
         </Field>
-        <Text size={200} className={s.muted}>{t("calcNote")}</Text>
+        <div className={s.summary}><Text size={200}>{t("calcNote")}</Text></div>
       </div>
     );
   }
@@ -199,7 +204,7 @@ export function CalcEditor({ column, columnType, spec, onChange, columns }: Prop
             <Input size="small" type="number" value={String(operand.value)} onChange={(_, d) => onChange({ ...spec, operand: { source: "value", value: d.value === "" ? 0 : Number(d.value) } })} />
           </Field>
         )}
-      <Text size={200} className={s.muted}>{describeCalc(spec, labelOf)}. {t("calcNote")}</Text>
+      <div className={s.summary}><Text size={200} weight="semibold">{describeCalc(spec, labelOf)}.</Text> <Text size={200}>{t("calcNote")}</Text></div>
     </div>
   );
 }

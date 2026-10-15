@@ -1,5 +1,5 @@
 import { ReactElement, useCallback, useEffect, useMemo, useState } from "react";
-import { Button, Field, Input, MessageBar, MessageBarBody, Select, Spinner, Text, Title3, makeStyles, tokens } from "@fluentui/react-components";
+import { Button, Input, MessageBar, MessageBarBody, Select, Spinner, Text, Title3, makeStyles, tokens } from "@fluentui/react-components";
 import { Play20Filled, Record20Filled, Stop20Filled, Open20Regular } from "@fluentui/react-icons";
 import { FormEntry, currentForm, toFormLike } from "../registry";
 import { discardRecording, isRecording, picker, recordedCount, startRecording, stopRecording } from "../controller";
@@ -9,6 +9,7 @@ import { Step, StoredValue, isSupportedType } from "../model";
 import { columnInfoFromAttr } from "../compat";
 import { StepsEditor, stepsValid } from "./StepsEditor";
 import { PreviewPanel } from "./PreviewPanel";
+import { Field } from "./fields";
 import { Msg, Notice } from "./Notice";
 import { errorText, useApp } from "./context";
 import { getLang, t } from "../i18n";

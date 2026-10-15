@@ -1,19 +1,39 @@
 import { ReactElement } from "react";
-import { Button, Field, Input, Select, Text, makeStyles, tokens } from "@fluentui/react-components";
+import { Badge, Button, Input, Select, Text, makeStyles, tokens } from "@fluentui/react-components";
 import { ArrowDown20Regular, ArrowUp20Regular, Delete20Regular } from "@fluentui/react-icons";
 import { Step, StoredValue } from "../model";
 import { ColumnInfo, copyCandidates } from "../compat";
 import { calcValid, defaultCalc, isCalculable } from "../calc";
 import { CalcEditor } from "./CalcEditor";
+import { Field } from "./fields";
 import { describeValue, labelFor } from "../controller";
 import { t } from "../i18n";
 
 const useStyles = makeStyles({
-  list: { display: "flex", flexDirection: "column", gap: tokens.spacingVerticalS },
-  card: { border: `1px solid ${tokens.colorNeutralStroke2}`, borderRadius: tokens.borderRadiusMedium, padding: tokens.spacingHorizontalS, display: "flex", flexDirection: "column", gap: tokens.spacingVerticalXS, minWidth: 0 },
-  head: { display: "flex", justifyContent: "space-between", alignItems: "flex-start", flexWrap: "wrap", gap: tokens.spacingHorizontalXS },
+  list: { display: "flex", flexDirection: "column", gap: tokens.spacingVerticalM },
+  card: {
+    display: "flex", flexDirection: "column", minWidth: 0, overflow: "hidden",
+    backgroundColor: tokens.colorNeutralBackground1,
+    borderTop: `1px solid ${tokens.colorNeutralStroke2}`, borderRight: `1px solid ${tokens.colorNeutralStroke2}`, borderBottom: `1px solid ${tokens.colorNeutralStroke2}`,
+    borderLeft: `4px solid ${tokens.colorBrandBackground}`,
+    borderRadius: tokens.borderRadiusMedium,
+    boxShadow: tokens.shadow4,
+  },
+  head: {
+    display: "flex", justifyContent: "space-between", alignItems: "flex-start", flexWrap: "wrap", gap: tokens.spacingHorizontalXS,
+    padding: `${tokens.spacingVerticalS} ${tokens.spacingHorizontalS}`,
+    backgroundImage: `linear-gradient(90deg, ${tokens.colorBrandBackground2} 0%, ${tokens.colorNeutralBackground1} 100%)`,
+    borderBottom: `1px solid ${tokens.colorNeutralStroke2}`,
+  },
+  titleRow: { display: "flex", alignItems: "flex-start", gap: tokens.spacingHorizontalS, minWidth: 0 },
   title: { minWidth: 0, overflowWrap: "anywhere" },
   tools: { display: "flex", flexShrink: 0 },
+  body: { display: "flex", flexDirection: "column", gap: tokens.spacingVerticalXS, padding: tokens.spacingHorizontalS, minWidth: 0 },
+  settings: {
+    display: "flex", flexDirection: "column", gap: tokens.spacingVerticalS, minWidth: 0,
+    backgroundColor: tokens.colorNeutralBackground3, border: `1px solid ${tokens.colorNeutralStroke2}`, borderRadius: tokens.borderRadiusMedium,
+    padding: tokens.spacingHorizontalS,
+  },
   muted: { color: tokens.colorNeutralForeground3 },
   value: { overflowWrap: "anywhere" },
 });
@@ -57,10 +77,13 @@ export function StepsEditor({ steps, onChange, fc, labels, optionLabels, columns
         return (
           <div key={`${step.column}-${i}`} className={s.card} role="listitem">
             <div className={s.head}>
-              <div className={s.title}>
-                <Text weight="semibold">{labelFor(fc, step.column, labels)}</Text>
-                <br />
-                <Text size={200} className={s.muted}>{step.column} · {step.operation === "clear" ? t("opClear") : t("opSet")}</Text>
+              <div className={s.titleRow}>
+                <Badge appearance="filled" color="brand" shape="circular" size="large" aria-hidden>{i + 1}</Badge>
+                <div className={s.title}>
+                  <Text weight="semibold">{labelFor(fc, step.column, labels)}</Text>
+                  <br />
+                  <Text size={200} className={s.muted}>{step.column} · {step.operation === "clear" ? t("opClear") : t("opSet")}</Text>
+                </div>
               </div>
               <div className={s.tools}>
                 <Button appearance="subtle" size="small" icon={<ArrowUp20Regular />} aria-label={t("moveUp")} title={t("moveUp")} disabled={i === 0} onClick={() => move(i, -1)} />
@@ -69,10 +92,11 @@ export function StepsEditor({ steps, onChange, fc, labels, optionLabels, columns
               </div>
             </div>
 
+            <div className={s.body}>
             {step.operation === "clear" ? (
               <Text className={s.muted}>{t("emptyValue")}</Text>
             ) : (
-              <>
+              <div className={s.settings}>
                 {step.valueMode === "fixed" ? <Text className={s.value}>{describeValue(fc, step, step.value as StoredValue, optionLabels)}</Text> : null}
                 <Field label={t("stepSource")} size="small">
                   <Select
@@ -109,8 +133,9 @@ export function StepsEditor({ steps, onChange, fc, labels, optionLabels, columns
                     </Select>
                   </Field>
                 ) : null}
-              </>
+              </div>
             )}
+            </div>
           </div>
         );
       })}
