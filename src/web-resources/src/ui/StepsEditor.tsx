@@ -48,7 +48,8 @@ export function StepsEditor({ steps, onChange, fc, labels, optionLabels, columns
     <div className={s.list} role="list" aria-label={t("stepsTitle")}>
       {steps.map((step, i) => {
         const sources = columns ? copyCandidates(columns.find((c) => c.name === step.column), columns) : [];
-        const canCopy = sources.length > 0 || step.valueMode === "copy";
+        // Always offered so it is discoverable; the list says when no column of a matching type exists.
+        const canCopy = columns !== undefined || step.valueMode === "copy";
         // A value that was never stored (an "ask" step loaded from Dataverse) cannot become a fixed value again.
         const canFixed = step.value !== undefined || step.valueMode === "fixed";
         return (
