@@ -1,6 +1,40 @@
 # Configuration
 
-There are no environment variables or connection references.
+There are no connection references. Where the Replay button appears is controlled by two settings and the security roles.
+
+## Where the Replay button appears
+
+The button is shown when **all three** are true:
+
+1. The current **app** is allowed by `msftnl_FormUpdateReplay_Apps`.
+2. The current **table** is allowed by `msftnl_FormUpdateReplay_Tables`.
+3. The user has **read access to the recording table**, which both shipped roles give.
+
+After installation `msftnl_FormUpdateReplay_Apps` is `none`, so Replay is hidden until an administrator enables it.
+
+| Setting | Type | Default | Values |
+|---------|------|---------|--------|
+| `msftnl_FormUpdateReplay_Apps` | Text | `none` | Comma-separated unique names of model-driven apps. `*` for every app, `none` for no app. |
+| `msftnl_FormUpdateReplay_Tables` | Text | `*` | Comma-separated logical table names. `*` for every table. Prefix a name with `-` to exclude it. |
+
+Names are not case-sensitive. Separators can be commas, semicolons or spaces.
+
+| Goal | Apps | Tables |
+|------|------|--------|
+| Only in the Copilot Service workspace, on cases | `msdyn_CustomerServiceWorkspace` | `incident` |
+| In two apps, on cases, accounts and contacts | `msdyn_CustomerServiceWorkspace,Customerservicehub` | `incident,account,contact` |
+| Everywhere except leads | `*` | `*,-lead` |
+| Switched off | `none` | anything |
+
+### How to change the settings
+
+Settings are solution components, see [Use settings to provide customized app experiences](https://learn.microsoft.com/power-apps/maker/data-platform/create-edit-configure-settings). In the maker portal, open **Solutions**, turn **Solution preview** on, open Form Update Replay and edit the settings. An *environment value* applies to every app; an *app value* overrides it for one app and needs that app in the solution. Reload the app (Ctrl+F5) after a change.
+
+To set an environment value without the portal, call the documented [SaveSettingValue](https://learn.microsoft.com/power-apps/developer/data-platform/webapi/reference/savesettingvalue) action of the Web API with `SettingName` and `Value`.
+
+**Finding an app's unique name:** query the Web API, `GET [org]/api/data/v9.2/appmodules?$select=uniquename,name`. Examples: `msdyn_CustomerServiceWorkspace` (Copilot Service workspace), `Customerservicehub` (Customer Service Hub).
+
+> The settings decide where the button is shown. They do not secure anything. A user who somehow opens the Replay page can still only read and change what their Dataverse roles allow.
 
 ## Security roles
 

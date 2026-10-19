@@ -8,7 +8,7 @@
     <Descriptions>
       <Description description="Record column changes on a model-driven form and replay them on other records." languagecode="1033" />
     </Descriptions>
-    <Version>1.0.3.0</Version>
+    <Version>2.0.0.0</Version>
     <Managed>2</Managed>
     <Publisher>
       <UniqueName>msftnl</UniqueName>
@@ -86,6 +86,7 @@
       <RootComponent type="1" schemaName="msftnl_updaterecordingstep" behavior="0" />
       <RootComponent type="20" id="{054bd3e6-01c8-f111-a05b-000d3abe04ca}" behavior="0" />
       <RootComponent type="20" id="{c27ce8ec-01c8-f111-a05b-000d3abe04ca}" behavior="0" />
+      <RootComponent type="50" schemaName=":RibbonDiffXml" behavior="0" />
       <RootComponent type="61" schemaName="msftnl_/furep/html/furep.hub.html" behavior="0" />
       <RootComponent type="61" schemaName="msftnl_/furep/img/furep.svg" behavior="0" />
       <RootComponent type="61" schemaName="msftnl_/furep/js/furep.hub.js" behavior="0" />
