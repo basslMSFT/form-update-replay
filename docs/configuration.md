@@ -28,9 +28,20 @@ Names are not case-sensitive. Separators can be commas, semicolons or spaces.
 
 ### How to change the settings
 
-Settings are solution components, see [Use settings to provide customized app experiences](https://learn.microsoft.com/power-apps/maker/data-platform/create-edit-configure-settings). In the maker portal, open **Solutions**, turn **Solution preview** on, open Form Update Replay and edit the settings. An *environment value* applies to every app; an *app value* overrides it for one app and needs that app in the solution. Reload the app (Ctrl+F5) after a change.
+Both settings are meant to be set once for the **whole environment**. Because the apps setting already lists the apps that show Replay, one environment value controls which apps and tables are enabled; you do not need a different value per app.
 
-To set an environment value without the portal, call the documented [SaveSettingValue](https://learn.microsoft.com/power-apps/developer/data-platform/webapi/reference/savesettingvalue) action of the Web API with `SettingName` and `Value`.
+**Tested: set an environment value with the Web API.** Call the documented [SaveSettingValue](https://learn.microsoft.com/power-apps/developer/data-platform/webapi/reference/savesettingvalue) action with `SettingName` and `Value` and leave `AppUniqueName` out. For example, to enable Replay in two apps:
+
+```http
+POST [org]/api/data/v9.2/SaveSettingValue
+{ "SettingName": "msftnl_FormUpdateReplay_Apps", "Value": "msdyn_CustomerServiceWorkspace,Customerservicehub" }
+```
+
+**Not tested: the settings screen in the maker portal.** Microsoft documents that settings can be edited there, see [Use settings to provide customized app experiences](https://learn.microsoft.com/power-apps/maker/data-platform/create-edit-configure-settings): open **Solutions**, turn **Solution preview** on, open Form Update Replay and edit the setting. This was not tried while building the solution.
+
+**Per-app values are not supported by this solution.** A setting can also have a value for a single app that overrides the environment value. Setting such a value through the Web API did not work in testing (the call reported success but nothing was stored, and inserting the row directly failed), and per Microsoft's documentation the screen only offers it for apps that are in the solution. Do not rely on it; put every app name in the environment value instead.
+
+Reload the app (Ctrl+F5) after a change.
 
 **Finding an app's unique name:** query the Web API, `GET [org]/api/data/v9.2/appmodules?$select=uniquename,name`. Examples: `msdyn_CustomerServiceWorkspace` (Copilot Service workspace), `Customerservicehub` (Customer Service Hub).
 

@@ -7,7 +7,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/), and this
 ## [2.0.0] - 2026-10-19
 
 ### Added
-- **Control where Replay is shown.** Two solution settings, `msftnl_FormUpdateReplay_Apps` (default `none`) and `msftnl_FormUpdateReplay_Tables` (default `*`), choose the model-driven apps and tables that show the Replay button. Both can be set for the whole environment or per app. See `docs/configuration.md`.
+- **Control where Replay is shown.** Two solution settings, `msftnl_FormUpdateReplay_Apps` (default `none`) and `msftnl_FormUpdateReplay_Tables` (default `*`), choose the model-driven apps and tables that show the Replay button. They are set once as environment values. See `docs/configuration.md`.
 - **The button follows the security roles.** Replay is shown only to users who can read the recording table, which the shipped User and Admin roles do.
 
 ### Changed

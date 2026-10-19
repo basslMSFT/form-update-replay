@@ -59,7 +59,7 @@ pac solution import --path FormUpdateReplay_managed.zip --publish-changes
 
 ### Turn it on
 
-Replay is **off everywhere after installation**. Two settings decide where the button appears. Both are lists of names, separated by commas. Set them as environment values, or per app, in the solution's settings (see [Use settings to provide customized app experiences](https://learn.microsoft.com/power-apps/maker/data-platform/create-edit-configure-settings)).
+Replay is **off everywhere after installation**. Two settings decide where the button appears. Both are lists of names, separated by commas, and are set once for the whole environment (see [docs/configuration.md](docs/configuration.md) for how, and for why per-app values are not supported).
 
 | Setting | Default | Meaning |
 |---------|---------|---------|
