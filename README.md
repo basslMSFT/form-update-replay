@@ -1,10 +1,10 @@
 # Form Update Replay
 
-Record the column changes you make on a Dynamics 365 form and replay them on other records. Works on every table, every form and every model-driven app, including the multi-session Copilot Service workspace. Dutch and English, chosen automatically from the user's language.
+Record the column changes you make on a Dynamics 365 form and replay them on other records. Works on any table and form of any model-driven app, including the multi-session Copilot Service workspace, once an administrator turns it on for the apps and tables they want (see [Turn it on](#turn-it-on)). Dutch and English, chosen automatically from the user's language.
 
 ## How it works
 
-1. Open a record and click **Replay** in the command bar (use the "..." menu if it is not visible). A side pane opens.
+1. Open a record and click **Replay** in the command bar (use the "..." menu if it is not visible). The button is shown only to people who have one of the Form Update Replay roles, and only in the apps and on the tables an administrator enabled. A side pane opens.
 2. Click **Start recording**, change columns on the form, then click **Stop recording**.
 3. Review the changes. For each change choose where the value comes from: the **fixed value** you recorded, **ask when replaying** (you pick or type a value that fits the column, for example a choice list for an option set or a record picker for a lookup), **copy from column** (only columns of a compatible type are offered), or **calculate** (see below). Give the recording a name and save it.
 4. On another record of the same table, open the pane, choose the recording and click **Preview**. You see what will change and why anything is skipped. **Apply to form** sets the values on the open form; you save the form yourself.
@@ -46,8 +46,9 @@ A narrated walkthrough (3.5 minutes, including Calculate) is in [docs/media/form
 
 1. Download the latest managed solution zip from the [Releases](../../releases) page.
 2. Go to [make.powerapps.com](https://make.powerapps.com), pick your environment, open **Solutions** and choose **Import solution**.
-3. Upload the zip, finish the wizard, then choose **Publish all customizations**.
-4. Hard-reload the app (Ctrl+F5).
+3. Upload the zip, finish the wizard, then choose **Publish all customizations**. This takes several minutes, because the Replay button is added to the command bar of every table.
+4. **Turn it on** (below) and assign the security roles. Until you do, nobody sees the Replay button.
+5. Hard-reload the app (Ctrl+F5).
 
 Or with the Power Platform CLI:
 
@@ -56,14 +57,33 @@ pac auth create --url https://YOUR_ORG.crm.dynamics.com
 pac solution import --path FormUpdateReplay_managed.zip --publish-changes
 ```
 
+### Turn it on
+
+Replay is **off everywhere after installation**. Two settings decide where the button appears. Both are lists of names, separated by commas. Set them as environment values, or per app, in the solution's settings (see [Use settings to provide customized app experiences](https://learn.microsoft.com/power-apps/maker/data-platform/create-edit-configure-settings)).
+
+| Setting | Default | Meaning |
+|---------|---------|---------|
+| `msftnl_FormUpdateReplay_Apps` | `none` | Unique names of the model-driven apps that show Replay, for example `msdyn_CustomerServiceWorkspace,Customerservicehub`. `*` means every app. |
+| `msftnl_FormUpdateReplay_Tables` | `*` | Logical names of the tables that show Replay, for example `incident,account`. `*` means every table. A minus excludes a table: `*,-lead`. |
+
+The button appears only when **both** lists allow the current app and table, **and** the user has one of the roles below. See [docs/configuration.md](docs/configuration.md) for examples and for how to find an app's unique name.
+
+> Showing or hiding the button is a convenience, not a security boundary. What people can read and change is always decided by their Dataverse security roles.
+
+### Upgrading from 1.0.x
+
+Version 1.0.x added the Replay button to every app. After the upgrade the old button is hidden and the new one follows the settings above, so **Replay disappears until you set `msftnl_FormUpdateReplay_Apps`**. Existing recordings are not touched.
+
 ### Security roles
 
 The solution adds two roles. Assign them next to the role people already have; they only cover the recording tables.
 
 | Role | Gives |
 |------|-------|
-| Form Update Replay User | Create, read, edit, delete, assign and share own recordings, and use recordings shared with them or their teams. |
-| Form Update Replay Admin | The same rights across the whole organization, and the *All recordings* tab. |
+| Form Update Replay User | Create, read, edit, delete, assign and share own recordings, and use recordings shared with them or their teams. Shows the Replay button. |
+| Form Update Replay Admin | The same rights across the whole organization, and the *All recordings* tab. Shows the Replay button. |
+
+The Replay button is shown to everyone who can read recordings, which in practice means everyone with one of these roles. A custom role works too when it grants read access to the *Update Recording* table.
 
 Replaying never grants more access than the user already has: values are set on the open form, so read-only and secured columns are skipped and the normal save rules apply. Columns that are hidden on the form (hidden field, section or tab) or not on it at all count as not available: they are skipped as target, as copy source and as input of a calculation.
 
@@ -81,6 +101,8 @@ Text, multi-line text, whole number, decimal, float, currency, yes/no, date and 
 - Many apps, including the Copilot Service workspace, autosave. Applied values are then saved shortly after you apply them, so look at the preview first.
 - Lookups are replayed by record, so the target record must exist in the environment.
 - A recording only applies to forms of the table it was recorded on.
+- The Replay button is a classic command-bar button defined in the solution's ribbon XML. That is the variant I found that can be hidden by role, app and table from a solution; the modern command designer cannot do this for a command that is not tied to one app and table. It cannot be edited in the command designer. Installing or upgrading republishes the ribbon of every table, which takes several minutes.
+- The button appears on main forms only, not in grids, subgrids or quick create forms.
 - The side pane learns which record is on screen from the documented `Xrm.Utility.getPageContext` and gets the form from the Replay command. On a record where Replay was not used yet, the pane follows you only while the deprecated `Xrm.Page` still exists; once Microsoft removes it, the pane asks you to select Replay on that record. Nothing else breaks. See [docs/architecture.md](docs/architecture.md).
 
 ## For developers

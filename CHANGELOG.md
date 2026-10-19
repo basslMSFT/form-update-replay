@@ -4,6 +4,16 @@ All notable changes to this solution will be documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/), and this project adheres to [Semantic Versioning](https://semver.org/).
 
+## [Unreleased]
+
+### Added
+- **Control where Replay is shown.** Two solution settings, `msftnl_FormUpdateReplay_Apps` (default `none`) and `msftnl_FormUpdateReplay_Tables` (default `*`), choose the model-driven apps and tables that show the Replay button. Both can be set for the whole environment or per app. See `docs/configuration.md`.
+- **The button follows the security roles.** Replay is shown only to users who can read the recording table, which the shipped User and Admin roles do.
+
+### Changed
+- **Replay is off until an administrator enables it.** After installing or upgrading, set `msftnl_FormUpdateReplay_Apps`, for example to `msdyn_CustomerServiceWorkspace,Customerservicehub`. Existing recordings are not touched.
+- The Replay button is now a classic ribbon button defined in the solution (application ribbon plus display rules) instead of a modern global command, because only that can be hidden by role, app and table. The old global command stays in the package but hidden, so an upgrade cannot leave two buttons. Installing or upgrading republishes the command bar of every table and takes several minutes.
+
 ## [1.0.3] - 2026-10-16
 
 ### Changed

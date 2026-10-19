@@ -1,4 +1,5 @@
 import { entryFromForm, getRegistry } from "./registry";
+import { isAvailable } from "./visibility";
 
 /**
  * Command-bar entry point (global command on the main form). It remembers the form for the focused session and opens
@@ -31,4 +32,6 @@ async function openPanel(fc: Xrm.FormContext): Promise<void> {
       Xrm.Navigation.openErrorDialog({ message: e instanceof Error ? e.message : String(e) });
     });
   },
+  // Command-bar display rule: decides per app and table whether the button is shown (see visibility.ts).
+  isAvailable: (table?: string) => isAvailable(table),
 };

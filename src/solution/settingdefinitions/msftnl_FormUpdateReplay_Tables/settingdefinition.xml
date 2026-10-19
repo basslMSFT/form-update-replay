@@ -1,0 +1,20 @@
+<settingdefinition uniquename="msftnl_FormUpdateReplay_Tables">
+  <datatype>1</datatype>
+  <defaultvalue>*</defaultvalue>
+  <description default="Tables on whose forms the Replay button is shown, as a comma-separated list of table logical names, for example incident,account,contact. Use * for all tables. Put a minus in front of a name to exclude it, for example *,-lead. The button is also limited to the apps listed in the apps setting.">
+    <label description="Tables on whose forms the Replay button is shown, as a comma-separated list of table logical names, for example incident,account,contact. Use * for all tables. Put a minus in front of a name to exclude it, for example *,-lead. The button is also limited to the apps listed in the apps setting." languagecode="1033" />
+    <label description="Tabellen op waarvan de formulieren de knop Replay wordt getoond, als kommagescheiden lijst van logische tabelnamen, bijvoorbeeld incident,account,contact. Gebruik * voor alle tabellen. Zet een min voor een naam om die uit te sluiten, bijvoorbeeld *,-lead. De knop is ook beperkt tot de apps in de instelling voor apps." languagecode="1043" />
+  </description>
+  <displayname default="Form Update Replay: tables">
+    <label description="Form Update Replay: tables" languagecode="1033" />
+    <label description="Form Update Replay: tabellen" languagecode="1043" />
+  </displayname>
+  <iscustomizable>1</iscustomizable>
+  <ishidden>0</ishidden>
+  <isoverridable>1</isoverridable>
+  <isplatform>0</isplatform>
+  <overridablelevel>0</overridablelevel>
+  <releaselevel>0</releaselevel>
+  <statecode>0</statecode>
+  <statuscode>1</statuscode>
+</settingdefinition>

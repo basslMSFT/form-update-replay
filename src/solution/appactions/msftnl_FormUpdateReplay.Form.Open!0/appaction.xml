@@ -16,7 +16,7 @@
     <label description="Replay" languagecode="1043" />
   </buttontooltiptitle>
   <context>0</context>
-  <hidden>0</hidden>
+  <hidden>1</hidden>
   <iconwebresourceid>
     <webresourceid>c1ad91d0-12c8-f111-a05b-000d3abe04ca</webresourceid>
   </iconwebresourceid>
