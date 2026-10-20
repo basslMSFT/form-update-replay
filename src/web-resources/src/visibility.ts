@@ -5,6 +5,9 @@
  */
 export const APPS_SETTING = "msftnl_FormUpdateReplay_Apps";
 export const TABLES_SETTING = "msftnl_FormUpdateReplay_Tables";
+/** The same two lists for the bulk replay button in grids; off by default because it changes many records at once. */
+export const GRID_APPS_SETTING = "msftnl_FormUpdateReplay_GridApps";
+export const GRID_TABLES_SETTING = "msftnl_FormUpdateReplay_GridTables";
 
 /** Splits a setting value on commas, semicolons and whitespace; case-insensitive. */
 export function parseList(raw: unknown): string[] {
@@ -76,13 +79,29 @@ function currentAppName(gc: GlobalContextWithSettings): Promise<string | undefin
  * This only controls what is shown. Access to the data is always enforced by Dataverse security roles.
  */
 export async function isAvailable(table?: string | null): Promise<boolean> {
+  return allowed(APPS_SETTING, TABLES_SETTING, table || pageTable());
+}
+
+async function allowed(appsSetting: string, tablesSetting: string, table: string | null | undefined): Promise<boolean> {
   try {
     const gc = globalContext();
     const app = await currentAppName(gc);
-    const apps = gc.getCurrentAppSetting?.(APPS_SETTING);
-    const tables = gc.getCurrentAppSetting?.(TABLES_SETTING);
-    return isAvailableFor(apps, tables, app, table || pageTable());
+    return isAvailableFor(gc.getCurrentAppSetting?.(appsSetting), gc.getCurrentAppSetting?.(tablesSetting), app, table);
   } catch {
     return false;
   }
+}
+
+/** The table a grid shows. In a subgrid the command's primary entity is the parent form's table, so ask the grid itself. */
+export function gridTable(control: unknown): string | null {
+  try {
+    return (control as { getEntityName?: () => string } | null)?.getEntityName?.() ?? null;
+  } catch {
+    return null;
+  }
+}
+
+/** Display rule for the grid buttons: separate settings, so bulk replay is switched on on its own. */
+export async function isGridAvailable(control: unknown): Promise<boolean> {
+  return allowed(GRID_APPS_SETTING, GRID_TABLES_SETTING, gridTable(control));
 }

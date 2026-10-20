@@ -12,6 +12,23 @@ Record the column changes you make on a Dynamics 365 form and replay them on oth
 
 Recordings are private to their owner until you share them or assign them to a team.
 
+## Replay on selected records
+
+Select records in a list or in a subgrid and click **Replay** in the command bar (use the "..." menu if it is not visible). The button is enabled once at least one row is selected and, like the form button, is shown only in the apps and on the tables an administrator enabled for grids (see [Turn it on](#turn-it-on)).
+
+1. Choose a recording for the table of the grid and click **Preview**. The records are read, and any question the recording asks is shown once for all records.
+2. The preview shows how many records will change, per column how many will change, are already correct or are skipped and why, and the first records one by one.
+3. Confirm. The records are updated five at a time, up to **250 per run**. A progress bar shows how far it is and **Stop** ends the run after the records already under way. A record that someone else changed after the preview is skipped and reported, never overwritten. A record that fails (for example, a closed case or a record you cannot edit) is reported and does not stop the others.
+4. When it is done you see a result per record. **Download CSV** saves one row per record and column with the old value, the new value and the result. **Undo this run** puts the old values back, but only for columns that still hold the value the run wrote, so a later edit by someone else is never overwritten. The undo is kept until the page is reloaded, so download the CSV if you need a lasting record.
+
+What is different from a form:
+
+- There is no form, so **form scripts and business rules do not run**. Server-side logic, such as plug-ins and flows, still does, and so does auditing. The dialog says so before you confirm.
+- Whether a column can be changed is decided by the table's metadata and your security roles, not by what a form shows. A column that is read-only for you is skipped; a column that is merely hidden on a form is not.
+- Changes made by server-side logic as a result of the update are not undone. For example, when a recording sets the primary contact of an account, Dynamics also sets that contact's company, and Undo restores the primary contact but not that side effect.
+
+Recordings are the same ones the form uses; a calculation or a copy reads the values of each selected record.
+
 ## Calculate
 
 Choose **Calculate** as the value source to work out the value when the recording is replayed, from the form it is replayed on. No formula language: you pick the options.
@@ -59,20 +76,26 @@ pac solution import --path FormUpdateReplay_managed.zip --publish-changes
 
 ### Turn it on
 
-Replay is **off everywhere after installation**. Two settings decide where the button appears. Both are lists of names, separated by commas, and are set once for the whole environment (see [docs/configuration.md](docs/configuration.md) for how, and for why per-app values are not supported).
+Replay is **off everywhere after installation**. Four settings decide where the buttons appear: two for the form button and two for the grid button. All are lists of names, separated by commas, and are set once for the whole environment (see [docs/configuration.md](docs/configuration.md) for how, and for why per-app values are not supported).
 
 | Setting | Default | Meaning |
 |---------|---------|---------|
-| `msftnl_FormUpdateReplay_Apps` | `none` | Unique names of the model-driven apps that show Replay, for example `msdyn_CustomerServiceWorkspace,Customerservicehub`. `*` means every app. |
-| `msftnl_FormUpdateReplay_Tables` | `*` | Logical names of the tables that show Replay, for example `incident,account`. `*` means every table. A minus excludes a table: `*,-lead`. |
+| `msftnl_FormUpdateReplay_Apps` | `none` | Unique names of the model-driven apps that show Replay on forms, for example `msdyn_CustomerServiceWorkspace,Customerservicehub`. `*` means every app. |
+| `msftnl_FormUpdateReplay_Tables` | `*` | Logical names of the tables that show Replay on forms, for example `incident,account`. `*` means every table. A minus excludes a table: `*,-lead`. |
+| `msftnl_FormUpdateReplay_GridApps` | `none` | The same for the Replay button in lists and subgrids, which updates the selected records. Kept separate because it changes many records at once. |
+| `msftnl_FormUpdateReplay_GridTables` | `*` | The same for the tables whose lists and subgrids show it. |
 
-The button appears only when **both** lists allow the current app and table, **and** the user has one of the roles below. See [docs/configuration.md](docs/configuration.md) for examples and for how to find an app's unique name.
+A button appears only when **both** lists of its pair allow the current app and table, **and** the user has one of the roles below. See [docs/configuration.md](docs/configuration.md) for examples and for how to find an app's unique name.
 
 > Showing or hiding the button is a convenience, not a security boundary. What people can read and change is always decided by their Dataverse security roles.
 
 ### Upgrading from 1.0.x
 
 Version 1.0.x added the Replay button to every app. After the upgrade the old button is hidden and the new one follows the settings above, so **Replay disappears until you set `msftnl_FormUpdateReplay_Apps`**. Existing recordings are not touched.
+
+### Upgrading from 2.0.x
+
+Nothing changes for the form button. The new grid button stays hidden until you set `msftnl_FormUpdateReplay_GridApps`. The upgrade republishes the command bars (several minutes).
 
 ### Security roles
 
@@ -85,7 +108,7 @@ The solution adds two roles. Assign them next to the role people already have; t
 
 The Replay button is shown to everyone who can read recordings, which in practice means everyone with one of these roles. A custom role works too when it grants read access to the *Update Recording* table.
 
-Replaying never grants more access than the user already has: values are set on the open form, so read-only and secured columns are skipped and the normal save rules apply. Columns that are hidden on the form (hidden field, section or tab) or not on it at all count as not available: they are skipped as target, as copy source and as input of a calculation.
+Replaying never grants more access than the user already has. On a form, values are set on the open form, so read-only and secured columns are skipped and the normal save rules apply; columns that are hidden on the form (hidden field, section or tab) or not on it at all count as not available: they are skipped as target, as copy source and as input of a calculation. In a grid, each record is updated as the signed-in user through the Web API, so a column or record the user cannot change is skipped or reported and Dataverse enforces the security roles on every write.
 
 ## What is stored
 
@@ -97,12 +120,12 @@ Text, multi-line text, whole number, decimal, float, currency, yes/no, date and 
 
 ## Limitations
 
-- Replay sets values on the open form only. It does not change records in the background.
+- On a form, Replay sets values on the open form only; you save it yourself. The grid button is the only part that changes records directly, and then only the selected ones (up to 250 per run, the rows currently loaded in the grid).
 - Many apps, including the Copilot Service workspace, autosave. Applied values are then saved shortly after you apply them, so look at the preview first.
 - Lookups are replayed by record, so the target record must exist in the environment.
 - A recording only applies to forms of the table it was recorded on.
-- The Replay button is a classic command-bar button defined in the solution's ribbon XML. That is the variant I found that can be hidden by role, app and table from a solution; the modern command designer cannot do this for a command that is not tied to one app and table. It cannot be edited in the command designer. Installing or upgrading republishes the ribbon of every table, which takes several minutes.
-- The button appears on main forms only, not in grids, subgrids or quick create forms.
+- The Replay buttons are classic command-bar buttons defined in the solution's ribbon XML. That is the variant I found that can be hidden by role, app and table from a solution; the modern command designer cannot do this for a command that is not tied to one app and table. They cannot be edited in the command designer. Installing or upgrading republishes the ribbon of every table, which takes several minutes.
+- The form button appears on main forms only, not in quick create forms. The grid button appears in main grids and subgrids; if it is not visible, look under the "..." menu.
 - The side pane learns which record is on screen from the documented `Xrm.Utility.getPageContext` and gets the form from the Replay command. On a record where Replay was not used yet, the pane follows you only while the deprecated `Xrm.Page` still exists; once Microsoft removes it, the pane asks you to select Replay on that record. Nothing else breaks. See [docs/architecture.md](docs/architecture.md).
 
 ## For developers

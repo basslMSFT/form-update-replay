@@ -17,11 +17,11 @@ export interface AttrLike {
   setValue(value: unknown): void;
   fireOnChange(): void;
   getFormat?(): string | null;
-  getOptions?(): Array<{ value: number; text: string }>;
-  getMaxLength?(): number;
-  getMin?(): number;
-  getMax?(): number;
-  getPrecision?(): number;
+  getOptions?(): Array<{ value: number; text: string }> | undefined;
+  getMaxLength?(): number | undefined;
+  getMin?(): number | undefined;
+  getMax?(): number | undefined;
+  getPrecision?(): number | undefined;
   addOnChange(handler: (ctx: unknown) => void): void;
   removeOnChange(handler: (ctx: unknown) => void): void;
   controls?: { get(): ControlLike[] };

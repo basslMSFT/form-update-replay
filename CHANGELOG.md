@@ -4,6 +4,18 @@ All notable changes to this solution will be documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/), and this project adheres to [Semantic Versioning](https://semver.org/).
 
+## [2.1.0] - 2026-10-20
+
+### Added
+- **Replay on selected records in a grid.** Select records in a list or in a subgrid and choose Replay in the command bar. Pick a recording, answer any questions once, review a preview ("N records will change") and confirm. The records are updated through the Web API, five at a time, up to 250 per run. A record that someone else changes between the preview and the update is skipped and reported.
+- **A CSV of every run** with the old and new value of each column and the result per record.
+- **Undo last run.** Restores the old values of the last run on a table, but only for columns that still hold the value the run wrote. It is kept until the page is reloaded.
+- **Separate switches for grids.** Two new settings, `msftnl_FormUpdateReplay_GridApps` (default `none`) and `msftnl_FormUpdateReplay_GridTables` (default `*`), control where the grid button is shown. It stays off until an administrator enables it, because it changes many records at once. The button also needs the same read access to the recording table as the form button. See `docs/configuration.md`.
+
+### Changed
+- Updating records in a grid does not run form scripts or business rules (there is no form). Server-side logic such as plug-ins and flows still runs. The dialog says so.
+- Installing or upgrading republishes the command bar of every table again (several minutes).
+
 ## [2.0.0] - 2026-10-19
 
 ### Added

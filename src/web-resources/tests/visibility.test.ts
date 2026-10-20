@@ -120,4 +120,31 @@ describe("isAvailable (command bar rule)", () => {
     await rule("contact");
     expect(calls.props).toBe(1);
   });
+
+  describe("grid rule", () => {
+    const grid = (table: string) => ({ getEntityName: () => table });
+
+    it("is off by default and does not follow the form settings", async () => {
+      const { isGridAvailable } = await import("../src/visibility");
+      install({ msftnl_FormUpdateReplay_Apps: "*", msftnl_FormUpdateReplay_Tables: "*", msftnl_FormUpdateReplay_GridApps: "none", msftnl_FormUpdateReplay_GridTables: "*" }, "anyapp");
+      expect(await isGridAvailable(grid("incident"))).toBe(false);
+    });
+
+    it("uses the table of the grid, not the table of the page it sits on", async () => {
+      const { isGridAvailable } = await import("../src/visibility");
+      install({ msftnl_FormUpdateReplay_GridApps: "anyapp", msftnl_FormUpdateReplay_GridTables: "incident" }, "anyapp", "account");
+      expect(await isGridAvailable(grid("incident"))).toBe(true);
+      expect(await isGridAvailable(grid("contact"))).toBe(false);
+    });
+
+    it("is hidden without a grid, in other apps, and when the settings do not exist", async () => {
+      const { isGridAvailable } = await import("../src/visibility");
+      install({ msftnl_FormUpdateReplay_GridApps: "otherapp", msftnl_FormUpdateReplay_GridTables: "*" }, "anyapp");
+      expect(await isGridAvailable(grid("incident"))).toBe(false);
+      expect(await isGridAvailable(undefined)).toBe(false);
+      expect(await isGridAvailable({ getEntityName: () => { throw new Error("x"); } })).toBe(false);
+      install({}, "anyapp");
+      expect(await isGridAvailable(grid("incident"))).toBe(false);
+    });
+  });
 });

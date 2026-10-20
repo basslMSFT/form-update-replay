@@ -4,10 +4,25 @@ import { Step, StoredLookup, StoredValue, isSupportedType } from "./model";
 import { columnInfoFromAttr, isCopyCompatible, isValueAllowed } from "./compat";
 import { CalcContext, CalcSpec, calcColumns, calcKindFor, evaluateCalc } from "./calc";
 import { t } from "./i18n";
+import type { StringKey } from "./i18n";
 
 export type SkipReason =
   | "missing" | "readonly" | "unsupported" | "typeMismatch" | "needsInput" | "sourceMissing" | "sourceIncompatible" | "valueNotAllowed"
   | "calcInputMissing" | "calcInvalid";
+
+/** The text that explains each reason a step is skipped. */
+export const SKIP_REASON_KEYS: Record<SkipReason, StringKey> = {
+  missing: "skipMissing",
+  readonly: "skipReadonly",
+  unsupported: "skipUnsupported",
+  typeMismatch: "skipTypeMismatch",
+  needsInput: "skipNeedsInput",
+  sourceMissing: "skipSourceMissing",
+  sourceIncompatible: "skipSourceIncompatible",
+  valueNotAllowed: "skipValueNotAllowed",
+  calcInputMissing: "skipCalcInputMissing",
+  calcInvalid: "skipCalcInvalid",
+};
 
 export interface PlanItem {
   step: Step;
@@ -42,8 +57,8 @@ function displayText(attr: AttrLike, value: StoredValue): string {
   if (value === null || value === undefined) return "";
   switch (attr.getAttributeType()) {
     case "lookup": return (value as StoredLookup).name ?? "";
-    case "optionset": return attr.getOptions?.().find((o) => o.value === value)?.text ?? String(value);
-    case "multiselectoptionset": return (value as number[]).map((v) => attr.getOptions?.().find((o) => o.value === v)?.text ?? String(v)).join(", ");
+    case "optionset": return attr.getOptions?.()?.find((o) => o.value === value)?.text ?? String(value);
+    case "multiselectoptionset": return (value as number[]).map((v) => attr.getOptions?.()?.find((o) => o.value === v)?.text ?? String(v)).join(", ");
     case "boolean": return value === true ? t("yes") : t("no");
     case "datetime": {
       const s = String(value);

@@ -10,7 +10,10 @@ Form Update Replay records the column changes a user makes on a model-driven for
 | Command library `furep.library.js` (captures the form, opens the side pane, decides where the button shows) | `src/web-resources/src/library.ts`, `visibility.ts` | Done |
 | Hub UI `furep.hub.html` + `furep.hub.js` (React + Fluent UI v9, pane and dialog modes) | `src/web-resources/src/ui` | Done |
 | Replay button: classic ribbon button with a privilege rule and an app/table rule | `src/solution/Other/RibbonCustomization.xml` | Done |
-| Settings `msftnl_FormUpdateReplay_Apps` and `_Tables` | `src/solution/settingdefinitions` | Done |
+| Settings `msftnl_FormUpdateReplay_Apps` and `_Tables` (form button) and `_GridApps` and `_GridTables` (grid button) | `src/solution/settingdefinitions` | Done |
+| Grid button: classic ribbon buttons on subgrids and main grids, sharing one command with a selection rule | `src/solution/Other/RibbonCustomization.xml` | Done |
+| Bulk replay engine: table metadata, a virtual form per record so the form planner runs unchanged, Web API writes, undo, CSV (no Xrm dependency) | `src/web-resources/src/bulk.ts`, `bulk-meta.ts` | Done |
+| Bulk dialog (React + Fluent UI v9, `mode=bulk`) | `src/web-resources/src/ui/BulkDialog.tsx` | Done |
 | Old global command `msftnl_FormUpdateReplay.Form.Open` (kept hidden so upgrades cannot show two buttons) | `src/solution/appactions` | Deprecated |
 | Tables and relationship | `src/solution/Entities` | Done |
 | Roles | `src/solution/Roles` | Done |
@@ -31,6 +34,8 @@ Form Update Replay records the column changes a user makes on a model-driven for
 | 10 | Computed values use a structured *Calculate* step (JSON in `msftnl_calculation`, evaluated by the pure functions in `calc.ts`) instead of Power Fx: there is no supported way to run Power Fx from a web resource, and a structured step needs no extra runtime or package, validates in the editor and previews safely. |
 | 11 | Where Replay is shown is configured with two solution settings (apps and tables) set as environment values, and the roles; it is off until an administrator sets the apps. Per-app values are not supported because they could not be written through the API in testing. See [configuration.md](configuration.md). |
 | 12 | The button is a classic ribbon button, not a modern command. A modern command can only be gated by Power Fx, which is not available for a command that is not bound to one app and table, and the platform refuses custom rules on modern commands outside Microsoft first-party solutions. |
+| 13 | Replay on selected records is a separate button with separate settings (default off), because it writes many records at once. It writes through the Web API, not through a form, so there are no form scripts or business rules; server-side logic still runs. Each record is read once and planned with the same planner as a form: a record is wrapped in a virtual form built from table metadata, so every skip reason, copy rule, calculation and value check behaves the same. |
+| 14 | A bulk run is limited to 250 records (the largest grid page), five at a time. Writes carry `If-Match` with the ETag read for the preview, so a record changed by someone else since then is skipped and reported, and `PATCH` can never create a record that was deleted meanwhile. Undo restores only columns that still hold the value the run wrote. The last run is kept in memory on the top window, so Undo lasts until the page is reloaded; the CSV is the lasting record. |
 
 ## How the pieces fit
 
@@ -38,6 +43,7 @@ Form Update Replay records the column changes a user makes on a model-driven for
 2. The pane (`mode=pane`) follows whatever form is active, using the registry first and the page context as a fallback. Recorders live in the same registry, so each session and record records independently.
 3. Recordings are stored through the Web API (deep insert of steps). The tab a recording appears on is derived from its owner and from sharing rows.
 4. Replay builds a plan first (what would change, what is skipped and why), the user can answer prompts, and only then are values set on the open form.
+5. In a grid, the command passes the grid control and the selected ids to `FormUpdateReplay.openBulk`, which checks the selection (1 to 250 rows), stores the ids in the registry under a one-time token (a long selection would not fit in a query string) and opens the bulk dialog (`mode=bulk`). The dialog reads the recording, loads the table metadata and the records, plans every record, shows the summary and, after confirmation, writes the changes. When it closes, the grid is refreshed.
 
 ## Findings that shaped the design
 
@@ -51,12 +57,14 @@ Form Update Replay records the column changes a user makes on a model-driven for
 - Records in the workspace autosave. Applying a recording to an open record therefore saves it shortly afterwards; the preview step exists for that reason.
 - Lookup values on forms often have no display name; the name is looked up when the recording is stopped.
 
+- A classic grid button works in both apps and in subgrids and main grids. The command receives the grid control (`SelectedControl`) and the selected ids (`SelectedControlSelectedItemIds`), and the app name and settings are available as on a form. In a subgrid `PrimaryEntityTypeName` is the table of the parent form, not of the grid, so the display rule asks the grid control for its table (`getEntityName()`), which also lets one setting list the tables whose grids may show the button. A button without a selection rule disappears as soon as rows are selected, so the command has an enable rule (`SelectionCountRule`, at least one row). Both buttons sit in the `Management` group of `MainTab` for `Mscrm.SubGrid` and `Mscrm.HomepageGrid`; they usually end up under the "..." menu.
+- The engine was tested against Dataverse: read and write of text, memo, whole number, yes/no, choice and date-only columns, lookups (single-target and polymorphic, set and clear), calculation and question steps, a conflict created between preview and update (a genuine 412), and undo. Currency, multi-select choice, float, decimal and date-and-time columns are covered by unit tests against a fake API only. Clearing a lookup is a `DELETE` on the relationship reference; setting one is an `@odata.bind` with the navigation property for that target table, which metadata gives per attribute and target. Server-side logic can also change other data as a result of a write: setting an account's primary contact made the platform set that contact's company, and Undo does not revert such side effects.
 - Calculations are evaluated in the user's browser time zone. A working-day step moves by calendar day, so the time of day survives a daylight saving change, and weekends are skipped without holiday calendars.
 - A Calculate step stores only the calculation (no value). Replaying it reads other columns from the open form, so a column the target form does not have is reported as a reason instead of guessed.
 
 ## Known limitations
 
-- Only form-level replay (no background updates of many records).
+- On a form, replay is form-level only: no background updates. The grid button updates the selected records (up to 250 per run) but runs no form scripts or business rules.
 - No audit of who replayed what; enable Dataverse auditing on the target tables if you need it.
 - Field-level security cannot be detected before replay beyond what the form reports as read-only.
 - A recording stores the values as they were typed, readable by everyone it is shared with, also when a column is protected by field-level security for them. Do not share recordings of secured or personal columns; use **Ask when replaying** instead, which stores no value.

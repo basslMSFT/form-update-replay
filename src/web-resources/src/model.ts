@@ -2,6 +2,9 @@
 
 import type { CalcSpec } from "./calc";
 
+/** Most records one grid replay may update; it matches the largest page a grid shows. */
+export const MAX_RECORDS = 250;
+
 export const SCHEMA_VERSION = 1;
 
 export type Operation = "set" | "clear";
