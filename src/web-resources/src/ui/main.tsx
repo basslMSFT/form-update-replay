@@ -4,6 +4,7 @@ import { FluentProvider, Spinner, webLightTheme } from "@fluentui/react-componen
 import { AppContext, AppCtx, errorText } from "./context";
 import { Pane } from "./Pane";
 import { Hub } from "./Hub";
+import { BulkDialog } from "./BulkDialog";
 import { createApi, loadIdentity } from "../store";
 import { getXrm } from "../controller";
 import { langFromLcid, setLang } from "../i18n";
@@ -14,8 +15,9 @@ function dataParam(name: string): string | null {
   return new URLSearchParams(data).get(name);
 }
 
-function modeFromQuery(): "pane" | "dialog" {
-  return dataParam("mode") === "dialog" ? "dialog" : "pane";
+function modeFromQuery(): "pane" | "dialog" | "bulk" {
+  const mode = dataParam("mode");
+  return mode === "dialog" || mode === "bulk" ? mode : "pane";
 }
 
 async function boot(): Promise<AppContext> {
@@ -36,7 +38,8 @@ function App(): JSX.Element {
   useEffect(() => { boot().then(setCtx).catch((e) => setError(errorText(e))); }, []);
   if (error) return <div style={{ padding: 16 }}>{error}</div>;
   if (!ctx) return <Spinner style={{ marginTop: 40 }} />;
-  return <AppCtx.Provider value={ctx}>{modeFromQuery() === "dialog" ? <Hub /> : <Pane />}</AppCtx.Provider>;
+  const mode = modeFromQuery();
+  return <AppCtx.Provider value={ctx}>{mode === "bulk" ? <BulkDialog token={dataParam("token")} /> : mode === "dialog" ? <Hub /> : <Pane />}</AppCtx.Provider>;
 }
 
 createRoot(document.getElementById("root")!).render(

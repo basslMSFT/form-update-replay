@@ -116,7 +116,7 @@ export function isValueAllowed(attr: AttrLike, value: StoredValue): boolean {
   }
 }
 
-const TYPE_BY_METADATA: Record<string, string> = {
+export const TYPE_BY_METADATA: Record<string, string> = {
   StringType: "string",
   MemoType: "memo",
   IntegerType: "integer",

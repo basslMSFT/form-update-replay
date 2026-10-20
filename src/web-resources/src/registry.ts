@@ -11,9 +11,18 @@ export interface FormEntry {
   seenAt: number;
 }
 
+/** The records selected in a grid, handed from the command bar to the bulk dialog under a one-time token. */
+export interface BulkRequest {
+  table: string;
+  ids: string[];
+}
+
 export interface Registry {
   forms: Record<string, FormEntry>;
   recorders: Record<string, Recorder>;
+  bulkRequests?: Record<string, BulkRequest>;
+  /** The last bulk run per table, kept in memory so it can be undone until the page is reloaded. */
+  lastRuns?: Record<string, unknown>;
 }
 
 type TopWindow = Window & { __formUpdateReplay?: Registry; Microsoft?: { Apm?: { getFocusedSession?: () => { sessionId?: string } | undefined } } };

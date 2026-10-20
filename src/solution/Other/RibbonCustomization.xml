@@ -6,6 +6,16 @@
         <Button Id="msftnl.FormUpdateReplay.Button" Command="msftnl.FormUpdateReplay.Command" Sequence="5" TemplateAlias="o1" LabelText="$LocLabels:msftnl.FormUpdateReplay.Label" Alt="$LocLabels:msftnl.FormUpdateReplay.Label" ToolTipTitle="$LocLabels:msftnl.FormUpdateReplay.Label" ToolTipDescription="$LocLabels:msftnl.FormUpdateReplay.Tooltip" ModernImage="$webresource:msftnl_/furep/img/furep.svg" />
       </CommandUIDefinition>
     </CustomAction>
+    <CustomAction Id="msftnl.FormUpdateReplay.SubGrid.CustomAction" Location="Mscrm.SubGrid.{!EntityLogicalName}.MainTab.Management.Controls._children" Sequence="5">
+      <CommandUIDefinition>
+        <Button Id="msftnl.FormUpdateReplay.SubGrid.Button" Command="msftnl.FormUpdateReplay.GridCommand" Sequence="5" TemplateAlias="o1" LabelText="$LocLabels:msftnl.FormUpdateReplay.Label" Alt="$LocLabels:msftnl.FormUpdateReplay.Label" ToolTipTitle="$LocLabels:msftnl.FormUpdateReplay.Label" ToolTipDescription="$LocLabels:msftnl.FormUpdateReplay.GridTooltip" ModernImage="$webresource:msftnl_/furep/img/furep.svg" />
+      </CommandUIDefinition>
+    </CustomAction>
+    <CustomAction Id="msftnl.FormUpdateReplay.HomepageGrid.CustomAction" Location="Mscrm.HomepageGrid.{!EntityLogicalName}.MainTab.Management.Controls._children" Sequence="5">
+      <CommandUIDefinition>
+        <Button Id="msftnl.FormUpdateReplay.HomepageGrid.Button" Command="msftnl.FormUpdateReplay.GridCommand" Sequence="5" TemplateAlias="o1" LabelText="$LocLabels:msftnl.FormUpdateReplay.Label" Alt="$LocLabels:msftnl.FormUpdateReplay.Label" ToolTipTitle="$LocLabels:msftnl.FormUpdateReplay.Label" ToolTipDescription="$LocLabels:msftnl.FormUpdateReplay.GridTooltip" ModernImage="$webresource:msftnl_/furep/img/furep.svg" />
+      </CommandUIDefinition>
+    </CustomAction>
   </CustomActions>
   <Templates>
     <RibbonTemplates Id="Mscrm.Templates"></RibbonTemplates>
@@ -23,6 +33,21 @@
         </JavaScriptFunction>
       </Actions>
     </CommandDefinition>
+    <CommandDefinition Id="msftnl.FormUpdateReplay.GridCommand">
+      <EnableRules>
+        <EnableRule Id="msftnl.FormUpdateReplay.HasSelection" />
+      </EnableRules>
+      <DisplayRules>
+        <DisplayRule Id="msftnl.FormUpdateReplay.HasPrivilege" />
+        <DisplayRule Id="msftnl.FormUpdateReplay.EnabledForGrid" />
+      </DisplayRules>
+      <Actions>
+        <JavaScriptFunction FunctionName="FormUpdateReplay.openBulk" Library="$webresource:msftnl_/furep/js/furep.library.js">
+          <CrmParameter Value="SelectedControl" />
+          <CrmParameter Value="SelectedControlSelectedItemIds" />
+        </JavaScriptFunction>
+      </Actions>
+    </CommandDefinition>
   </CommandDefinitions>
   <RuleDefinitions>
     <TabDisplayRules />
@@ -35,8 +60,17 @@
           <CrmParameter Value="PrimaryEntityTypeName" />
         </CustomRule>
       </DisplayRule>
+      <DisplayRule Id="msftnl.FormUpdateReplay.EnabledForGrid">
+        <CustomRule FunctionName="FormUpdateReplay.isGridAvailable" Library="$webresource:msftnl_/furep/js/furep.library.js" Default="false">
+          <CrmParameter Value="SelectedControl" />
+        </CustomRule>
+      </DisplayRule>
     </DisplayRules>
-    <EnableRules />
+    <EnableRules>
+      <EnableRule Id="msftnl.FormUpdateReplay.HasSelection">
+        <SelectionCountRule AppliesTo="SelectedEntity" Minimum="1" />
+      </EnableRule>
+    </EnableRules>
   </RuleDefinitions>
   <LocLabels>
     <LocLabel Id="msftnl.FormUpdateReplay.Label">
@@ -49,6 +83,12 @@
       <Titles>
         <Title languagecode="1033" description="Record column changes on this form and replay them on other records." />
         <Title languagecode="1043" description="Neem kolomwijzigingen op dit formulier op en speel ze af op andere records." />
+      </Titles>
+    </LocLabel>
+    <LocLabel Id="msftnl.FormUpdateReplay.GridTooltip">
+      <Titles>
+        <Title languagecode="1033" description="Replay a recording on the selected records." />
+        <Title languagecode="1043" description="Speel een opname af op de geselecteerde records." />
       </Titles>
     </LocLabel>
   </LocLabels>
