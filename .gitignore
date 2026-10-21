@@ -24,6 +24,15 @@ tmp/
 .env.*
 local.settings.json
 
+# Credentials and certificates (never commit; a project .npmrc can hold registry tokens)
+.npmrc
+*.pem
+*.pfx
+*.p12
+*.key
+*.cer
+*.publishsettings
+
 # Dataverse Skills plugin / MCP config
 .token_cache.bin
 .claude/mcp_settings.json
