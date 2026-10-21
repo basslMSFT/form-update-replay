@@ -83,22 +83,18 @@ Replay is **off everywhere after installation**. Four settings decide where the 
 
 | Setting | Default | Meaning |
 |---------|---------|---------|
-| `msftnl_FormUpdateReplay_Apps` | `none` | Unique names of the model-driven apps that show Replay on forms, for example `msdyn_CustomerServiceWorkspace,Customerservicehub`. `*` means every app. |
-| `msftnl_FormUpdateReplay_Tables` | `*` | Logical names of the tables that show Replay on forms, for example `incident,account`. `*` means every table. A minus excludes a table: `*,-lead`. |
-| `msftnl_FormUpdateReplay_GridApps` | `none` | The same for the Replay button in lists and subgrids, which updates the selected records. Kept separate because it changes many records at once. |
-| `msftnl_FormUpdateReplay_GridTables` | `*` | The same for the tables whose lists and subgrids show it. |
+| `bassllab_FormUpdateReplay_Apps` | `none` | Unique names of the model-driven apps that show Replay on forms, for example `msdyn_CustomerServiceWorkspace,Customerservicehub`. `*` means every app. |
+| `bassllab_FormUpdateReplay_Tables` | `*` | Logical names of the tables that show Replay on forms, for example `incident,account`. `*` means every table. A minus excludes a table: `*,-lead`. |
+| `bassllab_FormUpdateReplay_GridApps` | `none` | The same for the Replay button in lists and subgrids, which updates the selected records. Kept separate because it changes many records at once. |
+| `bassllab_FormUpdateReplay_GridTables` | `*` | The same for the tables whose lists and subgrids show it. |
 
 A button appears only when **both** lists of its pair allow the current app and table, **and** the user has one of the roles below. See [docs/configuration.md](docs/configuration.md) for examples and for how to find an app's unique name.
 
 > Showing or hiding the button is a convenience, not a security boundary. What people can read and change is always decided by their Dataverse security roles.
 
-### Upgrading from 1.0.x
+### Moving from 1.x or 2.x
 
-Version 1.0.x added the Replay button to every app. After the upgrade the old button is hidden and the new one follows the settings above, so **Replay disappears until you set `msftnl_FormUpdateReplay_Apps`**. Existing recordings are not touched.
-
-### Upgrading from 2.0.x
-
-Nothing changes for the form button. The new grid button stays hidden until you set `msftnl_FormUpdateReplay_GridApps`. The upgrade republishes the command bars (several minutes).
+**3.0.0 is a new solution under a new publisher (Bassl Labs, prefix `bassllab_`) and cannot be imported over 1.x or 2.x.** Remove the old solution first, install 3.0.0 and set the four settings again. Recordings are not carried over. The steps are in [docs/installation.md](docs/installation.md#moving-from-1x-or-2x-to-30).
 
 ### Security roles
 
@@ -115,7 +111,7 @@ Replaying never grants more access than the user already has. On a form, values 
 
 ## What is stored
 
-Each recording is a row in `msftnl_updaterecording` with one child row per change in `msftnl_updaterecordingstep` (column, type, value, how the value is obtained). Everything stays in your Dataverse environment. Nothing is sent anywhere else. Recorded values are visible to everyone the recording is shared with, so use **Ask when replaying** for personal or sensitive values.
+Each recording is a row in `bassllab_updaterecording` with one child row per change in `bassllab_updaterecordingstep` (column, type, value, how the value is obtained). Everything stays in your Dataverse environment. Nothing is sent anywhere else. Recorded values are visible to everyone the recording is shared with, so use **Ask when replaying** for personal or sensitive values.
 
 ## Supported columns
 

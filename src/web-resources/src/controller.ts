@@ -15,7 +15,7 @@ export function getXrm(): typeof Xrm {
   throw new Error("Xrm is not available");
 }
 
-const NOTIFICATION_ID = "msftnl_furep_recording";
+const NOTIFICATION_ID = "bassllab_furep_recording";
 
 /** True while the native record picker is open; the form is not the current page then, which must not reset the pane. */
 export const picker = { active: false };

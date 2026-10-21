@@ -8,9 +8,9 @@ import { cleanGuid } from "./value-codec";
  * Command-bar entry points. The form button opens the Form Update Replay side pane; the grid button opens the bulk
  * dialog for the selected records. All real work happens in the hub bundle so this file stays tiny and loads fast.
  */
-const PANE_ID = "msftnl_formupdatereplay";
-const HUB = "msftnl_/furep/html/furep.hub.html";
-const ICON = "msftnl_/furep/img/furep.svg";
+const PANE_ID = "bassllab_formupdatereplay";
+const HUB = "bassllab_/furep/html/furep.hub.html";
+const ICON = "bassllab_/furep/img/furep.svg";
 
 async function openPanel(fc: Xrm.FormContext): Promise<void> {
   if (fc?.data?.entity) {

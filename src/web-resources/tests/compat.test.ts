@@ -143,9 +143,9 @@ describe("plan with copy and ask steps", () => {
 describe("stored steps", () => {
   it("keeps the recorded value only for fixed steps", () => {
     const base = { sortOrder: 10, operation: "set" as const, column: "t", columnType: "string", value: "secret" };
-    expect(stepToPayload({ ...base, valueMode: "fixed" }).msftnl_value).toBe('"secret"');
-    expect(stepToPayload({ ...base, valueMode: "prompt", promptText: "Q" })).toMatchObject({ msftnl_value: null, msftnl_prompttext: "Q" });
-    expect(stepToPayload({ ...base, valueMode: "copy", sourceColumn: "s", promptText: "old" })).toMatchObject({ msftnl_value: null, msftnl_sourcecolumnlogicalname: "s", msftnl_prompttext: null });
+    expect(stepToPayload({ ...base, valueMode: "fixed" }).bassllab_value).toBe('"secret"');
+    expect(stepToPayload({ ...base, valueMode: "prompt", promptText: "Q" })).toMatchObject({ bassllab_value: null, bassllab_prompttext: "Q" });
+    expect(stepToPayload({ ...base, valueMode: "copy", sourceColumn: "s", promptText: "old" })).toMatchObject({ bassllab_value: null, bassllab_sourcecolumnlogicalname: "s", bassllab_prompttext: null });
   });
 });
 

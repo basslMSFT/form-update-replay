@@ -6,20 +6,20 @@ There are no connection references. Where the Replay buttons appear is controlle
 
 The **form button** is shown when **all three** are true:
 
-1. The current **app** is allowed by `msftnl_FormUpdateReplay_Apps`.
-2. The current **table** is allowed by `msftnl_FormUpdateReplay_Tables`.
+1. The current **app** is allowed by `bassllab_FormUpdateReplay_Apps`.
+2. The current **table** is allowed by `bassllab_FormUpdateReplay_Tables`.
 3. The user has **read access to the recording table**, which both shipped roles give.
 
-The **grid button** (Replay on the selected records in a list or subgrid) follows the same rules with its own pair of settings, `msftnl_FormUpdateReplay_GridApps` and `msftnl_FormUpdateReplay_GridTables`, because it changes many records at once and an administrator may want it in fewer apps or on fewer tables than the form button. The table it checks is the table **shown in the grid**, so on a subgrid of cases inside an account form, `incident` decides, not `account`. It is also enabled only while at least one row is selected.
+The **grid button** (Replay on the selected records in a list or subgrid) follows the same rules with its own pair of settings, `bassllab_FormUpdateReplay_GridApps` and `bassllab_FormUpdateReplay_GridTables`, because it changes many records at once and an administrator may want it in fewer apps or on fewer tables than the form button. The table it checks is the table **shown in the grid**, so on a subgrid of cases inside an account form, `incident` decides, not `account`. It is also enabled only while at least one row is selected.
 
-After installation `msftnl_FormUpdateReplay_Apps` and `msftnl_FormUpdateReplay_GridApps` are `none`, so Replay is hidden until an administrator enables it.
+After installation `bassllab_FormUpdateReplay_Apps` and `bassllab_FormUpdateReplay_GridApps` are `none`, so Replay is hidden until an administrator enables it.
 
 | Setting | Type | Default | Values |
 |---------|------|---------|--------|
-| `msftnl_FormUpdateReplay_Apps` | Text | `none` | Comma-separated unique names of model-driven apps. `*` for every app, `none` for no app. |
-| `msftnl_FormUpdateReplay_Tables` | Text | `*` | Comma-separated logical table names. `*` for every table. Prefix a name with `-` to exclude it. |
-| `msftnl_FormUpdateReplay_GridApps` | Text | `none` | The same, for the grid button. |
-| `msftnl_FormUpdateReplay_GridTables` | Text | `*` | The same, for the grid button. |
+| `bassllab_FormUpdateReplay_Apps` | Text | `none` | Comma-separated unique names of model-driven apps. `*` for every app, `none` for no app. |
+| `bassllab_FormUpdateReplay_Tables` | Text | `*` | Comma-separated logical table names. `*` for every table. Prefix a name with `-` to exclude it. |
+| `bassllab_FormUpdateReplay_GridApps` | Text | `none` | The same, for the grid button. |
+| `bassllab_FormUpdateReplay_GridTables` | Text | `*` | The same, for the grid button. |
 
 Names are not case-sensitive. Separators can be commas, semicolons or spaces.
 
@@ -40,10 +40,10 @@ Both settings are meant to be set once for the **whole environment**. Because th
 
 ```http
 POST [org]/api/data/v9.2/SaveSettingValue
-{ "SettingName": "msftnl_FormUpdateReplay_Apps", "Value": "msdyn_CustomerServiceWorkspace,Customerservicehub" }
+{ "SettingName": "bassllab_FormUpdateReplay_Apps", "Value": "msdyn_CustomerServiceWorkspace,Customerservicehub" }
 
 POST [org]/api/data/v9.2/SaveSettingValue
-{ "SettingName": "msftnl_FormUpdateReplay_GridApps", "Value": "msdyn_CustomerServiceWorkspace,Customerservicehub" }
+{ "SettingName": "bassllab_FormUpdateReplay_GridApps", "Value": "msdyn_CustomerServiceWorkspace,Customerservicehub" }
 ```
 
 **Opened and seen, saving not tested: the settings screen in the maker portal.** In [make.powerapps.com](https://make.powerapps.com), select the environment, open **Solutions**, then open **Form Update Replay**. Select the setting **Form Update Replay: apps**, **Form Update Replay: tables**, **Form Update Replay: apps (grids)** or **Form Update Replay: tables (grids)** (type *Setting*) in the list of items. The **Edit** panel shows the description, the default value, and under **Setting environment value** the value for your environment, which is where you type a new value. The screen showed the value that had been set with the Web API above, so both routes edit the same value. Editing and saving a value on the screen was not tried, so use the Web API call if saving fails. Microsoft describes the screen in [Use settings to provide customized app experiences](https://learn.microsoft.com/power-apps/maker/data-platform/create-edit-configure-settings); the documentation says it needs **Solution preview** to be on in the Solutions area.

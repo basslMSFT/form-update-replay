@@ -26,7 +26,7 @@ Node 22 or newer. The Power Platform CLI (`pac`) is only needed to pack or impor
 
 - Keep the engine (`recorder.ts`, `player.ts`, `value-codec.ts`) free of direct Xrm calls so it stays unit-testable.
 - Every user-visible string goes into `src/web-resources/src/i18n.ts` in both Dutch and English; a test fails when the two differ.
-- Use the `msftnl_` prefix for all Dataverse components and never hard-code org URLs, IDs or customer names.
+- Use the `bassllab_` prefix for all Dataverse components and never hard-code org URLs, IDs or customer names.
 - Change tables and roles in a development environment, then `pac solution export` and `pac solution unpack` into `src/solution`. Do not hand-edit table XML.
 - Update `CHANGELOG.md` and keep the version identical in `package.json`, the solution and the changelog (`node scripts/check-version.mjs`).
 

@@ -3,11 +3,11 @@
  * lists of app unique names and table logical names. The default for apps is "none", so nothing shows until an admin
  * turns Replay on. Roles are checked separately by the command bar itself (a privilege rule on the recording table).
  */
-export const APPS_SETTING = "msftnl_FormUpdateReplay_Apps";
-export const TABLES_SETTING = "msftnl_FormUpdateReplay_Tables";
+export const APPS_SETTING = "bassllab_FormUpdateReplay_Apps";
+export const TABLES_SETTING = "bassllab_FormUpdateReplay_Tables";
 /** The same two lists for the bulk replay button in grids; off by default because it changes many records at once. */
-export const GRID_APPS_SETTING = "msftnl_FormUpdateReplay_GridApps";
-export const GRID_TABLES_SETTING = "msftnl_FormUpdateReplay_GridTables";
+export const GRID_APPS_SETTING = "bassllab_FormUpdateReplay_GridApps";
+export const GRID_TABLES_SETTING = "bassllab_FormUpdateReplay_GridTables";
 
 /** Splits a setting value on commas, semicolons and whitespace; case-insensitive. */
 export function parseList(raw: unknown): string[] {

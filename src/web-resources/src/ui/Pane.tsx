@@ -22,7 +22,7 @@ const useStyles = makeStyles({
   muted: { color: tokens.colorNeutralForeground3 },
 });
 
-const HUB = "msftnl_/furep/html/furep.hub.html";
+const HUB = "bassllab_/furep/html/furep.hub.html";
 
 export function Pane(): ReactElement {
   const s = useStyles();

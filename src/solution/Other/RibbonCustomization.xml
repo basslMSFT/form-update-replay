@@ -1,19 +1,19 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RibbonDiffXml xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
   <CustomActions>
-    <CustomAction Id="msftnl.FormUpdateReplay.CustomAction" Location="Mscrm.Form.{!EntityLogicalName}.MainTab.Actions.Controls._children" Sequence="5">
+    <CustomAction Id="bassllab.FormUpdateReplay.CustomAction" Location="Mscrm.Form.{!EntityLogicalName}.MainTab.Actions.Controls._children" Sequence="5">
       <CommandUIDefinition>
-        <Button Id="msftnl.FormUpdateReplay.Button" Command="msftnl.FormUpdateReplay.Command" Sequence="5" TemplateAlias="o1" LabelText="$LocLabels:msftnl.FormUpdateReplay.Label" Alt="$LocLabels:msftnl.FormUpdateReplay.Label" ToolTipTitle="$LocLabels:msftnl.FormUpdateReplay.Label" ToolTipDescription="$LocLabels:msftnl.FormUpdateReplay.Tooltip" ModernImage="$webresource:msftnl_/furep/img/furep.svg" />
+        <Button Id="bassllab.FormUpdateReplay.Button" Command="bassllab.FormUpdateReplay.Command" Sequence="5" TemplateAlias="o1" LabelText="$LocLabels:bassllab.FormUpdateReplay.Label" Alt="$LocLabels:bassllab.FormUpdateReplay.Label" ToolTipTitle="$LocLabels:bassllab.FormUpdateReplay.Label" ToolTipDescription="$LocLabels:bassllab.FormUpdateReplay.Tooltip" ModernImage="$webresource:bassllab_/furep/img/furep.svg" />
       </CommandUIDefinition>
     </CustomAction>
-    <CustomAction Id="msftnl.FormUpdateReplay.SubGrid.CustomAction" Location="Mscrm.SubGrid.{!EntityLogicalName}.MainTab.Management.Controls._children" Sequence="5">
+    <CustomAction Id="bassllab.FormUpdateReplay.SubGrid.CustomAction" Location="Mscrm.SubGrid.{!EntityLogicalName}.MainTab.Management.Controls._children" Sequence="5">
       <CommandUIDefinition>
-        <Button Id="msftnl.FormUpdateReplay.SubGrid.Button" Command="msftnl.FormUpdateReplay.GridCommand" Sequence="5" TemplateAlias="o1" LabelText="$LocLabels:msftnl.FormUpdateReplay.Label" Alt="$LocLabels:msftnl.FormUpdateReplay.Label" ToolTipTitle="$LocLabels:msftnl.FormUpdateReplay.Label" ToolTipDescription="$LocLabels:msftnl.FormUpdateReplay.GridTooltip" ModernImage="$webresource:msftnl_/furep/img/furep.svg" />
+        <Button Id="bassllab.FormUpdateReplay.SubGrid.Button" Command="bassllab.FormUpdateReplay.GridCommand" Sequence="5" TemplateAlias="o1" LabelText="$LocLabels:bassllab.FormUpdateReplay.Label" Alt="$LocLabels:bassllab.FormUpdateReplay.Label" ToolTipTitle="$LocLabels:bassllab.FormUpdateReplay.Label" ToolTipDescription="$LocLabels:bassllab.FormUpdateReplay.GridTooltip" ModernImage="$webresource:bassllab_/furep/img/furep.svg" />
       </CommandUIDefinition>
     </CustomAction>
-    <CustomAction Id="msftnl.FormUpdateReplay.HomepageGrid.CustomAction" Location="Mscrm.HomepageGrid.{!EntityLogicalName}.MainTab.Management.Controls._children" Sequence="5">
+    <CustomAction Id="bassllab.FormUpdateReplay.HomepageGrid.CustomAction" Location="Mscrm.HomepageGrid.{!EntityLogicalName}.MainTab.Management.Controls._children" Sequence="5">
       <CommandUIDefinition>
-        <Button Id="msftnl.FormUpdateReplay.HomepageGrid.Button" Command="msftnl.FormUpdateReplay.GridCommand" Sequence="5" TemplateAlias="o1" LabelText="$LocLabels:msftnl.FormUpdateReplay.Label" Alt="$LocLabels:msftnl.FormUpdateReplay.Label" ToolTipTitle="$LocLabels:msftnl.FormUpdateReplay.Label" ToolTipDescription="$LocLabels:msftnl.FormUpdateReplay.GridTooltip" ModernImage="$webresource:msftnl_/furep/img/furep.svg" />
+        <Button Id="bassllab.FormUpdateReplay.HomepageGrid.Button" Command="bassllab.FormUpdateReplay.GridCommand" Sequence="5" TemplateAlias="o1" LabelText="$LocLabels:bassllab.FormUpdateReplay.Label" Alt="$LocLabels:bassllab.FormUpdateReplay.Label" ToolTipTitle="$LocLabels:bassllab.FormUpdateReplay.Label" ToolTipDescription="$LocLabels:bassllab.FormUpdateReplay.GridTooltip" ModernImage="$webresource:bassllab_/furep/img/furep.svg" />
       </CommandUIDefinition>
     </CustomAction>
   </CustomActions>
@@ -21,28 +21,28 @@
     <RibbonTemplates Id="Mscrm.Templates"></RibbonTemplates>
   </Templates>
   <CommandDefinitions>
-    <CommandDefinition Id="msftnl.FormUpdateReplay.Command">
+    <CommandDefinition Id="bassllab.FormUpdateReplay.Command">
       <EnableRules />
       <DisplayRules>
-        <DisplayRule Id="msftnl.FormUpdateReplay.HasPrivilege" />
-        <DisplayRule Id="msftnl.FormUpdateReplay.EnabledForAppAndTable" />
+        <DisplayRule Id="bassllab.FormUpdateReplay.HasPrivilege" />
+        <DisplayRule Id="bassllab.FormUpdateReplay.EnabledForAppAndTable" />
       </DisplayRules>
       <Actions>
-        <JavaScriptFunction FunctionName="FormUpdateReplay.openPanel" Library="$webresource:msftnl_/furep/js/furep.library.js">
+        <JavaScriptFunction FunctionName="FormUpdateReplay.openPanel" Library="$webresource:bassllab_/furep/js/furep.library.js">
           <CrmParameter Value="PrimaryControl" />
         </JavaScriptFunction>
       </Actions>
     </CommandDefinition>
-    <CommandDefinition Id="msftnl.FormUpdateReplay.GridCommand">
+    <CommandDefinition Id="bassllab.FormUpdateReplay.GridCommand">
       <EnableRules>
-        <EnableRule Id="msftnl.FormUpdateReplay.HasSelection" />
+        <EnableRule Id="bassllab.FormUpdateReplay.HasSelection" />
       </EnableRules>
       <DisplayRules>
-        <DisplayRule Id="msftnl.FormUpdateReplay.HasPrivilege" />
-        <DisplayRule Id="msftnl.FormUpdateReplay.EnabledForGrid" />
+        <DisplayRule Id="bassllab.FormUpdateReplay.HasPrivilege" />
+        <DisplayRule Id="bassllab.FormUpdateReplay.EnabledForGrid" />
       </DisplayRules>
       <Actions>
-        <JavaScriptFunction FunctionName="FormUpdateReplay.openBulk" Library="$webresource:msftnl_/furep/js/furep.library.js">
+        <JavaScriptFunction FunctionName="FormUpdateReplay.openBulk" Library="$webresource:bassllab_/furep/js/furep.library.js">
           <CrmParameter Value="SelectedControl" />
           <CrmParameter Value="SelectedControlSelectedItemIds" />
         </JavaScriptFunction>
@@ -52,40 +52,40 @@
   <RuleDefinitions>
     <TabDisplayRules />
     <DisplayRules>
-      <DisplayRule Id="msftnl.FormUpdateReplay.HasPrivilege">
-        <EntityPrivilegeRule EntityName="msftnl_updaterecording" PrivilegeType="Read" PrivilegeDepth="Basic" />
+      <DisplayRule Id="bassllab.FormUpdateReplay.HasPrivilege">
+        <EntityPrivilegeRule EntityName="bassllab_updaterecording" PrivilegeType="Read" PrivilegeDepth="Basic" />
       </DisplayRule>
-      <DisplayRule Id="msftnl.FormUpdateReplay.EnabledForAppAndTable">
-        <CustomRule FunctionName="FormUpdateReplay.isAvailable" Library="$webresource:msftnl_/furep/js/furep.library.js" Default="false">
+      <DisplayRule Id="bassllab.FormUpdateReplay.EnabledForAppAndTable">
+        <CustomRule FunctionName="FormUpdateReplay.isAvailable" Library="$webresource:bassllab_/furep/js/furep.library.js" Default="false">
           <CrmParameter Value="PrimaryEntityTypeName" />
         </CustomRule>
       </DisplayRule>
-      <DisplayRule Id="msftnl.FormUpdateReplay.EnabledForGrid">
-        <CustomRule FunctionName="FormUpdateReplay.isGridAvailable" Library="$webresource:msftnl_/furep/js/furep.library.js" Default="false">
+      <DisplayRule Id="bassllab.FormUpdateReplay.EnabledForGrid">
+        <CustomRule FunctionName="FormUpdateReplay.isGridAvailable" Library="$webresource:bassllab_/furep/js/furep.library.js" Default="false">
           <CrmParameter Value="SelectedControl" />
         </CustomRule>
       </DisplayRule>
     </DisplayRules>
     <EnableRules>
-      <EnableRule Id="msftnl.FormUpdateReplay.HasSelection">
+      <EnableRule Id="bassllab.FormUpdateReplay.HasSelection">
         <SelectionCountRule AppliesTo="SelectedEntity" Minimum="1" />
       </EnableRule>
     </EnableRules>
   </RuleDefinitions>
   <LocLabels>
-    <LocLabel Id="msftnl.FormUpdateReplay.Label">
+    <LocLabel Id="bassllab.FormUpdateReplay.Label">
       <Titles>
         <Title languagecode="1033" description="Replay" />
         <Title languagecode="1043" description="Replay" />
       </Titles>
     </LocLabel>
-    <LocLabel Id="msftnl.FormUpdateReplay.Tooltip">
+    <LocLabel Id="bassllab.FormUpdateReplay.Tooltip">
       <Titles>
         <Title languagecode="1033" description="Record column changes on this form and replay them on other records." />
         <Title languagecode="1043" description="Neem kolomwijzigingen op dit formulier op en speel ze af op andere records." />
       </Titles>
     </LocLabel>
-    <LocLabel Id="msftnl.FormUpdateReplay.GridTooltip">
+    <LocLabel Id="bassllab.FormUpdateReplay.GridTooltip">
       <Titles>
         <Title languagecode="1033" description="Replay a recording on the selected records." />
         <Title languagecode="1043" description="Speel een opname af op de geselecteerde records." />
