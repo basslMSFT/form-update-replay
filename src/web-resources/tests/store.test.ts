@@ -45,7 +45,7 @@ describe("sharing", () => {
     async request(_m, path) {
       let data: { value: unknown[] };
       if (path.startsWith("principalobjectaccessset")) data = { value: path.includes("objectid eq a") ? poa.filter((p) => p.objectid === "a") : poa };
-      else if (path.startsWith("systemusers")) data = { value: [{ systemuserid: "u1", fullname: "Kirsten" }] };
+      else if (path.startsWith("systemusers")) data = { value: [{ systemuserid: "u1", fullname: "Alex" }] };
       else if (path.startsWith("teams")) data = { value: [{ teamid: "t1", name: "Support" }] };
       else data = { value: [rec("a", me), rec("b", me), rec("c", "other")] };
       return { data, headers: { get: () => null } };
@@ -63,7 +63,7 @@ describe("sharing", () => {
 
   it("names the principals and tells read from write access", async () => {
     const shares = await getShares(api, "a", me);
-    expect(shares.map((s) => [s.principal.name, s.canWrite])).toEqual([["Kirsten", false], ["Support", true]]);
+    expect(shares.map((s) => [s.principal.name, s.canWrite])).toEqual([["Alex", false], ["Support", true]]);
   });
 
   it("leaves the count empty when sharing information cannot be read", async () => {
