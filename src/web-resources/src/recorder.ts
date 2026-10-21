@@ -12,6 +12,8 @@ interface Tracked {
   original: StoredValue;
   value: StoredValue;
   changed: boolean;
+  /** A column the platform fills in itself: its changes are noted but never become a step. */
+  skip: boolean;
 }
 
 /**
@@ -28,7 +30,8 @@ export class Recorder {
     return this.active;
   }
 
-  start(form: FormLike): void {
+  /** `skip` lists columns that can never be written (see derived.ts); they are left out of the steps. */
+  start(form: FormLike, skip: ReadonlySet<string> = new Set()): void {
     if (this.active) return;
     this.tracked.clear();
     this.order.length = 0;
@@ -36,7 +39,7 @@ export class Recorder {
     for (const attr of form.attributes) {
       if (!isSupportedType(attr.getAttributeType())) continue;
       const name = attr.getName();
-      this.tracked.set(name, { attr, original: readValue(attr), value: readValue(attr), changed: false });
+      this.tracked.set(name, { attr, original: readValue(attr), value: readValue(attr), changed: false, skip: skip.has(name) });
       const fn = (): void => this.onChange(name);
       attr.addOnChange(fn);
       this.handlers.push({ attr, fn });
@@ -50,8 +53,13 @@ export class Recorder {
     t.value = readValue(t.attr);
     if (!t.changed) {
       t.changed = true;
-      this.order.push(name);
+      if (!t.skip) this.order.push(name);
     }
+  }
+
+  /** Columns that changed but were left out because the platform fills them in itself. */
+  leftOut(): string[] {
+    return [...this.tracked.entries()].filter(([, t]) => t.skip && t.changed && !valuesEqual(t.original, t.value)).map(([name]) => name);
   }
 
   /** Steps recorded so far, without stopping. */

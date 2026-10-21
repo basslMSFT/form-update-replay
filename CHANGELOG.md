@@ -4,6 +4,15 @@ All notable changes to this solution will be documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/), and this project adheres to [Semantic Versioning](https://semver.org/).
 
+## [3.0.1] - 2026-10-21
+
+### Fixed
+- **Editing an address line recorded a step that could not be replayed.** Changing "Address 1: Street 3" also made Dataverse update the composite column "Address 1", which is not on the form as a field, so the recording contained a second step that was skipped with "Column is not on this form". Recording now leaves out every column Dataverse fills in itself: the address composite, a contact's full name, created and modified dates, and calculated, rollup and formula columns. After you stop recording, the pane tells you which columns it left out. If the table's metadata cannot be read, recording works as before.
+
+### Notes
+- Existing recordings are not changed. A step for a left-out column is still skipped on replay, and you can delete it in **Manage recordings**.
+- Columns that a business rule or a script sets are still recorded, because they cannot be told apart from a change you made. Remove them in the review step if the rule sets them anyway when you replay.
+
 ## [3.0.0] - 2026-10-21
 
 ### Changed (breaking)
