@@ -28,11 +28,16 @@ export function recordedCount(entry: FormEntry): number {
   return getRegistry().recorders[entry.key]?.snapshot().length ?? 0;
 }
 
-export function startRecording(entry: FormEntry): void {
+export function startRecording(entry: FormEntry, skip: ReadonlySet<string> = new Set()): void {
   const reg = getRegistry();
   const rec = (reg.recorders[entry.key] ??= new Recorder());
-  rec.start(toFormLike(entry.fc));
+  rec.start(toFormLike(entry.fc), skip);
   entry.fc.ui.setFormNotification(t("formRecording"), "INFO", NOTIFICATION_ID);
+}
+
+/** Columns the last recording left out because the platform fills them in itself. */
+export function leftOutColumns(entry: FormEntry): string[] {
+  return getRegistry().recorders[entry.key]?.leftOut() ?? [];
 }
 
 export async function stopRecording(entry: FormEntry): Promise<Step[]> {

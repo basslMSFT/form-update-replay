@@ -2,7 +2,8 @@ import { ReactElement, useCallback, useEffect, useMemo, useState } from "react";
 import { Button, Input, MessageBar, MessageBarBody, Select, Spinner, Text, Title3, makeStyles, tokens } from "@fluentui/react-components";
 import { Play20Filled, Record20Filled, Stop20Filled, Open20Regular } from "@fluentui/react-icons";
 import { FormEntry, currentForm, recordOnScreen, toFormLike } from "../registry";
-import { discardRecording, isRecording, picker, recordedCount, startRecording, stopRecording } from "../controller";
+import { discardRecording, isRecording, labelFor, leftOutColumns, picker, recordedCount, startRecording, stopRecording } from "../controller";
+import { loadNonSettable } from "../derived";
 import { RecordingRow, createRecording, getRecording, listRecordings } from "../store";
 import { PlanItem, apply, plan } from "../player";
 import { Step, StoredValue, isSupportedType } from "../model";
@@ -65,6 +66,9 @@ export function Pane(): ReactElement {
 
   useEffect(() => { void refresh(); }, [refresh, entry?.key]);
 
+  // Warm the lookup of non-writable columns so that pressing Record does not wait for it.
+  useEffect(() => { if (entry?.entity) void loadNonSettable(api, entry.entity); }, [api, entry?.entity]);
+
   // Switching records or sessions drops any half-finished review or preview.
   useEffect(() => {
     setDraft(null);
@@ -84,12 +88,19 @@ export function Pane(): ReactElement {
     [entry, draft],
   );
 
-  const onStart = (): void => {
+  const onStart = async (): Promise<void> => {
     if (!entry) return;
     setMessage(null);
-    startRecording(entry);
-    setRecording(true);
-    setCount(0);
+    setBusy(true);
+    try {
+      // Columns the platform fills in itself (address composite, full name, ...) cannot be replayed, so they are not recorded.
+      const skip = await loadNonSettable(api, entry.entity);
+      startRecording(entry, skip);
+      setRecording(true);
+      setCount(0);
+    } finally {
+      setBusy(false);
+    }
   };
 
   const onStop = async (): Promise<void> => {
@@ -97,10 +108,13 @@ export function Pane(): ReactElement {
     setBusy(true);
     try {
       const steps = await stopRecording(entry);
+      const left = leftOutColumns(entry).map((c) => labelFor(entry.fc, c)).join(", ");
       setRecording(false);
       if (steps.length === 0) {
-        setMessage({ intent: "info", text: t("paneNoChanges") });
+        setMessage(left ? { intent: "warning", text: t("paneOnlyLeftOut", left) } : { intent: "info", text: t("paneNoChanges") });
       } else {
+        // A warning bar stays until it is closed, so the note is still there while the changes are reviewed.
+        if (left) setMessage({ intent: "warning", text: t("paneLeftOut", left) });
         setDraft(steps);
         setDraftName("");
       }
@@ -206,7 +220,7 @@ export function Pane(): ReactElement {
               </>
             ) : (
               <div className={s.row}>
-                <Button appearance="primary" icon={<Record20Filled />} onClick={onStart}>{t("paneRecord")}</Button>
+                <Button appearance="primary" icon={busy ? <Spinner size="tiny" /> : <Record20Filled />} disabled={busy} onClick={() => void onStart()}>{t("paneRecord")}</Button>
               </div>
             )}
           </div>

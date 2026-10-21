@@ -88,6 +88,38 @@ describe("Recorder", () => {
     expect(steps[0]!.value).toEqual({ entityType: "product", id: "33333333-3333-3333-3333-333333333333" });
     expect(steps[1]!.value).toEqual([2, 5]);
   });
+
+  it("leaves out columns the platform fills in itself, but reports them", () => {
+    const line = new FakeAttr("address1_line3", "string", "");
+    const composite = new FakeAttr("address1_composite", "memo", "");
+    const other = new FakeAttr("title", "string", "old");
+    const rec = new Recorder();
+    rec.start(form(line, composite, other), new Set(["address1_composite"]));
+    // Editing an address line makes the platform update the composite column, which raises its own change event.
+    line.edit("Floor 3");
+    composite.edit("Main Street 1\nFloor 3");
+    other.edit("new");
+    expect(rec.snapshot().map((s) => s.column)).toEqual(["address1_line3", "title"]);
+    expect(rec.leftOut()).toEqual(["address1_composite"]);
+    expect(rec.stop().map((s) => s.column)).toEqual(["address1_line3", "title"]);
+    // The report survives stop(), which is when the pane reads it.
+    expect(rec.leftOut()).toEqual(["address1_composite"]);
+  });
+
+  it("does not report a skipped column that ends with its starting value, and records everything by default", () => {
+    const composite = new FakeAttr("address1_composite", "memo", "same");
+    const rec = new Recorder();
+    rec.start(form(composite), new Set(["address1_composite"]));
+    composite.edit("other");
+    composite.edit("same");
+    expect(rec.leftOut()).toEqual([]);
+    rec.stop();
+    const again = new Recorder();
+    again.start(form(composite));
+    composite.edit("changed");
+    expect(again.stop().map((s) => s.column)).toEqual(["address1_composite"]);
+    expect(again.leftOut()).toEqual([]);
+  });
 });
 
 describe("value codec", () => {

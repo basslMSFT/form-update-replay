@@ -115,7 +115,11 @@ Each recording is a row in `bassllab_updaterecording` with one child row per cha
 
 ## Supported columns
 
-Text, multi-line text, whole number, decimal, float, currency, yes/no, date and time, date only, choice, choices and lookup. Other column types (images, files, calculated and so on) are ignored while recording.
+Text, multi-line text, whole number, decimal, float, currency, yes/no, date and time, date only, choice, choices and lookup. Other column types (images, files and so on) are ignored while recording.
+
+Columns that Dataverse fills in itself are left out as well, because they can never be replayed: the address composite ("Address 1"), a contact's full name, created and modified dates, and calculated, rollup and formula columns. Editing an address line makes the platform update the composite column too; Replay records only the line you edited and tells you what it left out. The columns are looked up in the table's metadata when the pane opens, and if that lookup fails recording works as before.
+
+Columns that a **business rule or a script** sets for you are different: they look like ordinary changes and are recorded. Replaying fires the same rules again, so those steps are usually redundant, and they can be wrong when the rule would give another answer on the record you replay on. Remove them in the review step. See [docs/architecture.md](docs/architecture.md).
 
 ## Limitations
 
