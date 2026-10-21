@@ -4,6 +4,15 @@ All notable changes to this solution will be documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/), and this project adheres to [Semantic Versioning](https://semver.org/).
 
+## [3.0.0] - 2026-10-21
+
+### Changed (breaking)
+- **New publisher and prefix: Bassl Labs, `bassllab_`.** The solution was published as "MsftNL" with the prefix `msftnl_`. Every Dataverse component is renamed: the tables (`bassllab_updaterecording`, `bassllab_updaterecordingstep`), their columns, the four settings (`bassllab_FormUpdateReplay_Apps`, `_Tables`, `_GridApps`, `_GridTables`), the web resources, the role privileges and the command-bar IDs. The choice values of the recording tables use a new option value prefix as well. Behaviour and screens are unchanged.
+- **3.0.0 cannot be installed over 1.x or 2.x.** A solution cannot change publisher and Dataverse tables cannot be renamed, so this is a new solution. Remove the old one first (this deletes its recordings), then install 3.0.0 and set the four settings again. Existing recordings and setting values are not carried over. See `docs/installation.md`.
+
+### Removed
+- The hidden legacy global command. It only existed so that upgrading from 1.0.x could not show two Replay buttons, which no longer applies.
+
 ## [2.1.0] - 2026-10-20
 
 ### Added

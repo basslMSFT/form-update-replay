@@ -10,11 +10,10 @@ Form Update Replay records the column changes a user makes on a model-driven for
 | Command library `furep.library.js` (captures the form, opens the side pane, decides where the button shows) | `src/web-resources/src/library.ts`, `visibility.ts` | Done |
 | Hub UI `furep.hub.html` + `furep.hub.js` (React + Fluent UI v9, pane and dialog modes) | `src/web-resources/src/ui` | Done |
 | Replay button: classic ribbon button with a privilege rule and an app/table rule | `src/solution/Other/RibbonCustomization.xml` | Done |
-| Settings `msftnl_FormUpdateReplay_Apps` and `_Tables` (form button) and `_GridApps` and `_GridTables` (grid button) | `src/solution/settingdefinitions` | Done |
+| Settings `bassllab_FormUpdateReplay_Apps` and `_Tables` (form button) and `_GridApps` and `_GridTables` (grid button) | `src/solution/settingdefinitions` | Done |
 | Grid button: classic ribbon buttons on subgrids and main grids, sharing one command with a selection rule | `src/solution/Other/RibbonCustomization.xml` | Done |
 | Bulk replay engine: table metadata, a virtual form per record so the form planner runs unchanged, Web API writes, undo, CSV (no Xrm dependency) | `src/web-resources/src/bulk.ts`, `bulk-meta.ts` | Done |
 | Bulk dialog (React + Fluent UI v9, `mode=bulk`) | `src/web-resources/src/ui/BulkDialog.tsx` | Done |
-| Old global command `msftnl_FormUpdateReplay.Form.Open` (kept hidden so upgrades cannot show two buttons) | `src/solution/appactions` | Deprecated |
 | Tables and relationship | `src/solution/Entities` | Done |
 | Roles | `src/solution/Roles` | Done |
 | Plugins (C#) | none | Not needed |
@@ -30,8 +29,8 @@ Form Update Replay records the column changes a user makes on a model-driven for
 | 6 | Security roles ship with the solution: a User role and an Admin role. |
 | 7 | The UI follows the Fluent look and feel of the Copilot Service admin center quality screens. |
 | 8 | UI languages: Dutch and English, chosen from the user's language setting. |
-| 9 | Publisher prefix `msftnl_`. License: MIT. |
-| 10 | Computed values use a structured *Calculate* step (JSON in `msftnl_calculation`, evaluated by the pure functions in `calc.ts`) instead of Power Fx: there is no supported way to run Power Fx from a web resource, and a structured step needs no extra runtime or package, validates in the editor and previews safely. |
+| 9 | Publisher Bassl Labs, prefix `bassllab_`. License: MIT. Versions 1.x and 2.x were published as MsftNL with the prefix `msftnl_`; 3.0.0 renamed every component, gave the forms, views and roles new IDs and the choice columns a new option value prefix. Because a solution cannot change publisher and tables cannot be renamed, 3.0.0 is a new solution that cannot be imported over the old one: Dataverse refuses it with "The publisher name cannot be changed from 'MSFTNL' to 'bassllab'". |
+| 10 | Computed values use a structured *Calculate* step (JSON in `bassllab_calculation`, evaluated by the pure functions in `calc.ts`) instead of Power Fx: there is no supported way to run Power Fx from a web resource, and a structured step needs no extra runtime or package, validates in the editor and previews safely. |
 | 11 | Where Replay is shown is configured with two solution settings (apps and tables) set as environment values, and the roles; it is off until an administrator sets the apps. Per-app values are not supported because they could not be written through the API in testing. See [configuration.md](configuration.md). |
 | 12 | The button is a classic ribbon button, not a modern command. A modern command can only be gated by Power Fx, which is not available for a command that is not bound to one app and table, and the platform refuses custom rules on modern commands outside Microsoft first-party solutions. |
 | 13 | Replay on selected records is a separate button with separate settings (default off), because it writes many records at once. It writes through the Web API, not through a form, so there are no form scripts or business rules; server-side logic still runs. Each record is read once and planned with the same planner as a form: a record is wrapped in a virtual form built from table metadata, so every skip reason, copy rule, calculation and value check behaves the same. |
@@ -51,7 +50,7 @@ Form Update Replay records the column changes a user makes on a model-driven for
 - A setting's value for an app can be read in the browser with `getCurrentAppSetting`, and the platform lets an app value override an environment value (seen on an existing Microsoft setting). Creating an app value did not work in the tested environment: `SaveSettingValue` with an app name reported success but stored nothing, and inserting an `appsetting` row failed with a database constraint error. Environment values worked through `SaveSettingValue` without an app name. The solution therefore uses environment values only. The settings screen in the maker portal was opened and shows the environment value written through the API; saving a value on it has not been tried.
 - A text setting needs a non-empty default, so "off" is the value `none`.
 - Importing the ribbon republishes the command bar of every table (about 6 minutes in the test environment). A second solution import is refused while another is running.
-- The older global command (`appaction`, context *All*, location *Form*) still works in managed solutions and in every app. It could not be gated: Power Fx visibility is not available for it, and custom rules are refused ("App Action rules should define only under Microsoft First party Solutions"). The package keeps it with `hidden = 1` so an upgrade cannot leave an ungated second button.
+- The older global command (`appaction`, context *All*, location *Form*) works in managed solutions and in every app, but it could not be gated: Power Fx visibility is not available for it, and custom rules are refused ("App Action rules should define only under Microsoft First party Solutions"). Versions 1.x and 2.x kept it hidden so an upgrade could not leave an ungated second button; 3.0.0 does not contain it.
 - Copilot Service workspace keeps one form in the DOM at a time, but form contexts of other sessions stay alive; handlers keep working after switching sessions.
 - The side pane belongs to the app, not to a session. A collapsed pane never loads its content, so the command expands it before selecting it.
 - Records in the workspace autosave. Applying a recording to an open record therefore saves it shortly afterwards; the preview step exists for that reason.

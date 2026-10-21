@@ -35,8 +35,8 @@ export function createApi(clientUrl: string): Api {
   };
 }
 
-export const SET = "msftnl_updaterecordings";
-const STEP_NAV = "msftnl_updaterecording_updaterecordingstep";
+export const SET = "bassllab_updaterecordings";
+const STEP_NAV = "bassllab_updaterecording_updaterecordingstep";
 
 export interface RecordingRow {
   id: string;
@@ -69,47 +69,47 @@ const optionToMode = (v: number): Step["valueMode"] =>
 export function stepToPayload(step: Step): Record<string, unknown> {
   const label = step.operation === "clear" ? "Clear" : "Set";
   return {
-    msftnl_name: `${label} ${step.column}`.slice(0, 200),
-    msftnl_sortorder: step.sortOrder,
-    msftnl_operation: OPTION.operation[step.operation],
-    msftnl_valuemode: OPTION.valueMode[step.valueMode],
-    msftnl_columnlogicalname: step.column,
-    msftnl_columntype: step.columnType,
+    bassllab_name: `${label} ${step.column}`.slice(0, 200),
+    bassllab_sortorder: step.sortOrder,
+    bassllab_operation: OPTION.operation[step.operation],
+    bassllab_valuemode: OPTION.valueMode[step.valueMode],
+    bassllab_columnlogicalname: step.column,
+    bassllab_columntype: step.columnType,
     // Only fixed values are stored; "ask" and "copy" steps must not keep a recorded value (it may be sensitive).
-    msftnl_value: step.valueMode !== "fixed" || step.operation === "clear" || step.value === undefined ? null : JSON.stringify(step.value),
-    msftnl_sourcecolumnlogicalname: step.valueMode === "copy" ? step.sourceColumn ?? null : null,
-    msftnl_prompttext: step.valueMode === "prompt" ? step.promptText ?? null : null,
-    msftnl_calculation: step.valueMode === "calculate" && step.calc ? JSON.stringify(step.calc) : null,
+    bassllab_value: step.valueMode !== "fixed" || step.operation === "clear" || step.value === undefined ? null : JSON.stringify(step.value),
+    bassllab_sourcecolumnlogicalname: step.valueMode === "copy" ? step.sourceColumn ?? null : null,
+    bassllab_prompttext: step.valueMode === "prompt" ? step.promptText ?? null : null,
+    bassllab_calculation: step.valueMode === "calculate" && step.calc ? JSON.stringify(step.calc) : null,
   };
 }
 
 export function stepFromRow(row: any): Step {
   let value: StoredValue | undefined;
-  if (row.msftnl_value) {
-    try { value = JSON.parse(row.msftnl_value) as StoredValue; } catch { value = row.msftnl_value as string; }
+  if (row.bassllab_value) {
+    try { value = JSON.parse(row.bassllab_value) as StoredValue; } catch { value = row.bassllab_value as string; }
   }
   const step: Step = {
-    sortOrder: row.msftnl_sortorder,
-    operation: optionToOp(row.msftnl_operation),
-    valueMode: optionToMode(row.msftnl_valuemode),
-    column: row.msftnl_columnlogicalname,
-    columnType: row.msftnl_columntype ?? "",
+    sortOrder: row.bassllab_sortorder,
+    operation: optionToOp(row.bassllab_operation),
+    valueMode: optionToMode(row.bassllab_valuemode),
+    column: row.bassllab_columnlogicalname,
+    columnType: row.bassllab_columntype ?? "",
   };
   if (value !== undefined) step.value = value;
-  if (row.msftnl_sourcecolumnlogicalname) step.sourceColumn = row.msftnl_sourcecolumnlogicalname;
-  if (row.msftnl_prompttext) step.promptText = row.msftnl_prompttext;
-  if (row.msftnl_calculation) {
-    try { step.calc = JSON.parse(row.msftnl_calculation) as CalcSpec; } catch { /* a damaged calculation leaves the step without one; replay skips it */ }
+  if (row.bassllab_sourcecolumnlogicalname) step.sourceColumn = row.bassllab_sourcecolumnlogicalname;
+  if (row.bassllab_prompttext) step.promptText = row.bassllab_prompttext;
+  if (row.bassllab_calculation) {
+    try { step.calc = JSON.parse(row.bassllab_calculation) as CalcSpec; } catch { /* a damaged calculation leaves the step without one; replay skips it */ }
   }
   return step;
 }
 
 export function recordingToPayload(rec: Recording): Record<string, unknown> {
   return {
-    msftnl_name: rec.name,
-    msftnl_description: rec.description ?? null,
-    msftnl_tablelogicalname: rec.table,
-    msftnl_schemaversion: 1,
+    bassllab_name: rec.name,
+    bassllab_description: rec.description ?? null,
+    bassllab_tablelogicalname: rec.table,
+    bassllab_schemaversion: 1,
     [STEP_NAV]: rec.steps.map(stepToPayload),
   };
 }
@@ -118,10 +118,10 @@ function rowFromRecord(r: any): RecordingRow {
   const ownerId = bare(r._ownerid_value ?? "");
   const ownerType = r["_ownerid_value@Microsoft.Dynamics.CRM.lookuplogicalname"] === "team" ? "team" : "systemuser";
   return {
-    id: bare(r.msftnl_updaterecordingid),
-    name: r.msftnl_name ?? "",
-    description: r.msftnl_description ?? "",
-    table: r.msftnl_tablelogicalname ?? "",
+    id: bare(r.bassllab_updaterecordingid),
+    name: r.bassllab_name ?? "",
+    description: r.bassllab_description ?? "",
+    table: r.bassllab_tablelogicalname ?? "",
     stepCount: Array.isArray(r[STEP_NAV]) ? r[STEP_NAV].length : 0,
     ownerId,
     ownerType,
@@ -149,7 +149,7 @@ interface ShareEntryRaw {
 /** Who each recording is shared with, as recordingId -> principalId -> access. Null when the sharing table cannot be read. */
 async function loadShareMap(api: Api): Promise<Map<string, Map<string, ShareEntryRaw>> | null> {
   try {
-    const rows = await readAll(api, "principalobjectaccessset?$select=objectid,principalid,principaltypecode,accessrightsmask&$filter=objecttypecode eq 'msftnl_updaterecording'");
+    const rows = await readAll(api, "principalobjectaccessset?$select=objectid,principalid,principaltypecode,accessrightsmask&$filter=objecttypecode eq 'bassllab_updaterecording'");
     const map = new Map<string, Map<string, ShareEntryRaw>>();
     for (const r of rows) {
       const k = bare(r.objectid);
@@ -174,7 +174,7 @@ export function classify(row: RecordingRow, who: Identity, sharedWith: Map<strin
 export async function listRecordings(api: Api, who: Identity, scope: Scope): Promise<RecordingRow[]> {
   const raw = await readAll(
     api,
-    `${SET}?$select=msftnl_name,msftnl_description,msftnl_tablelogicalname,modifiedon,_ownerid_value&$expand=${STEP_NAV}($select=msftnl_updaterecordingstepid)&$orderby=modifiedon desc`,
+    `${SET}?$select=bassllab_name,bassllab_description,bassllab_tablelogicalname,modifiedon,_ownerid_value&$expand=${STEP_NAV}($select=bassllab_updaterecordingstepid)&$orderby=modifiedon desc`,
   );
   const rows = raw.map(rowFromRecord);
   const shares = await loadShareMap(api);
@@ -217,7 +217,7 @@ export async function getShares(api: Api, recordingId: string, ownerId: string):
 
 export async function revokeAccess(api: Api, recordingId: string, principal: Principal): Promise<void> {
   await api.request("POST", "RevokeAccess", {
-    Target: { "@odata.type": "Microsoft.Dynamics.CRM.msftnl_updaterecording", msftnl_updaterecordingid: recordingId },
+    Target: { "@odata.type": "Microsoft.Dynamics.CRM.bassllab_updaterecording", bassllab_updaterecordingid: recordingId },
     Revokee:
       principal.type === "team"
         ? { "@odata.type": "Microsoft.Dynamics.CRM.team", teamid: principal.id }
@@ -228,7 +228,7 @@ export async function revokeAccess(api: Api, recordingId: string, principal: Pri
 export async function getRecording(api: Api, id: string): Promise<{ row: RecordingRow; steps: Step[] }> {
   const res = await api.request(
     "GET",
-    `${SET}(${id})?$select=msftnl_name,msftnl_description,msftnl_tablelogicalname,modifiedon,_ownerid_value&$expand=${STEP_NAV}($orderby=msftnl_sortorder asc)`,
+    `${SET}(${id})?$select=bassllab_name,bassllab_description,bassllab_tablelogicalname,modifiedon,_ownerid_value&$expand=${STEP_NAV}($orderby=bassllab_sortorder asc)`,
   );
   const steps = ((res.data[STEP_NAV] ?? []) as any[]).map(stepFromRow).sort((a, b) => a.sortOrder - b.sortOrder);
   return { row: rowFromRecord(res.data), steps };
@@ -236,35 +236,35 @@ export async function getRecording(api: Api, id: string): Promise<{ row: Recordi
 
 export async function createRecording(api: Api, rec: Recording): Promise<string> {
   const res = await api.request("POST", SET, recordingToPayload(rec), { Prefer: "return=representation" });
-  return bare(res.data.msftnl_updaterecordingid);
+  return bare(res.data.bassllab_updaterecordingid);
 }
 
 export async function updateRecordingHeader(api: Api, id: string, fields: { name?: string; description?: string }): Promise<void> {
   const body: Record<string, unknown> = {};
-  if (fields.name !== undefined) body.msftnl_name = fields.name;
-  if (fields.description !== undefined) body.msftnl_description = fields.description;
+  if (fields.name !== undefined) body.bassllab_name = fields.name;
+  if (fields.description !== undefined) body.bassllab_description = fields.description;
   await api.request("PATCH", `${SET}(${id})`, body);
 }
 
 /** Replaces all steps of a recording. The new rows are created first, so a failure never leaves the recording without steps. */
 export async function replaceSteps(api: Api, id: string, steps: Step[]): Promise<void> {
-  const old = await readAll(api, `msftnl_updaterecordingsteps?$select=msftnl_updaterecordingstepid&$filter=_msftnl_recordingid_value eq ${id}`);
+  const old = await readAll(api, `bassllab_updaterecordingsteps?$select=bassllab_updaterecordingstepid&$filter=_bassllab_recordingid_value eq ${id}`);
   const created: string[] = [];
   try {
     for (const s of steps) {
       const res = await api.request(
         "POST",
-        "msftnl_updaterecordingsteps",
-        { ...stepToPayload(s), "msftnl_RecordingId@odata.bind": `/${SET}(${id})` },
+        "bassllab_updaterecordingsteps",
+        { ...stepToPayload(s), "bassllab_RecordingId@odata.bind": `/${SET}(${id})` },
         { Prefer: "return=representation" },
       );
-      created.push(bare(res.data.msftnl_updaterecordingstepid));
+      created.push(bare(res.data.bassllab_updaterecordingstepid));
     }
   } catch (e) {
-    for (const c of created) await api.request("DELETE", `msftnl_updaterecordingsteps(${c})`).catch(() => undefined);
+    for (const c of created) await api.request("DELETE", `bassllab_updaterecordingsteps(${c})`).catch(() => undefined);
     throw e;
   }
-  for (const o of old) await api.request("DELETE", `msftnl_updaterecordingsteps(${bare(o.msftnl_updaterecordingstepid)})`);
+  for (const o of old) await api.request("DELETE", `bassllab_updaterecordingsteps(${bare(o.bassllab_updaterecordingstepid)})`);
 }
 
 export async function deleteRecording(api: Api, id: string): Promise<void> {
@@ -293,7 +293,7 @@ export async function searchPrincipals(api: Api, text: string, ownerTeamsOnly = 
 
 export async function grantAccess(api: Api, recordingId: string, principal: Principal, canWrite: boolean): Promise<void> {
   await api.request("POST", "GrantAccess", {
-    Target: { "@odata.type": "Microsoft.Dynamics.CRM.msftnl_updaterecording", msftnl_updaterecordingid: recordingId },
+    Target: { "@odata.type": "Microsoft.Dynamics.CRM.bassllab_updaterecording", bassllab_updaterecordingid: recordingId },
     PrincipalAccess: {
       Principal:
         principal.type === "team"

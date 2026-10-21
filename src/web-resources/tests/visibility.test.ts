@@ -83,26 +83,26 @@ describe("isAvailable (command bar rule)", () => {
 
   it("shows the button in an enabled app on an enabled table", async () => {
     const { isAvailable: rule } = await import("../src/visibility");
-    install({ msftnl_FormUpdateReplay_Apps: "msdyn_CustomerServiceWorkspace", msftnl_FormUpdateReplay_Tables: "incident" }, "msdyn_CustomerServiceWorkspace");
+    install({ bassllab_FormUpdateReplay_Apps: "msdyn_CustomerServiceWorkspace", bassllab_FormUpdateReplay_Tables: "incident" }, "msdyn_CustomerServiceWorkspace");
     expect(await rule("incident")).toBe(true);
     expect(await rule("account")).toBe(false);
   });
 
   it("is hidden by default (apps = none)", async () => {
     const { isAvailable: rule } = await import("../src/visibility");
-    install({ msftnl_FormUpdateReplay_Apps: "none", msftnl_FormUpdateReplay_Tables: "*" }, "msdyn_CustomerServiceWorkspace");
+    install({ bassllab_FormUpdateReplay_Apps: "none", bassllab_FormUpdateReplay_Tables: "*" }, "msdyn_CustomerServiceWorkspace");
     expect(await rule("incident")).toBe(false);
   });
 
   it("falls back to the page table when the ribbon passes none", async () => {
     const { isAvailable: rule } = await import("../src/visibility");
-    install({ msftnl_FormUpdateReplay_Apps: "*", msftnl_FormUpdateReplay_Tables: "incident" }, "anyapp", "incident");
+    install({ bassllab_FormUpdateReplay_Apps: "*", bassllab_FormUpdateReplay_Tables: "incident" }, "anyapp", "incident");
     expect(await rule()).toBe(true);
   });
 
   it("hides the button when the app cannot be determined", async () => {
     const { isAvailable: rule } = await import("../src/visibility");
-    install({ msftnl_FormUpdateReplay_Apps: "*", msftnl_FormUpdateReplay_Tables: "*" }, new Error("no app"));
+    install({ bassllab_FormUpdateReplay_Apps: "*", bassllab_FormUpdateReplay_Tables: "*" }, new Error("no app"));
     expect(await rule("incident")).toBe(false);
   });
 
@@ -114,7 +114,7 @@ describe("isAvailable (command bar rule)", () => {
 
   it("looks the app up once per page", async () => {
     const { isAvailable: rule } = await import("../src/visibility");
-    const calls = install({ msftnl_FormUpdateReplay_Apps: "*", msftnl_FormUpdateReplay_Tables: "*" }, "anyapp");
+    const calls = install({ bassllab_FormUpdateReplay_Apps: "*", bassllab_FormUpdateReplay_Tables: "*" }, "anyapp");
     await rule("incident");
     await rule("account");
     await rule("contact");
@@ -126,20 +126,20 @@ describe("isAvailable (command bar rule)", () => {
 
     it("is off by default and does not follow the form settings", async () => {
       const { isGridAvailable } = await import("../src/visibility");
-      install({ msftnl_FormUpdateReplay_Apps: "*", msftnl_FormUpdateReplay_Tables: "*", msftnl_FormUpdateReplay_GridApps: "none", msftnl_FormUpdateReplay_GridTables: "*" }, "anyapp");
+      install({ bassllab_FormUpdateReplay_Apps: "*", bassllab_FormUpdateReplay_Tables: "*", bassllab_FormUpdateReplay_GridApps: "none", bassllab_FormUpdateReplay_GridTables: "*" }, "anyapp");
       expect(await isGridAvailable(grid("incident"))).toBe(false);
     });
 
     it("uses the table of the grid, not the table of the page it sits on", async () => {
       const { isGridAvailable } = await import("../src/visibility");
-      install({ msftnl_FormUpdateReplay_GridApps: "anyapp", msftnl_FormUpdateReplay_GridTables: "incident" }, "anyapp", "account");
+      install({ bassllab_FormUpdateReplay_GridApps: "anyapp", bassllab_FormUpdateReplay_GridTables: "incident" }, "anyapp", "account");
       expect(await isGridAvailable(grid("incident"))).toBe(true);
       expect(await isGridAvailable(grid("contact"))).toBe(false);
     });
 
     it("is hidden without a grid, in other apps, and when the settings do not exist", async () => {
       const { isGridAvailable } = await import("../src/visibility");
-      install({ msftnl_FormUpdateReplay_GridApps: "otherapp", msftnl_FormUpdateReplay_GridTables: "*" }, "anyapp");
+      install({ bassllab_FormUpdateReplay_GridApps: "otherapp", bassllab_FormUpdateReplay_GridTables: "*" }, "anyapp");
       expect(await isGridAvailable(grid("incident"))).toBe(false);
       expect(await isGridAvailable(undefined)).toBe(false);
       expect(await isGridAvailable({ getEntityName: () => { throw new Error("x"); } })).toBe(false);

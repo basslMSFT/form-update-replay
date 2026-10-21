@@ -191,19 +191,19 @@ describe("stored calculation", () => {
     const calc: CalcSpec = { kind: "date", base: { source: "column", column: "createdon" }, amount: 11, unit: "workdays" };
     const step: Step = { sortOrder: 10, operation: "set", valueMode: "calculate", column: "followupby", columnType: "datetime", value: "2026-01-01", calc };
     const payload = stepToPayload(step);
-    expect(payload).toMatchObject({ msftnl_valuemode: 100000003, msftnl_value: null, msftnl_sourcecolumnlogicalname: null });
-    const back = stepFromRow({ ...payload, msftnl_columnlogicalname: "followupby" });
+    expect(payload).toMatchObject({ bassllab_valuemode: 352410003, bassllab_value: null, bassllab_sourcecolumnlogicalname: null });
+    const back = stepFromRow({ ...payload, bassllab_columnlogicalname: "followupby" });
     expect(back).toMatchObject({ valueMode: "calculate", calc });
     expect(back.value).toBeUndefined();
   });
 
   it("ignores a calculation that is not valid JSON", () => {
-    const back = stepFromRow({ msftnl_sortorder: 10, msftnl_operation: 100000000, msftnl_valuemode: 100000003, msftnl_columnlogicalname: "x", msftnl_columntype: "datetime", msftnl_calculation: "{oops" });
+    const back = stepFromRow({ bassllab_sortorder: 10, bassllab_operation: 352410000, bassllab_valuemode: 352410003, bassllab_columnlogicalname: "x", bassllab_columntype: "datetime", bassllab_calculation: "{oops" });
     expect(back.calc).toBeUndefined();
   });
 
   it("does not store a calculation for other modes", () => {
     const step: Step = { sortOrder: 10, operation: "set", valueMode: "fixed", column: "x", columnType: "string", value: "a", calc: { kind: "text", mode: "append", separator: "none", text: "z" } };
-    expect(stepToPayload(step).msftnl_calculation).toBeNull();
+    expect(stepToPayload(step).bassllab_calculation).toBeNull();
   });
 });

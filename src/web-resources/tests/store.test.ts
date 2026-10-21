@@ -14,14 +14,14 @@ describe("step mapping", () => {
   it("round-trips a lookup step through the table columns", () => {
     const step: Step = { sortOrder: 10, operation: "set", valueMode: "fixed", column: "productid", columnType: "lookup", value: { entityType: "product", id: "abc", name: "P" } };
     const payload = stepToPayload(step) as Record<string, unknown>;
-    expect(payload.msftnl_operation).toBe(OPTION.operation.set);
-    expect(payload.msftnl_value).toBe('{"entityType":"product","id":"abc","name":"P"}');
+    expect(payload.bassllab_operation).toBe(OPTION.operation.set);
+    expect(payload.bassllab_value).toBe('{"entityType":"product","id":"abc","name":"P"}');
     expect(stepFromRow(payload)).toEqual(step);
   });
 
   it("keeps clear and prompt steps free of stored values", () => {
     const clear = stepToPayload({ sortOrder: 10, operation: "clear", valueMode: "fixed", column: "title", columnType: "string" }) as Record<string, unknown>;
-    expect(clear.msftnl_value).toBeNull();
+    expect(clear.bassllab_value).toBeNull();
     const prompt = stepFromRow(stepToPayload({ sortOrder: 20, operation: "set", valueMode: "prompt", column: "title", columnType: "string", promptText: "Which title?" }));
     expect(prompt).toMatchObject({ valueMode: "prompt", promptText: "Which title?" });
     expect(prompt).not.toHaveProperty("value");
@@ -29,13 +29,13 @@ describe("step mapping", () => {
 
   it("builds a deep insert payload with the steps under the relationship name", () => {
     const p = recordingToPayload({ name: "R", table: "incident", steps: [{ sortOrder: 10, operation: "set", valueMode: "fixed", column: "title", columnType: "string", value: "x" }] });
-    expect(p.msftnl_tablelogicalname).toBe("incident");
-    expect(Array.isArray(p.msftnl_updaterecording_updaterecordingstep)).toBe(true);
+    expect(p.bassllab_tablelogicalname).toBe("incident");
+    expect(Array.isArray(p.bassllab_updaterecording_updaterecordingstep)).toBe(true);
   });
 });
 
 describe("sharing", () => {
-  const rec = (id: string, owner: string) => ({ msftnl_updaterecordingid: id, msftnl_name: id, _ownerid_value: owner, "_ownerid_value@Microsoft.Dynamics.CRM.lookuplogicalname": "systemuser" });
+  const rec = (id: string, owner: string) => ({ bassllab_updaterecordingid: id, bassllab_name: id, _ownerid_value: owner, "_ownerid_value@Microsoft.Dynamics.CRM.lookuplogicalname": "systemuser" });
   const poa = [
     { objectid: "a", principalid: "u1", principaltypecode: "systemuser", accessrightsmask: 1 },
     { objectid: "a", principalid: "t1", principaltypecode: "team", accessrightsmask: 3 },
@@ -82,8 +82,8 @@ describe("tab placement", () => {
 
   it("lists only the requested scope", async () => {
     const records = [
-      { msftnl_updaterecordingid: "a", msftnl_name: "mine", _ownerid_value: me, "_ownerid_value@Microsoft.Dynamics.CRM.lookuplogicalname": "systemuser" },
-      { msftnl_updaterecordingid: "b", msftnl_name: "theirs", _ownerid_value: "someone-else", "_ownerid_value@Microsoft.Dynamics.CRM.lookuplogicalname": "systemuser" },
+      { bassllab_updaterecordingid: "a", bassllab_name: "mine", _ownerid_value: me, "_ownerid_value@Microsoft.Dynamics.CRM.lookuplogicalname": "systemuser" },
+      { bassllab_updaterecordingid: "b", bassllab_name: "theirs", _ownerid_value: "someone-else", "_ownerid_value@Microsoft.Dynamics.CRM.lookuplogicalname": "systemuser" },
     ];
     const api: Api = {
       async request(_m, path) {
@@ -118,19 +118,19 @@ describe("safe requests", () => {
     const api: Api = {
       async request(method, path) {
         calls.push(`${method} ${path.split("?")[0]}`);
-        if (method === "GET") return ok([{ msftnl_updaterecordingstepid: "old1" }]);
+        if (method === "GET") return ok([{ bassllab_updaterecordingstepid: "old1" }]);
         if (method === "POST") {
           posts++;
           if (posts === 2) throw new Error("boom");
-          return { data: { msftnl_updaterecordingstepid: `new${posts}` }, headers: { get: () => null } };
+          return { data: { bassllab_updaterecordingstepid: `new${posts}` }, headers: { get: () => null } };
         }
         return { data: null, headers: { get: () => null } };
       },
     };
     const step = (n: number): Step => ({ sortOrder: n, operation: "set", valueMode: "fixed", column: "title", columnType: "string", value: "x" });
     await expect(replaceSteps(api, "rec", [step(10), step(20)])).rejects.toThrow("boom");
-    expect(calls).toContain("DELETE msftnl_updaterecordingsteps(new1)");
-    expect(calls).not.toContain("DELETE msftnl_updaterecordingsteps(old1)");
+    expect(calls).toContain("DELETE bassllab_updaterecordingsteps(new1)");
+    expect(calls).not.toContain("DELETE bassllab_updaterecordingsteps(old1)");
   });
 
   it("removes the old steps only after the new ones exist", async () => {
@@ -138,12 +138,12 @@ describe("safe requests", () => {
     const api: Api = {
       async request(method, path) {
         calls.push(`${method} ${path.split("?")[0]}`);
-        if (method === "GET") return ok([{ msftnl_updaterecordingstepid: "old1" }]);
-        if (method === "POST") return { data: { msftnl_updaterecordingstepid: "new1" }, headers: { get: () => null } };
+        if (method === "GET") return ok([{ bassllab_updaterecordingstepid: "old1" }]);
+        if (method === "POST") return { data: { bassllab_updaterecordingstepid: "new1" }, headers: { get: () => null } };
         return { data: null, headers: { get: () => null } };
       },
     };
     await replaceSteps(api, "rec", [{ sortOrder: 10, operation: "set", valueMode: "fixed", column: "title", columnType: "string", value: "x" }]);
-    expect(calls.indexOf("POST msftnl_updaterecordingsteps")).toBeLessThan(calls.indexOf("DELETE msftnl_updaterecordingsteps(old1)"));
+    expect(calls.indexOf("POST bassllab_updaterecordingsteps")).toBeLessThan(calls.indexOf("DELETE bassllab_updaterecordingsteps(old1)"));
   });
 });

@@ -5,7 +5,7 @@ import { dirname, join } from "node:path";
 // always contains exactly what the build produced.
 const dist = "src/web-resources/dist";
 const assets = "src/web-resources/assets";
-const root = "src/solution/WebResources/msftnl_/furep";
+const root = "src/solution/WebResources/bassllab_/furep";
 const map = [
   [join(dist, "furep.library.js"), join(root, "js", "furep.library.js")],
   [join(dist, "furep.hub.js"), join(root, "js", "furep.hub.js")],

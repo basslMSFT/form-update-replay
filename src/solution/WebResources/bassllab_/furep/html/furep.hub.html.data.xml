@@ -1,0 +1,14 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<WebResource xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+  <WebResourceId>{26ac4fa5-2fd7-4949-9ef4-552fda80f0df}</WebResourceId>
+  <Name>bassllab_/furep/html/furep.hub.html</Name>
+  <DisplayName>Form Update Replay hub</DisplayName>
+  <WebResourceType>1</WebResourceType>
+  <IntroducedVersion>0.1.0.0</IntroducedVersion>
+  <IsEnabledForMobileClient>0</IsEnabledForMobileClient>
+  <IsAvailableForMobileOffline>0</IsAvailableForMobileOffline>
+  <IsCustomizable>1</IsCustomizable>
+  <CanBeDeleted>1</CanBeDeleted>
+  <IsHidden>0</IsHidden>
+  <FileName>/WebResources/bassllab_furephtmlfurephubhtml26AC4FA5-2FD7-4949-9EF4-552FDA80F0DF</FileName>
+</WebResource>

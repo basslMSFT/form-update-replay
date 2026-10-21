@@ -1,23 +1,23 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
-<Role id="{c27ce8ec-01c8-f111-a05b-000d3abe04ca}" name="Form Update Replay Admin" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+<Role id="{1de8fbd5-8a06-4062-9d9f-2e54a6f8d9ab}" name="Form Update Replay Admin" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
   <IsCustomizable>1</IsCustomizable>
   <IsAutoAssigned>0</IsAutoAssigned>
   <RolePrivileges>
-    <RolePrivilege name="prvAppendmsftnl_UpdateRecording" level="Global" />
-    <RolePrivilege name="prvAppendmsftnl_UpdateRecordingStep" level="Global" />
-    <RolePrivilege name="prvAppendTomsftnl_UpdateRecording" level="Global" />
-    <RolePrivilege name="prvAppendTomsftnl_UpdateRecordingStep" level="Global" />
-    <RolePrivilege name="prvAssignmsftnl_UpdateRecording" level="Global" />
-    <RolePrivilege name="prvAssignmsftnl_UpdateRecordingStep" level="Global" />
-    <RolePrivilege name="prvCreatemsftnl_UpdateRecording" level="Global" />
-    <RolePrivilege name="prvCreatemsftnl_UpdateRecordingStep" level="Global" />
-    <RolePrivilege name="prvDeletemsftnl_UpdateRecording" level="Global" />
-    <RolePrivilege name="prvDeletemsftnl_UpdateRecordingStep" level="Global" />
-    <RolePrivilege name="prvReadmsftnl_UpdateRecording" level="Global" />
-    <RolePrivilege name="prvReadmsftnl_UpdateRecordingStep" level="Global" />
-    <RolePrivilege name="prvSharemsftnl_UpdateRecording" level="Global" />
-    <RolePrivilege name="prvSharemsftnl_UpdateRecordingStep" level="Global" />
-    <RolePrivilege name="prvWritemsftnl_UpdateRecording" level="Global" />
-    <RolePrivilege name="prvWritemsftnl_UpdateRecordingStep" level="Global" />
+    <RolePrivilege name="prvAppendbassllab_UpdateRecording" level="Global" />
+    <RolePrivilege name="prvAppendbassllab_UpdateRecordingStep" level="Global" />
+    <RolePrivilege name="prvAppendTobassllab_UpdateRecording" level="Global" />
+    <RolePrivilege name="prvAppendTobassllab_UpdateRecordingStep" level="Global" />
+    <RolePrivilege name="prvAssignbassllab_UpdateRecording" level="Global" />
+    <RolePrivilege name="prvAssignbassllab_UpdateRecordingStep" level="Global" />
+    <RolePrivilege name="prvCreatebassllab_UpdateRecording" level="Global" />
+    <RolePrivilege name="prvCreatebassllab_UpdateRecordingStep" level="Global" />
+    <RolePrivilege name="prvDeletebassllab_UpdateRecording" level="Global" />
+    <RolePrivilege name="prvDeletebassllab_UpdateRecordingStep" level="Global" />
+    <RolePrivilege name="prvReadbassllab_UpdateRecording" level="Global" />
+    <RolePrivilege name="prvReadbassllab_UpdateRecordingStep" level="Global" />
+    <RolePrivilege name="prvSharebassllab_UpdateRecording" level="Global" />
+    <RolePrivilege name="prvSharebassllab_UpdateRecordingStep" level="Global" />
+    <RolePrivilege name="prvWritebassllab_UpdateRecording" level="Global" />
+    <RolePrivilege name="prvWritebassllab_UpdateRecordingStep" level="Global" />
   </RolePrivileges>
 </Role>

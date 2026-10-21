@@ -43,8 +43,8 @@ export interface Recording {
 
 /** Option set values used by the Dataverse tables (publisher option value prefix 10000). */
 export const OPTION = {
-  operation: { set: 100000000, clear: 100000001 },
-  valueMode: { fixed: 100000000, copy: 100000001, prompt: 100000002, calculate: 100000003 },
+  operation: { set: 352410000, clear: 352410001 },
+  valueMode: { fixed: 352410000, copy: 352410001, prompt: 352410002, calculate: 352410003 },
 } as const;
 
 export const SUPPORTED_TYPES = [
