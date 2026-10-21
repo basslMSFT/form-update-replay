@@ -1,0 +1,14 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<WebResource xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+  <WebResourceId>{e5df0bce-185d-4aa5-a606-5447adca5555}</WebResourceId>
+  <Name>bassllab_/furep/img/furep.svg</Name>
+  <DisplayName>Form Update Replay icon</DisplayName>
+  <WebResourceType>11</WebResourceType>
+  <IntroducedVersion>0.1.0.0</IntroducedVersion>
+  <IsEnabledForMobileClient>0</IsEnabledForMobileClient>
+  <IsAvailableForMobileOffline>0</IsAvailableForMobileOffline>
+  <IsCustomizable>1</IsCustomizable>
+  <CanBeDeleted>1</CanBeDeleted>
+  <IsHidden>0</IsHidden>
+  <FileName>/WebResources/bassllab_furepimgfurepsvgE5DF0BCE-185D-4AA5-A606-5447ADCA5555</FileName>
+</WebResource>

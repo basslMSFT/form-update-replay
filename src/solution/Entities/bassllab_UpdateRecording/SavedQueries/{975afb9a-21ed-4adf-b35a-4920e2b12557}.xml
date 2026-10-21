@@ -1,0 +1,37 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<savedqueries xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+  <savedquery>
+    <IsCustomizable>1</IsCustomizable>
+    <CanBeDeleted>0</CanBeDeleted>
+    <isquickfindquery>0</isquickfindquery>
+    <isprivate>0</isprivate>
+    <isdefault>0</isdefault>
+    <savedqueryid>{975afb9a-21ed-4adf-b35a-4920e2b12557}</savedqueryid>
+    <layoutxml>
+      <grid name="resultset" jump="bassllab_name" select="1" icon="1" preview="1">
+        <row name="result" id="bassllab_updaterecordingid">
+          <cell name="bassllab_name" width="300" />
+          <cell name="createdon" width="125" />
+        </row>
+      </grid>
+    </layoutxml>
+    <querytype>0</querytype>
+    <fetchxml>
+      <fetch version="1.0" mapping="logical">
+        <entity name="bassllab_updaterecording">
+          <attribute name="bassllab_updaterecordingid" />
+          <attribute name="bassllab_name" />
+          <attribute name="createdon" />
+          <order attribute="bassllab_name" descending="false" />
+          <filter type="and">
+            <condition attribute="statecode" operator="eq" value="1" />
+          </filter>
+        </entity>
+      </fetch>
+    </fetchxml>
+    <IntroducedVersion>0.1.0.0</IntroducedVersion>
+    <LocalizedNames>
+      <LocalizedName description="Inactive Update recordings" languagecode="1033" />
+    </LocalizedNames>
+  </savedquery>
+</savedqueries>

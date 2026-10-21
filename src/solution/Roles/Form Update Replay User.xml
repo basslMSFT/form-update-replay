@@ -1,0 +1,23 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Role id="{43332c90-cd54-44fe-a0be-8579a4f5207c}" name="Form Update Replay User" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+  <IsCustomizable>1</IsCustomizable>
+  <IsAutoAssigned>0</IsAutoAssigned>
+  <RolePrivileges>
+    <RolePrivilege name="prvAppendbassllab_UpdateRecording" level="Basic" />
+    <RolePrivilege name="prvAppendbassllab_UpdateRecordingStep" level="Basic" />
+    <RolePrivilege name="prvAppendTobassllab_UpdateRecording" level="Basic" />
+    <RolePrivilege name="prvAppendTobassllab_UpdateRecordingStep" level="Basic" />
+    <RolePrivilege name="prvAssignbassllab_UpdateRecording" level="Basic" />
+    <RolePrivilege name="prvAssignbassllab_UpdateRecordingStep" level="Basic" />
+    <RolePrivilege name="prvCreatebassllab_UpdateRecording" level="Basic" />
+    <RolePrivilege name="prvCreatebassllab_UpdateRecordingStep" level="Basic" />
+    <RolePrivilege name="prvDeletebassllab_UpdateRecording" level="Basic" />
+    <RolePrivilege name="prvDeletebassllab_UpdateRecordingStep" level="Basic" />
+    <RolePrivilege name="prvReadbassllab_UpdateRecording" level="Basic" />
+    <RolePrivilege name="prvReadbassllab_UpdateRecordingStep" level="Basic" />
+    <RolePrivilege name="prvSharebassllab_UpdateRecording" level="Basic" />
+    <RolePrivilege name="prvSharebassllab_UpdateRecordingStep" level="Basic" />
+    <RolePrivilege name="prvWritebassllab_UpdateRecording" level="Basic" />
+    <RolePrivilege name="prvWritebassllab_UpdateRecordingStep" level="Basic" />
+  </RolePrivileges>
+</Role>
