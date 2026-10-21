@@ -27,7 +27,7 @@ What is different from a form:
 - Whether a column can be changed is decided by the table's metadata and your security roles, not by what a form shows. A column that is read-only for you is skipped; a column that is merely hidden on a form is not.
 - Changes made by server-side logic as a result of the update are not undone. For example, when a recording sets the primary contact of an account, Dynamics also sets that contact's company, and Undo restores the primary contact but not that side effect.
 
-Recordings are the same ones the form uses; a calculation or a copy reads the values of each selected record.
+Recordings are the same ones the form uses; a calculation or a copy reads the values of each selected record. Screenshots 22 to 28 below show Replay on selected records.
 
 ## Calculate
 
@@ -43,7 +43,7 @@ A calculation sees what earlier steps of the same replay set, so a later step ca
 
 ## Screenshots
 
-A narrated walkthrough (3.5 minutes, including Calculate) is in [docs/media/form-update-replay-demo.mp4](docs/media/form-update-replay-demo.mp4). The screenshots use dummy data.
+A narrated walkthrough (3.5 minutes, including Calculate) is in [docs/media/form-update-replay-demo.mp4](docs/media/form-update-replay-demo.mp4). It was recorded before Replay on selected records existed, so that part is shown in screenshots 22 to 28 only. The screenshots use dummy data.
 
 | | |
 |---|---|
@@ -57,7 +57,10 @@ A narrated walkthrough (3.5 minutes, including Calculate) is in [docs/media/form
 | ![Numbers preview](docs/images/15-calculate-numbers-preview.png) **15. The same for numbers** | ![Manage recordings](docs/images/16-manage-recordings.png) **16. Manage recordings** |
 | ![Selecting several recordings](docs/images/17-multi-select.png) **17. Multi-select actions** | ![Share dialog](docs/images/18-share-dialog.png) **18. Share** |
 | ![Shared with a team](docs/images/19-shared-with-team.png) **19. Shared with a team** | ![Recording detail](docs/images/20-recording-detail.png) **20. Recording detail** |
-| ![Dutch user interface](docs/images/21-dutch.png) **21. Dutch interface** | |
+| ![Dutch user interface](docs/images/21-dutch.png) **21. Dutch interface** | ![The Replay command in a list](docs/images/22-grid-replay-button.png) **22. Replay in a list, with three cases selected** |
+| ![Preview of a grid replay, with a question](docs/images/23-grid-preview-question.png) **23. Grid preview: the question is asked once** | ![Preview with the question answered](docs/images/24-grid-preview-answered.png) **24. Grid preview: answered** |
+| ![Confirmation before updating](docs/images/25-grid-confirm.png) **25. Confirm before updating** | ![Result per record, with Download CSV and Undo](docs/images/26-grid-result.png) **26. Result per record, CSV and Undo** |
+| ![The list after the run](docs/images/27-grid-after-run.png) **27. The list after the run** | ![Replay in a subgrid](docs/images/28-subgrid-replay-button.png) **28. Replay in a subgrid** |
 
 ## Install
 
