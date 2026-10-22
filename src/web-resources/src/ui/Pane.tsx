@@ -13,6 +13,7 @@ import { StepsEditor, stepsValid } from "./StepsEditor";
 import { PreviewPanel } from "./PreviewPanel";
 import { Field } from "./fields";
 import { Msg, Notice } from "./Notice";
+import { VersionLabel } from "./VersionLabel";
 import { errorText, useApp } from "./context";
 import { getLang, t } from "../i18n";
 
@@ -291,6 +292,7 @@ export function Pane(): ReactElement {
           ) : null}
         </>
       )}
+      <VersionLabel />
     </div>
   );
 }

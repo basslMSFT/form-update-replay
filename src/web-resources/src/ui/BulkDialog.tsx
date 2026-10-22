@@ -13,6 +13,7 @@ import {
 import { getLang, t } from "../i18n";
 import { PromptField, PromptSpec } from "./PromptField";
 import { Msg, Notice } from "./Notice";
+import { VersionLabel } from "./VersionLabel";
 import { errorText, useApp } from "./context";
 
 const useStyles = makeStyles({
@@ -366,6 +367,7 @@ export function BulkDialog({ token }: { token: string | null }): ReactElement {
           </div>
         </>
       ) : null}
+      <VersionLabel />
     </div>
   );
 }
