@@ -67,6 +67,7 @@ export function PreviewPanel({ items, fc, answers, onAnswer, onApply, onCancel }
     <div>
       <Text weight="semibold" block>{t("previewTitle")}</Text>
       <Text size={200} className={s.muted} block>{t("previewNote")}</Text>
+      {items.some((i) => i.status === "apply" && i.related) ? <Text size={200} className={s.muted} block>{t("previewNoteRelated")}</Text> : null}
 
       <div className={s.list}>
         {items.map((i) => {

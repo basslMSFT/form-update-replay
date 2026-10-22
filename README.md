@@ -136,7 +136,7 @@ Columns that a **business rule or a script** sets for you are different: they lo
 
 ## Limitations
 
-- On a form, Replay sets values on the open form only; you save it yourself. The grid button is the only part that changes records directly, and then only the selected ones (up to 250 per run, the rows currently loaded in the grid).
+- On a form, Replay sets column values on the open form only; you save it yourself. Notes and tasks are the exception: they are created as soon as you click **Apply to form**. The grid button is the only part that changes records directly, and then only the selected ones (up to 250 per run, the rows currently loaded in the grid).
 - Many apps, including the Copilot Service workspace, autosave. Applied values are then saved shortly after you apply them, so look at the preview first.
 - Lookups are replayed by record, so the target record must exist in the environment.
 - Notes and tasks can only be added to a saved record, and only plain text (no attachments, no rich text). A task is created open and assigned to whoever replays; recurring or assigned-to-someone-else tasks are not supported.

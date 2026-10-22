@@ -214,7 +214,9 @@ export function Pane(): ReactElement {
       if (added) refreshTimelines(entry.fc);
       setBusy(false);
     }
-    const text = [t("applied", res.applied.length), ...(related.length ? [t("relatedResult", added, existed)] : [])].join(" ");
+    // Without column changes, "save the form to keep them" would be wrong: only notes and tasks were created.
+    const parts = [...(res.applied.length || !related.length ? [t("applied", res.applied.length)] : []), ...(related.length ? [t("relatedResult", added, existed)] : [])];
+    const text = parts.join(" ");
     setMessage(errors.length ? { intent: "error", text: t("errorGeneric", errors.join("; ")) } : { intent: "success", text });
   };
 
