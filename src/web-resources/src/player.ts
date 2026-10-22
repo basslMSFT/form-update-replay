@@ -3,12 +3,13 @@ import { AttrLike, readValue, toXrmValue, valuesEqual } from "./value-codec";
 import { Step, StoredLookup, StoredValue, isSupportedType } from "./model";
 import { columnInfoFromAttr, isCopyCompatible, isValueAllowed } from "./compat";
 import { CalcContext, CalcSpec, calcColumns, calcKindFor, evaluateCalc } from "./calc";
+import { ResolvedRelated, relatedColumns, relatedKindOf, resolveRelated } from "./related";
 import { t } from "./i18n";
 import type { StringKey } from "./i18n";
 
 export type SkipReason =
   | "missing" | "readonly" | "unsupported" | "typeMismatch" | "needsInput" | "sourceMissing" | "sourceIncompatible" | "valueNotAllowed"
-  | "calcInputMissing" | "calcInvalid";
+  | "calcInputMissing" | "calcInvalid" | "recordUnsaved" | "relatedUnsupported" | "relatedInvalid";
 
 /** The text that explains each reason a step is skipped. */
 export const SKIP_REASON_KEYS: Record<SkipReason, StringKey> = {
@@ -22,6 +23,9 @@ export const SKIP_REASON_KEYS: Record<SkipReason, StringKey> = {
   valueNotAllowed: "skipValueNotAllowed",
   calcInputMissing: "skipCalcInputMissing",
   calcInvalid: "skipCalcInvalid",
+  recordUnsaved: "skipRecordUnsaved",
+  relatedUnsupported: "skipRelatedUnsupported",
+  relatedInvalid: "skipRelatedInvalid",
 };
 
 export interface PlanItem {
@@ -30,6 +34,8 @@ export interface PlanItem {
   reason?: SkipReason;
   current: StoredValue;
   next: StoredValue;
+  /** The note or task an "Add note or task" step would create. */
+  related?: ResolvedRelated;
 }
 
 export interface PlayOptions {
@@ -39,6 +45,8 @@ export interface PlayOptions {
   now?: Date;
   userName?: string;
   locale?: string;
+  /** Facts about the record for "Add note or task" steps. Without it the record counts as saved and able to have both. */
+  record?: { saved: boolean; supports?: { note: boolean; task: boolean } };
 }
 
 const NUMERIC = ["integer", "decimal", "double", "money"];
@@ -86,6 +94,27 @@ function isReadOnly(attr: AttrLike): boolean {
   return (attr.controls?.get() ?? []).every((c) => c.getDisabled?.() === true);
 }
 
+/** Works out what an "Add note or task" step would create. Nothing is created here; see related.ts. */
+function planRelated(step: Step, byName: Map<string, AttrLike>, pending: Map<string, StoredValue>, options: PlayOptions): PlanItem {
+  const base = { step, current: null as StoredValue, next: null as StoredValue };
+  const spec = step.related;
+  if (!spec) return { ...base, status: "skip", reason: "relatedInvalid" };
+  const record = options.record ?? { saved: true };
+  if (!record.saved) return { ...base, status: "skip", reason: "recordUnsaved" };
+  if (record.supports && !record.supports[relatedKindOf(step)]) return { ...base, status: "skip", reason: "relatedUnsupported" };
+  if (relatedColumns(spec).some((c) => !byName.has(c))) return { ...base, status: "skip", reason: "sourceMissing" };
+  const valueOf = (c: string): StoredValue => (pending.has(c) ? pending.get(c)! : byName.has(c) ? readValue(byName.get(c)!) : null);
+  const related = resolveRelated(spec, {
+    now: options.now ?? new Date(),
+    userName: options.userName ?? "",
+    locale: options.locale,
+    text: (c) => (byName.has(c) ? displayText(byName.get(c)!, valueOf(c)) : ""),
+  });
+  const body = related.kind === "note" ? related.text : related.description;
+  if (related.kind === "task" ? related.subject === "" : related.subject === "" && body === "") return { ...base, status: "skip", reason: "relatedInvalid" };
+  return { ...base, related, status: "apply" };
+}
+
 /** Works out what replaying the steps would do on this form, without changing anything. */
 export function plan(form: FormLike, steps: Step[], options: PlayOptions = {}): PlanItem[] {
   // Hidden columns are left out, so they are "not on this form" as target, copy source and calculation input alike.
@@ -95,6 +124,10 @@ export function plan(form: FormLike, steps: Step[], options: PlayOptions = {}): 
   const pending = new Map<string, StoredValue>();
 
   for (const step of [...steps].sort((a, b) => a.sortOrder - b.sortOrder)) {
+    if (step.operation === "addRelated") {
+      items.push(planRelated(step, byName, pending, options));
+      continue;
+    }
     const attr = byName.get(step.column);
     const base = { step, current: null as StoredValue, next: null as StoredValue };
 
@@ -160,7 +193,7 @@ export function apply(form: FormLike, items: PlanItem[]): ApplyResult {
   const byName = new Map(form.attributes.map((a) => [a.getName(), a]));
   const result: ApplyResult = { applied: [], failed: [] };
   for (const item of items) {
-    if (item.status !== "apply") continue;
+    if (item.status !== "apply" || item.step.operation === "addRelated") continue;
     const attr = byName.get(item.step.column)!;
     if (!isAvailable(attr)) { result.failed.push({ column: item.step.column, message: t("skipMissing") }); continue; }
     try {

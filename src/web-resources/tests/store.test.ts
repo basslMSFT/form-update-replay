@@ -66,6 +66,16 @@ describe("sharing", () => {
     expect(shares.map((s) => [s.principal.name, s.canWrite])).toEqual([["Alex", false], ["Support", true]]);
   });
 
+  it("ignores a revoked share that is still stored with no access right", async () => {
+    poa.push({ objectid: "a", principalid: "t2", principaltypecode: "team", accessrightsmask: 0 });
+    try {
+      expect((await listRecordings(api, who, "all")).find((r) => r.id === "a")!.sharedCount).toBe(2);
+      expect((await getShares(api, "a", me)).map((s) => s.principal.id)).toEqual(["u1", "t1"]);
+    } finally {
+      poa.pop();
+    }
+  });
+
   it("leaves the count empty when sharing information cannot be read", async () => {
     const broken: Api = { async request(_m, path) { if (path.startsWith("principalobjectaccessset")) throw new Error("403"); return { data: { value: [rec("a", me)] }, headers: { get: () => null } }; } };
     expect((await listRecordings(broken, who, "all"))[0]!.sharedCount).toBeUndefined();

@@ -1,7 +1,8 @@
 import { ReactElement } from "react";
-import { Badge, Button, Input, Select, Text, makeStyles, tokens } from "@fluentui/react-components";
-import { ArrowDown20Regular, ArrowUp20Regular, Delete20Regular } from "@fluentui/react-icons";
-import { Step, StoredValue } from "../model";
+import { Badge, Button, Input, Select, Text, Textarea, makeStyles, tokens } from "@fluentui/react-components";
+import { Add20Regular, ArrowDown20Regular, ArrowUp20Regular, Delete20Regular } from "@fluentui/react-icons";
+import { RELATED_TEXT_MAX, RelatedSpec, Step, StoredValue } from "../model";
+import { RelatedKind, newRelated, relatedKindOf, relatedValid } from "../related";
 import { ColumnInfo, copyCandidates } from "../compat";
 import { calcValid, defaultCalc, isCalculable } from "../calc";
 import { CalcEditor } from "./CalcEditor";
@@ -35,6 +36,7 @@ const useStyles = makeStyles({
     padding: tokens.spacingHorizontalS,
   },
   muted: { color: tokens.colorNeutralForeground3 },
+  addRow: { display: "flex", flexWrap: "wrap", gap: tokens.spacingHorizontalS },
   value: { overflowWrap: "anywhere" },
 });
 
@@ -50,7 +52,7 @@ interface Props {
 
 /** Every "copy" step needs a source column and every "calculate" step a complete calculation before the recording can be saved. */
 export function stepsValid(steps: Step[]): boolean {
-  return steps.length > 0 && steps.every((x) => x.operation === "clear" || (x.valueMode === "copy" ? !!x.sourceColumn : x.valueMode === "calculate" ? calcValid(x.calc) : true));
+  return steps.length > 0 && steps.every((x) => (x.operation === "addRelated" ? relatedValid(x.related) : x.operation === "clear" || (x.valueMode === "copy" ? !!x.sourceColumn : x.valueMode === "calculate" ? calcValid(x.calc) : true)));
 }
 
 /** Editable list of recorded changes, used both when reviewing a new recording and when editing a saved one. */
@@ -58,6 +60,8 @@ export function StepsEditor({ steps, onChange, fc, labels, optionLabels, columns
   const s = useStyles();
   const update = (i: number, patch: Partial<Step>): void => onChange(steps.map((x, j) => (j === i ? { ...x, ...patch } : x)));
   const remove = (i: number): void => onChange(steps.filter((_, j) => j !== i).map((x, j) => ({ ...x, sortOrder: (j + 1) * 10 })));
+  const addRelated = (kind: RelatedKind): void =>
+    onChange([...steps, { sortOrder: (steps.length + 1) * 10, operation: "addRelated", valueMode: "fixed", column: kind === "note" ? "annotation" : "task", columnType: "related", related: newRelated(kind) }]);
   const move = (i: number, by: -1 | 1): void => {
     const target = i + by;
     if (target < 0 || target >= steps.length) return;
@@ -80,9 +84,9 @@ export function StepsEditor({ steps, onChange, fc, labels, optionLabels, columns
               <div className={s.titleRow}>
                 <Badge appearance="filled" color="brand" shape="circular" size="large" aria-hidden>{i + 1}</Badge>
                 <div className={s.title}>
-                  <Text weight="semibold">{labelFor(fc, step.column, labels)}</Text>
+                  <Text weight="semibold">{step.operation === "addRelated" ? t(relatedKindOf(step) === "note" ? "relatedNote" : "relatedTask") : labelFor(fc, step.column, labels)}</Text>
                   <br />
-                  <Text size={200} className={s.muted}>{step.column} · {step.operation === "clear" ? t("opClear") : t("opSet")}</Text>
+                  <Text size={200} className={s.muted}>{step.operation === "addRelated" ? t("relatedAdded") : `${step.column} · ${step.operation === "clear" ? t("opClear") : t("opSet")}`}</Text>
                 </div>
               </div>
               <div className={s.tools}>
@@ -93,7 +97,13 @@ export function StepsEditor({ steps, onChange, fc, labels, optionLabels, columns
             </div>
 
             <div className={s.body}>
-            {step.operation === "clear" ? (
+            {step.operation === "addRelated" ? (
+              step.related ? (
+                <RelatedEditor spec={step.related} onChange={(related) => update(i, { related })} />
+              ) : (
+                <Text className={s.muted}>{t("relatedDamaged")}</Text>
+              )
+            ) : step.operation === "clear" ? (
               <Text className={s.muted}>{t("emptyValue")}</Text>
             ) : (
               <div className={s.settings}>
@@ -139,6 +149,56 @@ export function StepsEditor({ steps, onChange, fc, labels, optionLabels, columns
           </div>
         );
       })}
+      <div className={s.addRow}>
+        <Button size="small" icon={<Add20Regular />} onClick={() => addRelated("note")}>{t("relatedAddNote")}</Button>
+        <Button size="small" icon={<Add20Regular />} onClick={() => addRelated("task")}>{t("relatedAddTask")}</Button>
+      </div>
+    </div>
+  );
+}
+
+interface RelatedEditorProps {
+  spec: RelatedSpec;
+  onChange: (spec: RelatedSpec) => void;
+}
+
+function RelatedEditor({ spec, onChange }: RelatedEditorProps): ReactElement {
+  const s = useStyles();
+  const subjectMax = spec.kind === "note" ? 500 : 200;
+  return (
+    <div className={s.settings}>
+      <Field label={t("relatedSubject")} size="small" required={spec.kind === "task"}>
+        <Input size="small" maxLength={subjectMax} value={spec.subject} onChange={(_, d) => onChange({ ...spec, subject: d.value })} />
+      </Field>
+      <Field label={t(spec.kind === "note" ? "relatedText" : "relatedDescription")} size="small">
+        <Textarea
+          size="small"
+          rows={4}
+          maxLength={RELATED_TEXT_MAX}
+          value={spec.kind === "note" ? spec.text : spec.description}
+          onChange={(_, d) => onChange(spec.kind === "note" ? { ...spec, text: d.value } : { ...spec, description: d.value })}
+        />
+      </Field>
+      {spec.kind === "task" ? (
+        <>
+          <Field label={t("relatedDue")} size="small" hint={t("relatedDueHint")}>
+            <Input
+              size="small"
+              type="number"
+              value={spec.dueInDays === null ? "" : String(spec.dueInDays)}
+              onChange={(_, d) => onChange({ ...spec, dueInDays: d.value.trim() === "" || !Number.isFinite(Number(d.value)) ? null : Math.trunc(Number(d.value)) })}
+            />
+          </Field>
+          <Field label={t("relatedPriority")} size="small">
+            <Select size="small" value={String(spec.priority)} onChange={(_, d) => onChange({ ...spec, priority: Number(d.value) as 0 | 1 | 2 })}>
+              <option value="0">{t("priorityLow")}</option>
+              <option value="1">{t("priorityNormal")}</option>
+              <option value="2">{t("priorityHigh")}</option>
+            </Select>
+          </Field>
+        </>
+      ) : null}
+      <Text size={200} className={s.muted}>{t("relatedPlaceholders")}</Text>
     </div>
   );
 }

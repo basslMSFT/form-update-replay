@@ -1,9 +1,11 @@
-import { ReactElement, useEffect, useState } from "react";
+import { ReactElement, useEffect, useMemo, useState } from "react";
 import {
   Button, Checkbox, Dialog, DialogActions, DialogBody, DialogContent, DialogSurface, DialogTitle, Input, MessageBar, MessageBarBody,
-  Radio, RadioGroup, Spinner, Text, makeStyles, tokens,
+  Radio, RadioGroup, Select, Spinner, Text, makeStyles, tokens,
 } from "@fluentui/react-components";
-import { Principal, RecordingRow, assignToTeam, deleteRecording, grantAccess, searchPrincipals, updateRecordingHeader } from "../store";
+import {
+  BusinessUnit, Principal, RecordingRow, UnitScope, assignToTeam, defaultTeams, deleteRecording, grantAccess, listBusinessUnits, searchPrincipals, unitsForScope, updateRecordingHeader,
+} from "../store";
 import { Field } from "./fields";
 import { errorText, useApp } from "./context";
 import { t } from "../i18n";
@@ -66,12 +68,23 @@ function usePrincipalSearch(text: string, only?: Principal["type"]): { results: 
 export function ShareDialog({ rows, onClose, onDone }: DialogProps): ReactElement {
   const s = useStyles();
   const { api } = useApp();
+  const [mode, setMode] = useState<"people" | "unit">("people");
   const [text, setText] = useState("");
   const [picked, setPicked] = useState("");
   const [canWrite, setCanWrite] = useState(false);
   const [saving, setSaving] = useState(false);
-  const { results, busy } = usePrincipalSearch(text);
+  const { results, busy } = usePrincipalSearch(mode === "people" ? text : "");
   const principal = results.find((p) => `${p.type}:${p.id}` === picked);
+
+  const [units, setUnits] = useState<BusinessUnit[]>([]);
+  const [unitId, setUnitId] = useState("");
+  const [scope, setScope] = useState<UnitScope>("unit");
+  const [unitError, setUnitError] = useState("");
+  useEffect(() => {
+    if (mode !== "unit" || units.length) return;
+    listBusinessUnits(api).then(setUnits).catch((e) => setUnitError(errorText(e)));
+  }, [mode, units.length, api]);
+  const covered = useMemo(() => (unitId ? unitsForScope(units, unitId, scope) : []), [units, unitId, scope]);
 
   const submit = async (): Promise<void> => {
     if (!principal) return;
@@ -80,24 +93,72 @@ export function ShareDialog({ rows, onClose, onDone }: DialogProps): ReactElemen
     finish(rows, res, rows.length === 1 ? t("shareDone", principal.name) : t("shareDoneMany", res.done, principal.name), onDone);
   };
 
+  const submitUnits = async (): Promise<void> => {
+    if (covered.length === 0) return;
+    setSaving(true);
+    try {
+      const teams = await defaultTeams(api, covered.map((u) => u.id));
+      if (teams.length === 0) { setUnitError(t("shareUnitNoTeams")); setSaving(false); return; }
+      const res = await runBulk(rows, async (r) => {
+        const failed: string[] = [];
+        for (const team of teams) await grantAccess(api, r.id, team, canWrite).catch((e) => failed.push(`${team.name}: ${errorText(e)}`));
+        if (failed.length) throw new Error(failed.join(", "));
+      });
+      finish(rows, res, t("shareUnitDone", teams.length), onDone);
+    } catch (e) {
+      setUnitError(errorText(e));
+      setSaving(false);
+    }
+  };
+
   return (
     <Dialog open onOpenChange={(_, d) => { if (!d.open) onClose(); }}>
       <DialogSurface>
         <DialogBody>
           <DialogTitle>{t("shareTitle")}: {heading(rows)}</DialogTitle>
           <DialogContent className={s.col}>
-            <Field label={t("shareSearch")}>
-              <Input value={text} onChange={(_, d) => { setText(d.value); setPicked(""); }} contentAfter={busy ? <Spinner size="extra-tiny" /> : undefined} />
-            </Field>
-            <RadioGroup value={picked} onChange={(_, d) => setPicked(d.value)} className={s.list}>
-              {results.map((p) => <Radio key={`${p.type}:${p.id}`} value={`${p.type}:${p.id}`} label={`${p.name} (${p.type === "team" ? t("shareTeam") : t("shareUser")})`} />)}
+            <RadioGroup layout="horizontal" value={mode} onChange={(_, d) => setMode(d.value as "people" | "unit")}>
+              <Radio value="people" label={t("shareModePeople")} />
+              <Radio value="unit" label={t("shareModeUnit")} />
             </RadioGroup>
-            {text.trim().length >= 2 && !busy && results.length === 0 ? <Text>{t("shareNoResults")}</Text> : null}
+            {mode === "people" ? (
+              <>
+                <Field label={t("shareSearch")}>
+                  <Input value={text} onChange={(_, d) => { setText(d.value); setPicked(""); }} contentAfter={busy ? <Spinner size="extra-tiny" /> : undefined} />
+                </Field>
+                <RadioGroup value={picked} onChange={(_, d) => setPicked(d.value)} className={s.list}>
+                  {results.map((p) => <Radio key={`${p.type}:${p.id}`} value={`${p.type}:${p.id}`} label={`${p.name} (${p.type === "team" ? t("shareTeam") : t("shareUser")})`} />)}
+                </RadioGroup>
+                {text.trim().length >= 2 && !busy && results.length === 0 ? <Text>{t("shareNoResults")}</Text> : null}
+              </>
+            ) : (
+              <>
+                {unitError ? <MessageBar intent="error"><MessageBarBody>{unitError}</MessageBarBody></MessageBar> : null}
+                <Field label={t("shareUnitPick")}>
+                  <Select value={unitId} onChange={(_, d) => setUnitId(d.value)}>
+                    <option value="">{t("shareUnitChoose")}</option>
+                    {units.map((u) => <option key={u.id} value={u.id}>{u.name}</option>)}
+                  </Select>
+                </Field>
+                <RadioGroup value={scope} onChange={(_, d) => setScope(d.value as UnitScope)}>
+                  <Radio value="unit" label={t("scopeUnit")} />
+                  <Radio value="below" label={t("scopeBelow")} />
+                  <Radio value="above" label={t("scopeAbove")} />
+                  <Radio value="branch" label={t("scopeBranch")} />
+                </RadioGroup>
+                {covered.length ? <Text size={200}>{t("shareUnitCovers", covered.length, covered.map((u) => u.name).join(", "))}</Text> : null}
+                <MessageBar intent="info"><MessageBarBody>{t("shareUnitSnapshot")}</MessageBarBody></MessageBar>
+              </>
+            )}
             <Text size={200}>{t("shareRead")}</Text>
             <Checkbox label={t("shareWrite")} checked={canWrite} onChange={(_, d) => setCanWrite(d.checked === true)} />
           </DialogContent>
           <DialogActions>
-            <Button appearance="primary" disabled={!principal || saving} onClick={() => void submit()}>{t("shareGrant")}</Button>
+            {mode === "people" ? (
+              <Button appearance="primary" disabled={!principal || saving} onClick={() => void submit()}>{t("shareGrant")}</Button>
+            ) : (
+              <Button appearance="primary" disabled={covered.length === 0 || saving} onClick={() => void submitUnits()}>{t("shareUnitGrant")}</Button>
+            )}
             <Button onClick={onClose}>{t("cancel")}</Button>
           </DialogActions>
         </DialogBody>

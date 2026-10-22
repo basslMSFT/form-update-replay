@@ -4,6 +4,25 @@ All notable changes to this solution will be documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/), and this project adheres to [Semantic Versioning](https://semver.org/).
 
+## [3.1.0] - 2026-10-22
+
+### Added
+- **Add a note or a task when you replay.** A recording can now contain "Add note" and "Add task" steps. Add them in the review step after recording, or in **Manage recordings**, with a subject, text, and for a task a due date (days from the day you replay) and a priority. Notes and tasks you add to the saved record in the timeline while you are recording are picked up automatically when you stop (attachments are not), and the pane counts them while you record. The text can use `{{today}}`, `{{now}}`, `{{user}}` and `{{column_name}}`. On a form the note or task is created when you apply the replay and the timeline is refreshed; on a grid one is created for every selected record, and **Undo last run** deletes exactly the notes and tasks that run created. A record that already has the identical note, or the identical open task, gets nothing extra.
+- **Share with a business unit.** The share dialog has a new "Business unit" tab. Pick a business unit and choose: this unit only, this unit and the units below it, this unit and the units above it, or the whole branch. The recording is shared with the default team of each unit it covers. The platform keeps those teams filled, so people who join or leave a unit follow automatically; a business unit created later is not included until you share again. See `docs/configuration.md`.
+
+### Changed
+- **Recording detail in Manage recordings is two columns.** The steps are on the left and "Shared with" is on the right (it stays in view while you scroll). On a narrow window it becomes one column with "Shared with" at the top. "Stop sharing" is now an outlined button with an icon instead of plain text.
+- **The version is shown at the bottom of every screen** (the side pane, Manage recordings and the grid dialog), so you can see that a page refresh loaded the latest files. If the command-bar script is older than the screen, a red line says so and asks you to reload the page.
+- **Save and Discard are at the top of the review step** in the side pane and stay visible while you scroll through a long list of changes.
+
+### Fixed
+- Stopping a share left a row without any access right behind, which kept the recording listed as shared and counted in the "shared with" number. Such rows are now ignored.
+- Skipped steps now have a red badge in the preview, and the "Save the record first" reason is shown as an error bar.
+
+### Notes
+- Notes and tasks can only be added to a saved record. On a new, unsaved form (or a table without notes or tasks) the step is skipped and the preview says why.
+- Installs over 3.0.x without any data change. The recording step table gets one new value in its Operation choice. Recordings made with 3.1.0 that contain note or task steps are skipped in those steps by older versions.
+
 ## [3.0.1] - 2026-10-21
 
 ### Fixed

@@ -1,10 +1,11 @@
 import { ReactElement } from "react";
-import { Badge, Button, Text, makeStyles, tokens } from "@fluentui/react-components";
+import { Badge, Button, MessageBar, MessageBarBody, Text, makeStyles, tokens } from "@fluentui/react-components";
 import { PlanItem, SKIP_REASON_KEYS } from "../player";
 import { StoredValue } from "../model";
 import { describeValue, labelFor } from "../controller";
 import { t } from "../i18n";
 import { PromptField, PromptSpec } from "./PromptField";
+import { describeResolved, relatedKindOf } from "../related";
 
 const useStyles = makeStyles({
   muted: { color: tokens.colorNeutralForeground3 },
@@ -75,16 +76,20 @@ export function PreviewPanel({ items, fc, answers, onAnswer, onApply, onCancel }
           return (
             <div key={i.step.column + i.step.sortOrder} className={s.card}>
               <div className={s.head}>
-                <div className={s.title}><Text weight="semibold">{labelFor(fc, i.step.column)}</Text></div>
-                <Badge appearance="tint" color={needsAnswer ? "informative" : i.status === "apply" ? "brand" : i.status === "noop" ? "success" : "warning"}>
+                <div className={s.title}><Text weight="semibold">{i.step.operation === "addRelated" ? t(relatedKindOf(i.step) === "note" ? "relatedNote" : "relatedTask") : labelFor(fc, i.step.column)}</Text></div>
+                <Badge appearance={needsAnswer || i.status !== "skip" ? "tint" : "filled"} color={needsAnswer ? "informative" : i.status === "apply" ? "brand" : i.status === "noop" ? "success" : "danger"}>
                   {needsAnswer ? t("statusAsk") : i.status === "apply" ? t("statusApply") : i.status === "noop" ? t("statusNoop") : t("statusSkip")}
                 </Badge>
               </div>
               {showInput ? (
                 <PromptInput item={i} fc={fc} value={answers[i.step.column]} onChange={(v) => onAnswer(i.step.column, v)} />
               ) : null}
-              {i.status === "skip" && !needsAnswer ? (
+              {i.status === "skip" && i.reason === "recordUnsaved" ? (
+                <MessageBar intent="error"><MessageBarBody>{t(SKIP_REASON_KEYS.recordUnsaved)}</MessageBarBody></MessageBar>
+              ) : i.status === "skip" && !needsAnswer ? (
                 <Text size={200} className={s.muted}>{t(SKIP_REASON_KEYS[i.reason!])}</Text>
+              ) : i.related ? (
+                <Text size={200} className={s.text}>{describeResolved(i.related)}{i.related.kind === "task" && i.related.dueDate ? ` (${t("relatedDueOn", new Date(`${i.related.dueDate}T00:00:00`).toLocaleDateString())})` : ""}</Text>
               ) : i.status !== "skip" ? (
                 <Text size={200} className={s.text}>{describeValue(fc, i.step, i.current)} → <b>{describeValue(fc, i.step, i.next)}</b></Text>
               ) : null}

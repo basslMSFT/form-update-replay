@@ -2,9 +2,10 @@ import { ReactElement, useCallback, useEffect, useMemo, useState } from "react";
 import { Button, Input, MessageBar, MessageBarBody, Select, Spinner, Text, Title3, makeStyles, tokens } from "@fluentui/react-components";
 import { Play20Filled, Record20Filled, Stop20Filled, Open20Regular } from "@fluentui/react-icons";
 import { FormEntry, currentForm, recordOnScreen, toFormLike } from "../registry";
-import { discardRecording, isRecording, labelFor, leftOutColumns, picker, recordedCount, startRecording, stopRecording } from "../controller";
+import { discardRecording, isRecording, labelFor, leftOutColumns, liveRelatedCount, picker, recordedCount, refreshTimelines, startRecording, stopRecording } from "../controller";
 import { loadNonSettable } from "../derived";
 import { RecordingRow, createRecording, getRecording, listRecordings } from "../store";
+import { createRelated, relatedSupport } from "../related";
 import { PlanItem, apply, plan } from "../player";
 import { Step, StoredValue, isSupportedType } from "../model";
 import { columnInfoFromAttr } from "../compat";
@@ -12,6 +13,7 @@ import { StepsEditor, stepsValid } from "./StepsEditor";
 import { PreviewPanel } from "./PreviewPanel";
 import { Field } from "./fields";
 import { Msg, Notice } from "./Notice";
+import { VersionLabel } from "./VersionLabel";
 import { errorText, useApp } from "./context";
 import { getLang, t } from "../i18n";
 
@@ -21,6 +23,11 @@ const useStyles = makeStyles({
   card: { border: `1px solid ${tokens.colorNeutralStroke2}`, borderRadius: tokens.borderRadiusMedium, padding: tokens.spacingHorizontalS, display: "flex", flexDirection: "column", gap: tokens.spacingVerticalS, minWidth: 0 },
   row: { display: "flex", gap: tokens.spacingHorizontalS, alignItems: "center", flexWrap: "wrap" },
   muted: { color: tokens.colorNeutralForeground3 },
+  // Stays at the top of the pane while the steps scroll underneath.
+  sticky: {
+    position: "sticky", top: 0, zIndex: 2, display: "flex", gap: tokens.spacingHorizontalS, flexWrap: "wrap",
+    backgroundColor: tokens.colorNeutralBackground1, padding: `${tokens.spacingVerticalS} 0`, borderBottom: `1px solid ${tokens.colorNeutralStroke2}`,
+  },
 });
 
 const HUB = "bassllab_/furep/html/furep.hub.html";
@@ -40,6 +47,8 @@ export function Pane(): ReactElement {
   const [answers, setAnswers] = useState<Record<string, StoredValue>>({});
   const [message, setMessage] = useState<Msg | null>(null);
   const [busy, setBusy] = useState(false);
+  const [support, setSupport] = useState<{ note: boolean; task: boolean } | undefined>();
+  const [relatedCount, setRelatedCount] = useState(0);
 
   // Follow the user to other records and sessions, and keep the live change counter fresh.
   useEffect(() => {
@@ -56,6 +65,16 @@ export function Pane(): ReactElement {
     return () => window.clearInterval(timer);
   }, []);
 
+  // While recording, notes and tasks added to the saved record in the timeline are counted too.
+  useEffect(() => {
+    if (!recording || !entry) { setRelatedCount(0); return; }
+    let live = true;
+    const poll = (): void => { void liveRelatedCount(entry, api).then((n) => { if (live) setRelatedCount(n); }); };
+    poll();
+    const timer = window.setInterval(poll, 3000);
+    return () => { live = false; window.clearInterval(timer); };
+  }, [recording, entry, api]);
+
   const refresh = useCallback(async () => {
     try {
       setRows(await listRecordings(api, identity, "all"));
@@ -67,7 +86,11 @@ export function Pane(): ReactElement {
   useEffect(() => { void refresh(); }, [refresh, entry?.key]);
 
   // Warm the lookup of non-writable columns so that pressing Record does not wait for it.
-  useEffect(() => { if (entry?.entity) void loadNonSettable(api, entry.entity); }, [api, entry?.entity]);
+  useEffect(() => {
+    if (!entry?.entity) return;
+    void loadNonSettable(api, entry.entity);
+    void relatedSupport(api, entry.entity).then(setSupport);
+  }, [api, entry?.entity]);
 
   // Switching records or sessions drops any half-finished review or preview.
   useEffect(() => {
@@ -95,7 +118,7 @@ export function Pane(): ReactElement {
     try {
       // Columns the platform fills in itself (address composite, full name, ...) cannot be replayed, so they are not recorded.
       const skip = await loadNonSettable(api, entry.entity);
-      startRecording(entry, skip);
+      startRecording(entry, skip, api);
       setRecording(true);
       setCount(0);
     } finally {
@@ -107,7 +130,7 @@ export function Pane(): ReactElement {
     if (!entry) return;
     setBusy(true);
     try {
-      const steps = await stopRecording(entry);
+      const steps = await stopRecording(entry, api);
       const left = leftOutColumns(entry).map((c) => labelFor(entry.fc, c)).join(", ");
       setRecording(false);
       if (steps.length === 0) {
@@ -139,7 +162,13 @@ export function Pane(): ReactElement {
   };
 
   const buildPlan = (steps: Step[], given: Record<string, StoredValue>): PlanItem[] =>
-    plan(toFormLike(entry!.fc), steps, { answers: given, now: new Date(), userName: xrm.Utility.getGlobalContext().userSettings.userName, locale: getLang() });
+    plan(toFormLike(entry!.fc), steps, {
+      answers: given,
+      now: new Date(),
+      userName: xrm.Utility.getGlobalContext().userSettings.userName,
+      locale: getLang(),
+      record: { saved: !!entry!.fc.data.entity.getId(), supports: support },
+    });
 
   const onPreview = async (): Promise<void> => {
     if (!entry || !selected) return;
@@ -163,15 +192,30 @@ export function Pane(): ReactElement {
     if (preview) setPreview({ ...preview, items: buildPlan(preview.steps, next) });
   };
 
-  const onApply = (): void => {
+  const onApply = async (): Promise<void> => {
     if (!entry || !preview) return;
     const res = apply(toFormLike(entry.fc), preview.items);
+    const related = preview.items.filter((i) => i.status === "apply" && i.related);
     setPreview(null);
-    setMessage(
-      res.failed.length
-        ? { intent: "error", text: t("errorGeneric", res.failed.map((f) => `${f.column}: ${f.message}`).join("; ")) }
-        : { intent: "success", text: t("applied", res.applied.length) },
-    );
+    const errors = res.failed.map((f) => `${f.column}: ${f.message}`);
+    let added = 0;
+    let existed = 0;
+    if (related.length) {
+      setBusy(true);
+      const parentId = (entry.fc.data.entity.getId() || "").replace(/[{}]/g, "").toLowerCase();
+      for (const item of related) {
+        try {
+          const made = await createRelated(api, entry.entity, parentId, item.related!);
+          if (made.status === "created") added++; else existed++;
+        } catch (e) {
+          errors.push(`${t(item.related!.kind === "note" ? "relatedNote" : "relatedTask")}: ${errorText(e)}`);
+        }
+      }
+      if (added) refreshTimelines(entry.fc);
+      setBusy(false);
+    }
+    const text = [t("applied", res.applied.length), ...(related.length ? [t("relatedResult", added, existed)] : [])].join(" ");
+    setMessage(errors.length ? { intent: "error", text: t("errorGeneric", errors.join("; ")) } : { intent: "success", text });
   };
 
   const openHub = (): void => {
@@ -201,19 +245,20 @@ export function Pane(): ReactElement {
             {draft ? (
               <>
                 <Text weight="semibold">{t("paneReview")}</Text>
-                <MessageBar intent="warning"><MessageBarBody>{t("piiWarning")}</MessageBarBody></MessageBar>
                 <Field label={t("paneName")} required>
                   <Input value={draftName} onChange={(_, d) => setDraftName(d.value)} />
                 </Field>
-                <StepsEditor steps={draft} onChange={setDraft} fc={entry.fc} columns={columns} />
-                <div className={s.row}>
+                <div className={s.sticky}>
                   <Button appearance="primary" disabled={busy || !draftName.trim() || !stepsValid(draft)} onClick={() => void onSave()}>{t("paneSave")}</Button>
                   <Button onClick={() => { discardRecording(entry); setDraft(null); }}>{t("paneDiscard")}</Button>
                 </div>
+                <MessageBar intent="warning"><MessageBarBody>{t("piiWarning")}</MessageBarBody></MessageBar>
+                <StepsEditor steps={draft} onChange={setDraft} fc={entry.fc} columns={columns} />
               </>
             ) : recording ? (
               <>
                 <Text>{t("paneRecording", count)}</Text>
+                {relatedCount > 0 ? <Text weight="semibold">{t("paneRecordingRelated", relatedCount)}</Text> : null}
                 <div className={s.row}>
                   <Button appearance="primary" icon={<Stop20Filled />} disabled={busy} onClick={() => void onStop()}>{t("paneStop")}</Button>
                 </div>
@@ -229,7 +274,7 @@ export function Pane(): ReactElement {
             <div className={s.card}>
               <Text weight="semibold">{t("paneReplay")}</Text>
               {preview ? (
-                <PreviewPanel items={preview.items} fc={entry.fc} answers={answers} onAnswer={onAnswer} onApply={onApply} onCancel={() => setPreview(null)} />
+                <PreviewPanel items={preview.items} fc={entry.fc} answers={answers} onAnswer={onAnswer} onApply={() => void onApply()} onCancel={() => setPreview(null)} />
               ) : tableRows.length === 0 ? (
                 <Text className={s.muted}>{t("paneNoRecordings")}</Text>
               ) : (
@@ -247,6 +292,7 @@ export function Pane(): ReactElement {
           ) : null}
         </>
       )}
+      <VersionLabel />
     </div>
   );
 }
