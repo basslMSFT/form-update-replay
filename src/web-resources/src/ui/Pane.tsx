@@ -26,7 +26,7 @@ const useStyles = makeStyles({
   // Stays at the top of the pane while the steps scroll underneath.
   sticky: {
     position: "sticky", top: 0, zIndex: 2, display: "flex", gap: tokens.spacingHorizontalS, flexWrap: "wrap",
-    backgroundColor: tokens.colorNeutralBackground1, padding: `${tokens.spacingVerticalS} 0`, borderBottom: `1px solid ${tokens.colorNeutralStroke2}`,
+    backgroundColor: tokens.colorNeutralBackground1, padding: `${tokens.spacingVerticalS} ${tokens.spacingHorizontalS}`, borderBottom: `1px solid ${tokens.colorNeutralStroke2}`,
   },
 });
 

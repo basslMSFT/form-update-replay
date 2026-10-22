@@ -4,6 +4,11 @@ All notable changes to this solution will be documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/), and this project adheres to [Semantic Versioning](https://semver.org/).
 
+## [Unreleased]
+
+### Changed
+- The Save recording and Discard buttons at the top of the review step have some room on the left edge.
+
 ## [3.1.0] - 2026-10-22
 
 ### Added
