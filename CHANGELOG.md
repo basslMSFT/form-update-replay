@@ -4,6 +4,14 @@ All notable changes to this solution will be documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/), and this project adheres to [Semantic Versioning](https://semver.org/).
 
+## [3.1.2] - 2026-10-23
+
+### Fixed
+- **The preview said "Nothing is saved until you save the form", which is not true for notes and tasks.** They are created as soon as you click **Apply to form**. The preview now says so when it contains a note or task, and it no longer claims that column changes need saving when only notes and tasks were added.
+
+### Notes
+- Installs over 3.1.x and 3.0.x. Nothing else changed.
+
 ## [3.1.1] - 2026-10-22
 
 ### Changed
