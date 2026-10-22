@@ -58,7 +58,7 @@ A calculation sees what earlier steps of the same replay set, so a later step ca
 
 ## Screenshots
 
-A narrated walkthrough (3.5 minutes, including Calculate) is in [docs/media/form-update-replay-demo.mp4](docs/media/form-update-replay-demo.mp4). It was recorded before Replay on selected records, notes and tasks, and business-unit sharing existed, so those parts are shown in screenshots 22 to 41 only. The screenshots use dummy data.
+A narrated walkthrough (3.5 minutes, including Calculate) is in [docs/media/form-update-replay-demo.mp4](docs/media/form-update-replay-demo.mp4). It was recorded before Replay on selected records, notes and tasks, and business-unit sharing existed. Those parts are covered by a second, shorter narrated video, [What's new in 3.1](docs/media/form-update-replay-whats-new-3.1.mp4) (2 minutes), and by screenshots 22 to 41. The screenshots and videos use dummy data.
 
 | | |
 |---|---|
