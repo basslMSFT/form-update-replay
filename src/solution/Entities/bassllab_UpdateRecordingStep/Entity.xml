@@ -529,6 +529,12 @@
                   <label description="Waarde wissen" languagecode="1043" />
                 </labels>
               </option>
+              <option value="352410002" IsHidden="0">
+                <labels>
+                  <label description="Add note or task" languagecode="1033" />
+                  <label description="Notitie of taak toevoegen" languagecode="1043" />
+                </labels>
+              </option>
             </options>
           </optionset>
           <displaynames>

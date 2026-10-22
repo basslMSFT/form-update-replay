@@ -1,6 +1,7 @@
 import type { Api } from "./store";
 import type { Step } from "./model";
 import { calcColumns } from "./calc";
+import { relatedColumns } from "./related";
 import { TYPE_BY_METADATA } from "./compat";
 
 /** What a grid replay needs to know about a column, taken from table metadata instead of an open form. */
@@ -36,6 +37,10 @@ export interface TableMeta {
 export function neededColumns(steps: Step[]): string[] {
   const out = new Set<string>();
   for (const s of steps) {
+    if (s.operation === "addRelated") {
+      if (s.related) for (const c of relatedColumns(s.related)) out.add(c);
+      continue;
+    }
     out.add(s.column);
     if (s.sourceColumn) out.add(s.sourceColumn);
     if (s.calc) for (const c of calcColumns(s.calc)) out.add(c);

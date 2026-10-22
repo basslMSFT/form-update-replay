@@ -67,6 +67,28 @@ Assign the roles next to the role people already have.
 
 A team can own recordings (use *Assign to team* in the management dialog). Give the team the User role so its members can use them.
 
+## Sharing with a business unit
+
+Dataverse cannot share a record with a business unit itself; access goes to users and teams. Every business unit has a **default team** that holds the users who are in that unit, and the platform keeps it up to date. The **Share** dialog (tab *Business unit*) uses that: pick a business unit, choose how far to go, and the recording is shared (read, or read and edit) with the default team of each unit it covers.
+
+| Choice | Units that get the share |
+|--------|--------------------------|
+| This unit only | The unit you picked |
+| This unit and the units below it | The unit and all its child units, at any depth |
+| This unit and the units above it | The unit and its parent, up to the root |
+| The whole branch | The units above and below, but not sibling branches |
+
+Things to know:
+
+- **It covers the units as they are today.** People who join or leave a unit are added to or removed from its default team by the platform, so their access follows. A business unit created later is not included until you share again. Stop sharing works per team in the recording's detail view.
+- **People still need the role.** Sharing grants access to the recording. A user also needs the *Form Update Replay User* role (or a role with read access to the recording table) to see it and to use Replay at all. Their role's depth does not matter for shared recordings.
+- **Why not role depth?** The roles give own-record access (User level) on purpose, so recordings stay private until shared. Business-unit depth only reaches the unit and its children (never a parent unit), and would make every recording visible to everyone in the unit. Sharing to default teams lets the owner decide per recording and also reach higher units.
+- Shared recordings can be viewed and, with the edit option, changed by those users. Only the owner (or an admin) can delete them.
+
+## Notes and tasks
+
+Steps that add a note or a task are created through the Web API as the user who replays. They need the create right for notes (annotation) or tasks and the append rights on the record, which standard sales and service roles usually include; a custom role without them gets a clear error per record.
+
 ## Language
 
 The interface follows the user's language setting: Dutch (1043) shows Dutch, every other language shows English.

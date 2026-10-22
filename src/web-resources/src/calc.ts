@@ -81,7 +81,7 @@ export function calcColumns(spec: CalcSpec): string[] {
   return [...out];
 }
 
-const BUILTIN = ["today", "now", "user"];
+export const BUILTIN = ["today", "now", "user"];
 
 /** Whether a spec is complete enough to save: every chosen column, date and number is filled in. */
 export function calcValid(spec: CalcSpec | undefined): boolean {
@@ -159,7 +159,7 @@ function toNumber(v: StoredValue): number | null {
   return typeof v === "number" && Number.isFinite(v) ? v : null;
 }
 
-function expand(text: string, ctx: CalcContext): string {
+export function expand(text: string, ctx: Pick<CalcContext, "now" | "userName" | "locale" | "text">): string {
   const locale = ctx.locale;
   return text.replace(/\{\{\s*([A-Za-z0-9_]+)\s*\}\}/g, (_, name: string) => {
     switch (name.toLowerCase()) {

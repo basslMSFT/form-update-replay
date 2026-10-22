@@ -244,10 +244,11 @@ function Detail({ id, onBack }: { id: string; onBack: () => void }): ReactElemen
         void loadShares(r.ownerId);
         loadColumns(api, r.table).then(setColumns).catch(() => setColumns([]));
         try {
-          const md = (await xrm.Utility.getEntityMetadata(r.table, st.map((x) => x.column))) as unknown as { Attributes: { get(n: string): { DisplayName?: string; OptionSet?: Record<string, { text?: string; value?: number }> } | undefined } };
+          const md = (await xrm.Utility.getEntityMetadata(r.table, st.filter((x) => x.operation !== "addRelated").map((x) => x.column))) as unknown as { Attributes: { get(n: string): { DisplayName?: string; OptionSet?: Record<string, { text?: string; value?: number }> } | undefined } };
           const l: Record<string, string> = {};
           const ol: Record<string, Record<string, string>> = {};
           for (const x of st) {
+            if (x.operation === "addRelated") continue;
             const a = md.Attributes.get(x.column);
             if (a?.DisplayName) l[x.column] = a.DisplayName;
             if (a?.OptionSet) {
