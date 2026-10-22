@@ -4,10 +4,13 @@ All notable changes to this solution will be documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/), and this project adheres to [Semantic Versioning](https://semver.org/).
 
-## [Unreleased]
+## [3.1.1] - 2026-10-22
 
 ### Changed
 - The Save recording and Discard buttons at the top of the review step have some room on the left edge.
+
+### Notes
+- Installs over 3.1.0 and 3.0.x. Nothing else changed.
 
 ## [3.1.0] - 2026-10-22
 
