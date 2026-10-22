@@ -3,7 +3,7 @@ import {
   Badge, Button, Input, Spinner, Tab, TabList, Table, TableBody, TableCell, TableCellLayout, TableHeader, TableHeaderCell, TableRow,
   TableRowId, TableSelectionCell, Text, Textarea, Title2, createTableColumn, makeStyles, mergeClasses, tokens, useTableFeatures, useTableSelection,
 } from "@fluentui/react-components";
-import { ArrowLeft20Regular, ArrowSync20Regular, Delete20Regular, Edit20Regular, Open20Regular, PeopleTeam20Regular, Person20Regular, Search20Regular, Share20Regular } from "@fluentui/react-icons";
+import { ArrowLeft20Regular, ArrowSync20Regular, Delete20Regular, Dismiss16Regular, Edit20Regular, Open20Regular, PeopleTeam20Regular, Person20Regular, Search20Regular, Share20Regular } from "@fluentui/react-icons";
 import { RecordingRow, Scope, ShareEntry, getRecording, getShares, listRecordings, loadTeamIds, replaceSteps, revokeAccess, updateRecordingHeader } from "../store";
 import { Step } from "../model";
 import { ColumnInfo, loadColumns } from "../compat";
@@ -27,7 +27,17 @@ const useStyles = makeStyles({
   },
   grow: { flexGrow: 1 },
   muted: { color: tokens.colorNeutralForeground3 },
-  detail: { display: "flex", flexDirection: "column", gap: tokens.spacingVerticalM, maxWidth: "900px" },
+  detail: { display: "flex", flexDirection: "column", gap: tokens.spacingVerticalM, maxWidth: "1400px" },
+  columns: {
+    display: "grid", gridTemplateColumns: "minmax(0, 1fr) minmax(280px, 360px)", gap: tokens.spacingHorizontalXL, alignItems: "start",
+    "@media (max-width: 860px)": { gridTemplateColumns: "minmax(0, 1fr)" },
+  },
+  main: { display: "flex", flexDirection: "column", gap: tokens.spacingVerticalM, minWidth: 0 },
+  side: {
+    display: "flex", flexDirection: "column", gap: tokens.spacingVerticalM, minWidth: 0,
+    position: "sticky", top: 0,
+    "@media (max-width: 860px)": { order: -1, position: "static" },
+  },
   hero: {
     display: "flex", flexDirection: "column", gap: tokens.spacingVerticalXXS,
     padding: `${tokens.spacingVerticalM} ${tokens.spacingHorizontalL}`,
@@ -40,7 +50,7 @@ const useStyles = makeStyles({
     padding: tokens.spacingHorizontalM,
   },
   section: { display: "flex", alignItems: "center", gap: tokens.spacingHorizontalS, paddingBottom: tokens.spacingVerticalXXS, borderBottom: `2px solid ${tokens.colorBrandBackground}` },
-  shareRow: { display: "flex", alignItems: "center", gap: tokens.spacingHorizontalS, padding: `${tokens.spacingVerticalXS} 0` },
+  shareRow: { display: "flex", alignItems: "center", flexWrap: "wrap", gap: tokens.spacingHorizontalS, padding: `${tokens.spacingVerticalXS} 0` },
   headCell: { fontWeight: tokens.fontWeightSemibold, color: tokens.colorBrandForeground1 },
   thead: { backgroundImage: `linear-gradient(90deg, ${tokens.colorBrandBackground2} 0%, ${tokens.colorNeutralBackground1} 100%)` },
   row: { backgroundColor: tokens.colorNeutralBackground1, ":hover": { backgroundColor: tokens.colorBrandBackground2Hover } },
@@ -303,25 +313,33 @@ function Detail({ id, onBack }: { id: string; onBack: () => void }): ReactElemen
           <Text className={s.muted}>{row.table} · {steps.length} {t("colSteps").toLowerCase()} · {t("colOwner")}: {row.ownerId === identity.userId ? t("you") : row.ownerName}</Text>
         </div>
         <Notice message={message} onDismiss={() => setMessage(null)} />
-        <div className={s.panel}>
-          <Field label={t("fieldName")} required><Input value={name} onChange={(_, d) => setName(d.value)} /></Field>
-          <Field label={t("fieldDescription")}><Textarea value={description} onChange={(_, d) => setDescription(d.value)} /></Field>
-        </div>
-        <div className={s.section}><Text weight="semibold" size={500}>{t("stepsTitle")}</Text><Badge appearance="filled" color="brand" shape="circular">{steps.length}</Badge></div>
-        <StepsEditor steps={steps} onChange={setSteps} labels={labels} optionLabels={optionLabels} columns={columns} />
-        <div><Button appearance="primary" disabled={saving || !name.trim() || !stepsValid(steps)} onClick={() => void save()}>{t("save")}</Button></div>
-
-        <div className={s.section}><Text weight="semibold" size={500}>{t("sharedWithTitle")}</Text></div>
-        <div className={s.panel}>
-        {shares.length === 0 ? <Text className={s.muted}>{t("notShared")}</Text> : shares.map((e) => (
-          <div key={`${e.principal.type}:${e.principal.id}`} className={s.shareRow}>
-            {e.principal.type === "team" ? <PeopleTeam20Regular /> : <Person20Regular />}
-            <Text className={s.grow}>{e.principal.name}</Text>
-            <Badge appearance="tint" color={e.canWrite ? "brand" : "informative"}>{e.canWrite ? t("accessWrite") : t("accessRead")}</Badge>
-            {canManageSharing ? <Button size="small" appearance="subtle" onClick={() => void stopSharing(e)}>{t("stopSharing")}</Button> : null}
+        <div className={s.columns}>
+          <div className={s.main}>
+            <div className={s.panel}>
+              <Field label={t("fieldName")} required><Input value={name} onChange={(_, d) => setName(d.value)} /></Field>
+              <Field label={t("fieldDescription")}><Textarea value={description} onChange={(_, d) => setDescription(d.value)} /></Field>
+            </div>
+            <div className={s.section}><Text weight="semibold" size={500}>{t("stepsTitle")}</Text><Badge appearance="filled" color="brand" shape="circular">{steps.length}</Badge></div>
+            <StepsEditor steps={steps} onChange={setSteps} labels={labels} optionLabels={optionLabels} columns={columns} />
+            <div><Button appearance="primary" disabled={saving || !name.trim() || !stepsValid(steps)} onClick={() => void save()}>{t("save")}</Button></div>
           </div>
-        ))}
-        {canManageSharing ? <div><Button icon={<Share20Regular />} onClick={() => setSharing(true)}>{t("share")}</Button></div> : null}
+
+          <div className={s.side}>
+            <div className={s.section}><Text weight="semibold" size={500}>{t("sharedWithTitle")}</Text></div>
+            <div className={s.panel}>
+              {shares.length === 0 ? <Text className={s.muted}>{t("notShared")}</Text> : shares.map((e) => (
+                <div key={`${e.principal.type}:${e.principal.id}`} className={s.shareRow}>
+                  {e.principal.type === "team" ? <PeopleTeam20Regular /> : <Person20Regular />}
+                  <Text className={s.grow}>{e.principal.name}</Text>
+                  <Badge appearance="tint" color={e.canWrite ? "brand" : "informative"}>{e.canWrite ? t("accessWrite") : t("accessRead")}</Badge>
+                  {canManageSharing ? (
+                    <Button size="small" appearance="outline" icon={<Dismiss16Regular />} aria-label={`${t("stopSharing")}: ${e.principal.name}`} onClick={() => void stopSharing(e)}>{t("stopSharing")}</Button>
+                  ) : null}
+                </div>
+              ))}
+              {canManageSharing ? <div><Button icon={<Share20Regular />} onClick={() => setSharing(true)}>{t("share")}</Button></div> : null}
+            </div>
+          </div>
         </div>
       </div>
       {sharing ? <ShareDialog rows={[row]} onClose={() => setSharing(false)} onDone={(text, intent = "success") => { setSharing(false); setMessage({ intent, text }); void loadShares(row.ownerId); }} /> : null}

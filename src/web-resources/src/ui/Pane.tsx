@@ -22,6 +22,11 @@ const useStyles = makeStyles({
   card: { border: `1px solid ${tokens.colorNeutralStroke2}`, borderRadius: tokens.borderRadiusMedium, padding: tokens.spacingHorizontalS, display: "flex", flexDirection: "column", gap: tokens.spacingVerticalS, minWidth: 0 },
   row: { display: "flex", gap: tokens.spacingHorizontalS, alignItems: "center", flexWrap: "wrap" },
   muted: { color: tokens.colorNeutralForeground3 },
+  // Stays at the top of the pane while the steps scroll underneath.
+  sticky: {
+    position: "sticky", top: 0, zIndex: 2, display: "flex", gap: tokens.spacingHorizontalS, flexWrap: "wrap",
+    backgroundColor: tokens.colorNeutralBackground1, padding: `${tokens.spacingVerticalS} 0`, borderBottom: `1px solid ${tokens.colorNeutralStroke2}`,
+  },
 });
 
 const HUB = "bassllab_/furep/html/furep.hub.html";
@@ -239,15 +244,15 @@ export function Pane(): ReactElement {
             {draft ? (
               <>
                 <Text weight="semibold">{t("paneReview")}</Text>
-                <MessageBar intent="warning"><MessageBarBody>{t("piiWarning")}</MessageBarBody></MessageBar>
                 <Field label={t("paneName")} required>
                   <Input value={draftName} onChange={(_, d) => setDraftName(d.value)} />
                 </Field>
-                <StepsEditor steps={draft} onChange={setDraft} fc={entry.fc} columns={columns} />
-                <div className={s.row}>
+                <div className={s.sticky}>
                   <Button appearance="primary" disabled={busy || !draftName.trim() || !stepsValid(draft)} onClick={() => void onSave()}>{t("paneSave")}</Button>
                   <Button onClick={() => { discardRecording(entry); setDraft(null); }}>{t("paneDiscard")}</Button>
                 </div>
+                <MessageBar intent="warning"><MessageBarBody>{t("piiWarning")}</MessageBarBody></MessageBar>
+                <StepsEditor steps={draft} onChange={setDraft} fc={entry.fc} columns={columns} />
               </>
             ) : recording ? (
               <>
