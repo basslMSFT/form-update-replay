@@ -71,7 +71,7 @@ Form Update Replay records the column changes a user makes on a model-driven for
 - No audit of who replayed what; enable Dataverse auditing on the target tables if you need it.
 - Field-level security cannot be detected before replay beyond what the form reports as read-only.
 - A recording stores the values as they were typed, readable by everyone it is shared with, also when a column is protected by field-level security for them. Do not share recordings of secured or personal columns; use **Ask when replaying** instead, which stores no value. This includes the text of notes and tasks.
-- Notes and tasks: only for saved records, plain text, no attachments, no "ask when replaying" for the text, and no rich text. The note created on a form appears in the timeline after a refresh that this tool requests (`refresh()` on a timeline control); whether every app's timeline honours it was only tested where noted in the changelog. A note typed in the enhanced case form's *Notes control* before the case is saved is not captured, because it is not a note on a saved record yet.
+- Notes and tasks: only for saved records, plain text, no attachments, no "ask when replaying" for the text, and no rich text. The note created on a form appears in the timeline after a refresh that this tool requests (`refresh()` on a timeline control); the platform documents it for the timeline control, but it has not been verified in every app. A note typed in the enhanced case form's *Notes control* before the case is saved is not captured, because it is not a note on a saved record yet.
 
 ## Supportability and security notes
 
