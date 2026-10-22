@@ -7,8 +7,17 @@ export const MAX_RECORDS = 250;
 
 export const SCHEMA_VERSION = 1;
 
-export type Operation = "set" | "clear";
+export type Operation = "set" | "clear" | "addRelated";
 export type ValueMode = "fixed" | "copy" | "prompt" | "calculate";
+
+/** A note or task that a replay adds to the record. Text may contain {{column}}, {{today}}, {{now}} and {{user}}. */
+export type RelatedSpec =
+  | { kind: "note"; subject: string; text: string }
+  | { kind: "task"; subject: string; description: string; dueInDays: number | null; priority: 0 | 1 | 2 };
+
+/** Longest stored text; the step table keeps the spec as JSON in a 10000-character column. */
+export const RELATED_TEXT_MAX = 6000;
+
 
 export interface StoredLookup {
   entityType: string;
@@ -31,6 +40,8 @@ export interface Step {
   promptText?: string;
   /** Only for valueMode "calculate". */
   calc?: CalcSpec;
+  /** Only for operation "addRelated"; `column` then holds "annotation" or "task". */
+  related?: RelatedSpec;
 }
 
 export interface Recording {
@@ -43,7 +54,7 @@ export interface Recording {
 
 /** Option set values used by the Dataverse tables (publisher option value prefix 10000). */
 export const OPTION = {
-  operation: { set: 352410000, clear: 352410001 },
+  operation: { set: 352410000, clear: 352410001, addRelated: 352410002 },
   valueMode: { fixed: 352410000, copy: 352410001, prompt: 352410002, calculate: 352410003 },
 } as const;
 

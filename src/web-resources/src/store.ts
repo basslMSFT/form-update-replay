@@ -1,4 +1,4 @@
-import { OPTION, Recording, Step, StoredValue } from "./model";
+import { OPTION, Recording, RelatedSpec, Step, StoredValue } from "./model";
 import type { CalcSpec } from "./calc";
 
 /** Thin HTTP layer so the store can be unit tested without a browser. */
@@ -62,11 +62,25 @@ export interface Identity {
 
 const bare = (id: string): string => id.replace(/[{}]/g, "").toLowerCase();
 
-const optionToOp = (v: number): Step["operation"] => (v === OPTION.operation.clear ? "clear" : "set");
+const optionToOp = (v: number): Step["operation"] => (v === OPTION.operation.clear ? "clear" : v === OPTION.operation.addRelated ? "addRelated" : "set");
 const optionToMode = (v: number): Step["valueMode"] =>
   v === OPTION.valueMode.copy ? "copy" : v === OPTION.valueMode.prompt ? "prompt" : v === OPTION.valueMode.calculate ? "calculate" : "fixed";
 
 export function stepToPayload(step: Step): Record<string, unknown> {
+  if (step.operation === "addRelated" && step.related) {
+    return {
+      bassllab_name: `${step.related.kind === "note" ? "Add note" : "Add task"}: ${step.related.subject}`.slice(0, 200),
+      bassllab_sortorder: step.sortOrder,
+      bassllab_operation: OPTION.operation.addRelated,
+      bassllab_valuemode: OPTION.valueMode.fixed,
+      bassllab_columnlogicalname: step.related.kind === "note" ? "annotation" : "task",
+      bassllab_columntype: "related",
+      bassllab_value: JSON.stringify(step.related),
+      bassllab_sourcecolumnlogicalname: null,
+      bassllab_prompttext: null,
+      bassllab_calculation: null,
+    };
+  }
   const label = step.operation === "clear" ? "Clear" : "Set";
   return {
     bassllab_name: `${label} ${step.column}`.slice(0, 200),
@@ -84,6 +98,13 @@ export function stepToPayload(step: Step): Record<string, unknown> {
 }
 
 export function stepFromRow(row: any): Step {
+  if (row.bassllab_operation === OPTION.operation.addRelated) {
+    let related: RelatedSpec | undefined;
+    try { related = JSON.parse(row.bassllab_value ?? "") as RelatedSpec; } catch { /* a damaged step stays without content; replay skips it */ }
+    const step: Step = { sortOrder: row.bassllab_sortorder, operation: "addRelated", valueMode: "fixed", column: row.bassllab_columnlogicalname, columnType: "related" };
+    if (related && (related.kind === "note" || related.kind === "task")) step.related = related;
+    return step;
+  }
   let value: StoredValue | undefined;
   if (row.bassllab_value) {
     try { value = JSON.parse(row.bassllab_value) as StoredValue; } catch { value = row.bassllab_value as string; }
@@ -152,6 +173,8 @@ async function loadShareMap(api: Api): Promise<Map<string, Map<string, ShareEntr
     const rows = await readAll(api, "principalobjectaccessset?$select=objectid,principalid,principaltypecode,accessrightsmask&$filter=objecttypecode eq 'bassllab_updaterecording'");
     const map = new Map<string, Map<string, ShareEntryRaw>>();
     for (const r of rows) {
+      // A revoked share can stay behind as a row without any access right.
+      if (Number(r.accessrightsmask ?? 1) === 0) continue;
       const k = bare(r.objectid);
       if (!map.has(k)) map.set(k, new Map());
       map.get(k)!.set(bare(r.principalid), { type: r.principaltypecode === "team" ? "team" : "systemuser", mask: Number(r.accessrightsmask ?? 1) });
@@ -200,7 +223,7 @@ export async function getShares(api: Api, recordingId: string, ownerId: string):
   const rows = await readAll(api, `principalobjectaccessset?$select=principalid,principaltypecode,accessrightsmask&$filter=objectid eq ${recordingId}`);
   const entries = rows
     .map((r) => ({ id: bare(r.principalid), type: (r.principaltypecode === "team" ? "team" : "systemuser") as Principal["type"], mask: Number(r.accessrightsmask ?? 1) }))
-    .filter((e) => e.id !== ownerId);
+    .filter((e) => e.id !== ownerId && e.mask !== 0);
   const users = entries.filter((e) => e.type === "systemuser").map((e) => e.id);
   const teams = entries.filter((e) => e.type === "team").map((e) => e.id);
   const names = new Map<string, string>();
@@ -306,6 +329,58 @@ export async function grantAccess(api: Api, recordingId: string, principal: Prin
 
 export async function assignToTeam(api: Api, recordingId: string, teamId: string): Promise<void> {
   await api.request("PATCH", `${SET}(${recordingId})`, { "ownerid@odata.bind": `/teams(${teamId})` });
+}
+
+export interface BusinessUnit {
+  id: string;
+  name: string;
+  parentId: string | null;
+}
+
+/** Which business units a share covers, counted from the one that was picked. */
+export type UnitScope = "unit" | "below" | "above" | "branch";
+
+export async function listBusinessUnits(api: Api): Promise<BusinessUnit[]> {
+  const rows = await readAll(api, "businessunits?$select=businessunitid,name,_parentbusinessunitid_value&$filter=isdisabled eq false&$orderby=name asc");
+  return rows.map((r) => ({ id: bare(r.businessunitid), name: String(r.name ?? ""), parentId: r._parentbusinessunitid_value ? bare(r._parentbusinessunitid_value) : null }));
+}
+
+/** The picked unit plus, depending on the scope, its descendants and/or its ancestors up to the root. */
+export function unitsForScope(all: BusinessUnit[], startId: string, scope: UnitScope): BusinessUnit[] {
+  const byId = new Map(all.map((u) => [u.id, u]));
+  const start = byId.get(startId);
+  if (!start) return [];
+  const out = new Map<string, BusinessUnit>([[start.id, start]]);
+  if (scope === "below" || scope === "branch") {
+    const children = new Map<string, BusinessUnit[]>();
+    for (const u of all) if (u.parentId) children.set(u.parentId, [...(children.get(u.parentId) ?? []), u]);
+    const queue = [start.id];
+    while (queue.length) {
+      for (const c of children.get(queue.shift()!) ?? []) {
+        if (out.has(c.id)) continue;
+        out.set(c.id, c);
+        queue.push(c.id);
+      }
+    }
+  }
+  if (scope === "above" || scope === "branch") {
+    for (let u = start.parentId ? byId.get(start.parentId) : undefined; u && !out.has(u.id); u = u.parentId ? byId.get(u.parentId) : undefined) out.set(u.id, u);
+  }
+  return [...out.values()];
+}
+
+/**
+ * The default team of each business unit. The platform keeps every user of a unit in its default team, so sharing with it
+ * reaches the people who are in the unit now; people who join later are not added to existing shares.
+ */
+export async function defaultTeams(api: Api, unitIds: string[]): Promise<Principal[]> {
+  const out: Principal[] = [];
+  for (let i = 0; i < unitIds.length; i += 20) {
+    const part = unitIds.slice(i, i + 20).map((id) => `_businessunitid_value eq ${id}`).join(" or ");
+    const rows = await readAll(api, `teams?$select=teamid,name&$filter=isdefault eq true and teamtype eq 0 and (${part})`);
+    for (const t of rows) out.push({ id: bare(t.teamid), type: "team", name: String(t.name ?? "") });
+  }
+  return out;
 }
 
 export async function loadIdentity(api: Api, userId: string, roleNames: string[]): Promise<Identity> {

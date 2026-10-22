@@ -10,7 +10,20 @@ Record the column changes you make on a Dynamics 365 form and replay them on oth
 4. On another record of the same table, open the pane, choose the recording and click **Preview**. You see what will change and why anything is skipped. **Apply to form** sets the values on the open form; you save the form yourself.
 5. **Manage recordings** opens a dialog with *My recordings*, *Shared by me*, *Shared with me*, *Team recordings* and (for admins) *All recordings*. The grid shows whether a recording is shared and with how many people or teams, for example *Yes (3)*. Open a recording to change the order of its changes, edit them, see who it is shared with and stop sharing. Select one or more rows with the round control to enable the actions: open and rename need exactly one row; share, assign to a team and delete work on several.
 
-Recordings are private to their owner until you share them or assign them to a team.
+Recordings are private to their owner until you share them or assign them to a team. **Share** offers two ways: people and teams by name, or a **business unit** (see [Sharing with a business unit](docs/configuration.md#sharing-with-a-business-unit)).
+
+## Notes and tasks
+
+A recording can also add a **note** or a **task** to the record, for example "Called the customer" or "Follow up in a week".
+
+- **Add them in the review step** (after you stop recording) or later in **Manage recordings**, with the **Add note** and **Add task** buttons under the steps. A note has a subject and text; a task has a subject, a description, a due date (a number of days counted from the day you replay) and a priority.
+- **Or just add them while recording.** Notes and tasks you add to the *saved* record in the timeline while recording are picked up when you stop, and shown in the review step so you can edit or remove them. Attachments are not captured.
+- The text can use `{{today}}`, `{{now}}`, `{{user}}` and `{{column_name}}` (a column of the record), for example `Reviewed {{today}} by {{user}}: {{title}}`.
+- **On a form**, the note or task is created when you click **Apply to form** (the record must be saved) and the timeline is refreshed.
+- **On selected records in a grid**, one is created for every record. **Undo this run** deletes exactly the notes and tasks that run created.
+- A record that already has the identical note (same subject and text) or the identical *open* task (same subject and description) gets nothing extra, so replaying twice does not duplicate.
+- Notes and tasks are created as you, so they need the normal create rights for notes or tasks, and the table must have notes or activities enabled. On a new, unsaved record, or when you lack the right, the step is skipped or reported with the reason.
+- Notes and tasks added by steps are plain text. They are stored in the recording as text, so do not put personal data in them; see *What is stored*.
 
 ## Replay on selected records
 
@@ -111,7 +124,7 @@ Replaying never grants more access than the user already has. On a form, values 
 
 ## What is stored
 
-Each recording is a row in `bassllab_updaterecording` with one child row per change in `bassllab_updaterecordingstep` (column, type, value, how the value is obtained). Everything stays in your Dataverse environment. Nothing is sent anywhere else. Recorded values are visible to everyone the recording is shared with, so use **Ask when replaying** for personal or sensitive values.
+Each recording is a row in `bassllab_updaterecording` with one child row per change in `bassllab_updaterecordingstep` (column, type, value, how the value is obtained). A note or task step stores its subject, text, due offset and priority as JSON in the same value column. Everything stays in your Dataverse environment. Nothing is sent anywhere else. Recorded values are visible to everyone the recording is shared with, so use **Ask when replaying** for personal or sensitive values.
 
 ## Supported columns
 
@@ -126,6 +139,8 @@ Columns that a **business rule or a script** sets for you are different: they lo
 - On a form, Replay sets values on the open form only; you save it yourself. The grid button is the only part that changes records directly, and then only the selected ones (up to 250 per run, the rows currently loaded in the grid).
 - Many apps, including the Copilot Service workspace, autosave. Applied values are then saved shortly after you apply them, so look at the preview first.
 - Lookups are replayed by record, so the target record must exist in the environment.
+- Notes and tasks can only be added to a saved record, and only plain text (no attachments, no rich text). A task is created open and assigned to whoever replays; recurring or assigned-to-someone-else tasks are not supported.
+- Sharing with a business unit is a one-time snapshot (see [docs/configuration.md](docs/configuration.md#sharing-with-a-business-unit)).
 - A recording only applies to forms of the table it was recorded on.
 - The Replay buttons are classic command-bar buttons defined in the solution's ribbon XML. That is the variant I found that can be hidden by role, app and table from a solution; the modern command designer cannot do this for a command that is not tied to one app and table. They cannot be edited in the command designer. Installing or upgrading republishes the ribbon of every table, which takes several minutes.
 - The form button appears on main forms only, not in quick create forms. The grid button appears in main grids and subgrids; if it is not visible, look under the "..." menu.

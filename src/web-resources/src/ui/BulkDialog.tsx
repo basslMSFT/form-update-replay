@@ -2,6 +2,7 @@ import { ReactElement, useCallback, useEffect, useMemo, useRef, useState } from 
 import { Badge, Button, MessageBar, MessageBarBody, ProgressBar, Select, Spinner, Text, Title3, makeStyles, tokens } from "@fluentui/react-components";
 import { ArrowDownload20Regular, ArrowUndo20Regular, Play20Filled, Stop20Filled } from "@fluentui/react-icons";
 import { getRegistry } from "../registry";
+import { relatedKindOf, relatedSupport } from "../related";
 import { RecordingRow, getRecording, listRecordings } from "../store";
 import { Step, StoredValue } from "../model";
 import { PlanItem, SKIP_REASON_KEYS } from "../player";
@@ -38,6 +39,12 @@ function specFor(step: Step, meta: TableMeta): PromptSpec | null {
 function resultText(o: Outcome, undo: boolean, item?: PlanItem): string {
   if (item && item.status === "skip") return t(SKIP_REASON_KEYS[item.reason ?? "missing"]);
   if (item && item.status === "noop") return t("statusNoop");
+  if (item?.related && !undo) {
+    const r = o.related?.find((x) => x.sortOrder === item.step.sortOrder);
+    if (r?.result === "created") return t("resultRelatedAdded");
+    if (r?.result === "exists") return t("resultRelatedExists");
+    if (r?.result === "failed") return r.message ?? "";
+  }
   switch (o.status) {
     case "applied": return t(undo ? "resultRestored" : "resultUpdated");
     case "unchanged": return t("resultUnchanged");
@@ -72,6 +79,7 @@ export function BulkDialog({ token }: { token: string | null }): ReactElement {
   const [message, setMessage] = useState<Msg | null>(null);
   const [progress, setProgress] = useState({ done: 0, total: 0 });
   const [steps, setSteps] = useState<Step[]>([]);
+  const [support, setSupport] = useState<{ note: boolean; task: boolean } | undefined>();
   const [meta, setMeta] = useState<TableMeta | null>(null);
   const [records, setRecords] = useState<BulkRecord[]>([]);
   const [answers, setAnswers] = useState<Record<string, StoredValue>>({});
@@ -92,13 +100,14 @@ export function BulkDialog({ token }: { token: string | null }): ReactElement {
   const plans = useMemo(() => {
     const map = new Map<string, PlanItem[]>();
     if (!meta) return map;
-    const options = { answers, now: startedAt.current, userName: xrm.Utility.getGlobalContext().userSettings.userName, locale: getLang() };
+    const options = { answers, now: startedAt.current, userName: xrm.Utility.getGlobalContext().userSettings.userName, locale: getLang(), record: { saved: true, supports: support } };
     for (const r of records) if (!r.error) map.set(r.id, planRecord(meta, r, steps, options));
     return map;
-  }, [meta, records, steps, answers, xrm]);
+  }, [meta, records, steps, answers, xrm, support]);
 
   const summary = useMemo(() => summarize(records, plans, steps), [records, plans, steps]);
-  const changeCount = summary.steps.reduce((n, x) => n + x.apply, 0);
+  const changeCount = summary.steps.filter((x) => !x.related).reduce((n, x) => n + x.apply, 0);
+  const relatedCount = summary.steps.filter((x) => x.related).reduce((n, x) => n + x.apply, 0);
   const prompts = useMemo(() => steps.filter((x) => x.valueMode === "prompt" && x.operation === "set"), [steps]);
   const unanswered = prompts.some((x) => !(x.column in answers) && summary.steps.find((r) => r.column === x.column)?.skipped.needsInput);
 
@@ -115,8 +124,10 @@ export function BulkDialog({ token }: { token: string | null }): ReactElement {
         return;
       }
       const m = await loadTableMeta(api, request.table, neededColumns(loaded));
+      const sup = await relatedSupport(api, request.table);
       const recs = await loadRecords(api, m, request.ids, (done, total) => setProgress({ done, total }));
       startedAt.current = new Date();
+      setSupport(sup);
       setSteps(loaded);
       setMeta(m);
       setRecords(recs);
@@ -259,9 +270,9 @@ export function BulkDialog({ token }: { token: string | null }): ReactElement {
                 </tr>
               </thead>
               <tbody>
-                {summary.steps.map((r) => (
-                  <tr key={r.column}>
-                    <td className={s.td}>{meta.columns.get(r.column)?.label ?? r.column}</td>
+                {summary.steps.map((r, idx) => (
+                  <tr key={`${r.column}-${idx}`}>
+                    <td className={s.td}>{r.related ? t(r.related === "note" ? "relatedNote" : "relatedTask") : meta.columns.get(r.column)?.label ?? r.column}</td>
                     <td className={s.td}>{r.apply}</td>
                     <td className={s.td}>{r.noop}</td>
                     <td className={s.td}>{Object.entries(r.skipped).map(([reason, n]) => `${n}× ${t(SKIP_REASON_KEYS[reason as keyof typeof SKIP_REASON_KEYS])}`).join("; ")}</td>
@@ -283,7 +294,7 @@ export function BulkDialog({ token }: { token: string | null }): ReactElement {
                       <tr key={r.id}>
                         <td className={s.td}>{r.name || r.id}</td>
                         <td className={s.td}>
-                          {r.error ? t("resultUnreadable", r.error) : changing.length ? <Badge appearance="tint" color="brand">{changing.map((i) => meta.columns.get(i.step.column)?.label ?? i.step.column).join(", ")}</Badge> : <Badge appearance="tint" color="success">{t("resultUnchanged")}</Badge>}
+                          {r.error ? t("resultUnreadable", r.error) : changing.length ? <Badge appearance="tint" color="brand">{changing.map((i) => (i.step.operation === "addRelated" ? t(relatedKindOf(i.step) === "note" ? "relatedNote" : "relatedTask") : meta.columns.get(i.step.column)?.label ?? i.step.column)).join(", ")}</Badge> : <Badge appearance="tint" color="success">{t("resultUnchanged")}</Badge>}
                         </td>
                       </tr>
                     );
@@ -307,6 +318,7 @@ export function BulkDialog({ token }: { token: string | null }): ReactElement {
         <div className={s.card}>
           <Text weight="semibold">{t("bulkConfirmTitle", summary.toChange)}</Text>
           <Text>{t("bulkConfirmText", changeCount, summary.toChange)}</Text>
+          {relatedCount ? <Text>{t("bulkConfirmRelated", relatedCount)}</Text> : null}
           <div className={s.row}>
             <Button appearance="primary" onClick={() => void onRun()}>{t("bulkConfirmButton", summary.toChange)}</Button>
             <Button onClick={() => setPhase("preview")}>{t("cancel")}</Button>

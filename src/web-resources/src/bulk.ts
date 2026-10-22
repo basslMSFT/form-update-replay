@@ -5,6 +5,7 @@ import { FormLike } from "./recorder";
 import { PlanItem, PlayOptions, plan } from "./player";
 import { BulkColumn, TableMeta, entitySetOf } from "./bulk-meta";
 import { getRegistry } from "./registry";
+import { CreatedRelated, createRelated, deleteCreated, describeResolved, relatedKindOf } from "./related";
 import { t } from "./i18n";
 
 /** Records updated at the same time. */
@@ -171,7 +172,7 @@ export interface ChangeLog {
 export function changesFrom(items: PlanItem[]): ChangeLog[] {
   const byColumn = new Map<string, ChangeLog>();
   for (const i of items) {
-    if (i.status !== "apply") continue;
+    if (i.status !== "apply" || i.step.operation === "addRelated") continue;
     const prev = byColumn.get(i.step.column);
     byColumn.set(i.step.column, { column: i.step.column, type: i.step.columnType, before: prev ? prev.before : i.current, after: i.next });
   }
@@ -213,6 +214,12 @@ export async function writeChanges(api: Api, meta: TableMeta, id: string, change
 
 export type OutcomeStatus = "applied" | "unchanged" | "failed" | "conflict" | "notStarted";
 
+export interface RelatedOutcome {
+  sortOrder: number;
+  result: "created" | "exists" | "failed";
+  message?: string;
+}
+
 export interface Outcome {
   id: string;
   name: string;
@@ -220,6 +227,9 @@ export interface Outcome {
   items: PlanItem[];
   changes: ChangeLog[];
   message?: string;
+  /** Notes and tasks this run created on the record; Undo deletes exactly these. */
+  created?: CreatedRelated[];
+  related?: RelatedOutcome[];
 }
 
 export interface RunControl {
@@ -229,6 +239,23 @@ export interface RunControl {
 
 const isConflict = (e: unknown): boolean => e instanceof Error && /^(412|409)\b/.test(e.message);
 
+/** Adds the notes and tasks of a plan to one record. A failure is recorded and the next one still runs. */
+async function addRelated(api: Api, table: string, id: string, items: PlanItem[]): Promise<{ created: CreatedRelated[]; related: RelatedOutcome[] }> {
+  const created: CreatedRelated[] = [];
+  const related: RelatedOutcome[] = [];
+  for (const item of items) {
+    if (item.status !== "apply" || !item.related) continue;
+    try {
+      const res = await createRelated(api, table, id, item.related);
+      if (res.status === "created") { created.push(res.created); related.push({ sortOrder: item.step.sortOrder, result: "created" }); }
+      else related.push({ sortOrder: item.step.sortOrder, result: "exists" });
+    } catch (e) {
+      related.push({ sortOrder: item.step.sortOrder, result: "failed", message: e instanceof Error ? e.message : String(e) });
+    }
+  }
+  return { created, related };
+}
+
 /** Updates every record that has changes. A failing record never stops the others; cancelling stops starting new ones. */
 export async function runBulk(api: Api, meta: TableMeta, records: BulkRecord[], plans: Map<string, PlanItem[]>, ctl: RunControl): Promise<Outcome[]> {
   const out: Outcome[] = new Array(records.length);
@@ -236,17 +263,24 @@ export async function runBulk(api: Api, meta: TableMeta, records: BulkRecord[], 
   await pool(records, CONCURRENCY, async (rec, i) => {
     const items = plans.get(rec.id) ?? [];
     const changes = changesFrom(items);
+    const hasRelated = items.some((x) => x.status === "apply" && x.related);
     const base = { id: rec.id, name: rec.name, items, changes };
     if (rec.error) out[i] = { ...base, status: "failed", message: rec.error, changes: [] };
     else if (ctl.cancelled) out[i] = { ...base, status: "notStarted" };
-    else if (changes.length === 0) out[i] = { ...base, status: "unchanged" };
+    else if (changes.length === 0 && !hasRelated) out[i] = { ...base, status: "unchanged" };
     else {
       try {
-        await writeChanges(api, meta, rec.id, changes, rec.etag);
-        out[i] = { ...base, status: "applied" };
+        if (changes.length) await writeChanges(api, meta, rec.id, changes, rec.etag);
       } catch (e) {
         out[i] = isConflict(e) ? { ...base, status: "conflict" } : { ...base, status: "failed", message: e instanceof Error ? e.message : String(e) };
+        ctl.onProgress?.(++done, records.length);
+        return;
       }
+      const { created, related } = hasRelated ? await addRelated(api, meta.table, rec.id, items) : { created: [], related: [] };
+      const failed = related.find((r) => r.result === "failed");
+      const wrote = changes.length > 0 || created.length > 0;
+      const status: OutcomeStatus = wrote ? "applied" : failed ? "failed" : "unchanged";
+      out[i] = { ...base, status, ...(failed ? { message: failed.message } : {}), ...(created.length ? { created } : {}), ...(related.length ? { related } : {}) };
     }
     ctl.onProgress?.(++done, records.length);
   });
@@ -254,8 +288,8 @@ export async function runBulk(api: Api, meta: TableMeta, records: BulkRecord[], 
 }
 
 /**
- * Puts the old values back for every record a run updated. A column is only restored when it still holds the value
- * the run wrote; a column someone edited since stays as it is and is reported.
+ * Puts the old values back for every record a run updated, and deletes the notes and tasks it created. A column is only
+ * restored when it still holds the value the run wrote; a column someone edited since stays as it is and is reported.
  */
 export async function undoRun(api: Api, meta: TableMeta, previous: Outcome[], ctl: RunControl): Promise<Outcome[]> {
   const targets = previous.filter((o) => o.status === "applied");
@@ -264,6 +298,9 @@ export async function undoRun(api: Api, meta: TableMeta, previous: Outcome[], ct
   await pool(targets, CONCURRENCY, async (o, i) => {
     const base = { id: o.id, name: o.name, items: [] as PlanItem[] };
     if (ctl.cancelled) { out[i] = { ...base, status: "notStarted", changes: [] }; return; }
+    const removal = o.created?.length ? await deleteCreated(api, o.created) : { removed: 0, failed: [] as string[] };
+    if (removal.failed.length) { out[i] = { ...base, status: "failed", changes: [], message: removal.failed[0] }; ctl.onProgress?.(++done, targets.length); return; }
+    if (o.changes.length === 0) { out[i] = { ...base, status: "applied", changes: [] }; ctl.onProgress?.(++done, targets.length); return; }
     const rec = await loadRecord(api, meta, o.id);
     if (rec.error) { out[i] = { ...base, status: "failed", changes: [], message: rec.error }; return; }
     const attrs = new Map([...meta.columns.values()].map((c) => [c.name, new RecordAttr(c, rec.raw)]));
@@ -292,6 +329,8 @@ export async function undoRun(api: Api, meta: TableMeta, previous: Outcome[], ct
 
 export interface StepSummary {
   column: string;
+  /** Set for a note or task step, which gets its own row. */
+  related?: "note" | "task";
   apply: number;
   noop: number;
   /** Skipped records per reason. */
@@ -306,10 +345,12 @@ export interface Summary {
   steps: StepSummary[];
 }
 
+const summaryKey = (s: Step): string => (s.operation === "addRelated" ? `${s.column}#${s.sortOrder}` : s.column);
+
 export function summarize(records: BulkRecord[], plans: Map<string, PlanItem[]>, steps: Step[]): Summary {
   const stepRows = new Map<string, StepSummary>();
   for (const s of [...steps].sort((a, b) => a.sortOrder - b.sortOrder)) {
-    if (!stepRows.has(s.column)) stepRows.set(s.column, { column: s.column, apply: 0, noop: 0, skipped: {} });
+    if (!stepRows.has(summaryKey(s))) stepRows.set(summaryKey(s), { column: s.column, ...(s.operation === "addRelated" ? { related: relatedKindOf(s) } : {}), apply: 0, noop: 0, skipped: {} });
   }
   let toChange = 0;
   let nothing = 0;
@@ -319,7 +360,7 @@ export function summarize(records: BulkRecord[], plans: Map<string, PlanItem[]>,
     const items = plans.get(rec.id) ?? [];
     if (items.some((i) => i.status === "apply")) toChange++; else nothing++;
     for (const i of items) {
-      const row = stepRows.get(i.step.column);
+      const row = stepRows.get(summaryKey(i.step));
       if (!row) continue;
       if (i.status === "apply") row.apply++;
       else if (i.status === "noop") row.noop++;
@@ -361,6 +402,10 @@ export function csvRows(meta: TableMeta, outcomes: Outcome[], resultText: (o: Ou
       continue;
     }
     for (const item of o.items) {
+      if (item.step.operation === "addRelated") {
+        rows.push([o.name, o.id, t(relatedKindOf(item.step) === "note" ? "relatedNote" : "relatedTask"), "", item.related ? describeResolved(item.related) : "", resultText(o, item)]);
+        continue;
+      }
       const column = meta.columns.get(item.step.column);
       const showsNew = item.status !== "skip";
       rows.push([
