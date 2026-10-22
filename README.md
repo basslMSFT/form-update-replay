@@ -25,6 +25,8 @@ A recording can also add a **note** or a **task** to the record, for example "Ca
 - Notes and tasks are created as you, so they need the normal create rights for notes or tasks, and the table must have notes or activities enabled. On a new, unsaved record, or when you lack the right, the step is skipped or reported with the reason.
 - Notes and tasks added by steps are plain text. They are stored in the recording as text, so do not put personal data in them; see *What is stored*.
 
+Screenshots 29 to 34, 37 and 39 to 41 below show notes and tasks, and screenshot 36 shows sharing with a business unit.
+
 ## Replay on selected records
 
 Select records in a list or in a subgrid and click **Replay** in the command bar (use the "..." menu if it is not visible). The button is enabled once at least one row is selected and, like the form button, is shown only in the apps and on the tables an administrator enabled for grids (see [Turn it on](#turn-it-on)).
@@ -56,7 +58,7 @@ A calculation sees what earlier steps of the same replay set, so a later step ca
 
 ## Screenshots
 
-A narrated walkthrough (3.5 minutes, including Calculate) is in [docs/media/form-update-replay-demo.mp4](docs/media/form-update-replay-demo.mp4). It was recorded before Replay on selected records existed, so that part is shown in screenshots 22 to 28 only. The screenshots use dummy data.
+A narrated walkthrough (3.5 minutes, including Calculate) is in [docs/media/form-update-replay-demo.mp4](docs/media/form-update-replay-demo.mp4). It was recorded before Replay on selected records, notes and tasks, and business-unit sharing existed, so those parts are shown in screenshots 22 to 41 only. The screenshots use dummy data.
 
 | | |
 |---|---|
@@ -74,6 +76,13 @@ A narrated walkthrough (3.5 minutes, including Calculate) is in [docs/media/form
 | ![Preview of a grid replay, with a question](docs/images/23-grid-preview-question.png) **23. Grid preview: the question is asked once** | ![Preview with the question answered](docs/images/24-grid-preview-answered.png) **24. Grid preview: answered** |
 | ![Confirmation before updating](docs/images/25-grid-confirm.png) **25. Confirm before updating** | ![Result per record, with Download CSV and Undo](docs/images/26-grid-result.png) **26. Result per record, CSV and Undo** |
 | ![The list after the run](docs/images/27-grid-after-run.png) **27. The list after the run** | ![Replay in a subgrid](docs/images/28-subgrid-replay-button.png) **28. Replay in a subgrid** |
+| ![Recording with a note added in the timeline](docs/images/29-recording-note-counter.png) **29. A note added while recording is counted** | ![Review step with Save and Discard at the top](docs/images/30-review-save-discard.png) **30. Review: Save and Discard stay at the top** |
+| ![Note step](docs/images/31-add-note-editor.png) **31. A note step** | ![Task step](docs/images/32-add-task-editor.png) **32. A task step** |
+| ![Preview with a note and a task](docs/images/33-preview-note-task.png) **33. Preview with a note and a task** | ![Timeline after Apply](docs/images/34-timeline-after-apply.png) **34. The timeline after Apply** |
+| ![Recording detail in two columns](docs/images/35-manage-detail-share-panel.png) **35. Recording detail: steps left, sharing right** | ![Share with a business unit](docs/images/36-share-business-unit.png) **36. Share with a business unit** |
+| ![Notes and tasks on an unsaved case](docs/images/37-new-case-save-first-error.png) **37. Unsaved record: save it first** | ![Version at the bottom of the pane](docs/images/38-version-label.png) **38. The version at the bottom of the pane** |
+| ![Grid preview with notes and tasks](docs/images/39-grid-preview-notes-tasks.png) **39. Grid preview with notes and tasks** | ![Grid result](docs/images/40-grid-result.png) **40. Grid result** |
+| ![Undo result](docs/images/41-undo-result.png) **41. Undo removes what the run created** | |
 
 ## Install
 
