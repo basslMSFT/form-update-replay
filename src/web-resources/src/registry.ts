@@ -20,6 +20,8 @@ export interface BulkRequest {
 export interface Registry {
   forms: Record<string, FormEntry>;
   recorders: Record<string, Recorder>;
+  /** Version of the command-bar script that is loaded in this page; set by library.ts. */
+  libraryVersion?: string;
   bulkRequests?: Record<string, BulkRequest>;
   /** The last bulk run per table, kept in memory so it can be undone until the page is reloaded. */
   lastRuns?: Record<string, unknown>;

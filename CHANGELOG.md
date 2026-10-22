@@ -12,6 +12,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/), and this
 
 ### Changed
 - **Recording detail in Manage recordings is two columns.** The steps are on the left and "Shared with" is on the right (it stays in view while you scroll). On a narrow window it becomes one column with "Shared with" at the top. "Stop sharing" is now an outlined button with an icon instead of plain text.
+- **The version is shown at the bottom of every screen** (the side pane, Manage recordings and the grid dialog), so you can see that a page refresh loaded the latest files. If the command-bar script is older than the screen, a red line says so and asks you to reload the page.
 - **Save and Discard are at the top of the review step** in the side pane and stay visible while you scroll through a long list of changes.
 
 ### Fixed

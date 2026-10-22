@@ -3,6 +3,7 @@ import { gridTable, isAvailable, isGridAvailable } from "./visibility";
 import { MAX_RECORDS } from "./model";
 import { langFromLcid, setLang, t } from "./i18n";
 import { cleanGuid } from "./value-codec";
+import { VERSION } from "./version";
 
 /**
  * Command-bar entry points. The form button opens the Form Update Replay side pane; the grid button opens the bulk
@@ -11,6 +12,12 @@ import { cleanGuid } from "./value-codec";
 const PANE_ID = "bassllab_formupdatereplay";
 const HUB = "bassllab_/furep/html/furep.hub.html";
 const ICON = "bassllab_/furep/img/furep.svg";
+
+try {
+  getRegistry().libraryVersion = VERSION;
+} catch {
+  // without access to the top window the pane simply does not compare versions
+}
 
 async function openPanel(fc: Xrm.FormContext): Promise<void> {
   if (fc?.data?.entity) {

@@ -11,6 +11,7 @@ import { StepsEditor, stepsValid } from "./StepsEditor";
 import { AssignDialog, DeleteDialog, DoneHandler, RenameDialog, ShareDialog } from "./Dialogs";
 import { Msg, Notice } from "./Notice";
 import { Field } from "./fields";
+import { VersionLabel } from "./VersionLabel";
 import { errorText, useApp } from "./context";
 import { getLang, t } from "../i18n";
 
@@ -214,6 +215,7 @@ export function Hub(): ReactElement {
       {action?.kind === "share" ? <ShareDialog rows={action.rows} onClose={() => setAction(null)} onDone={done} /> : null}
       {action?.kind === "assign" ? <AssignDialog rows={action.rows} onClose={() => setAction(null)} onDone={done} /> : null}
       {action?.kind === "delete" ? <DeleteDialog rows={action.rows} onClose={() => setAction(null)} onDone={done} /> : null}
+      <VersionLabel />
     </div>
   );
 }
@@ -343,6 +345,7 @@ function Detail({ id, onBack }: { id: string; onBack: () => void }): ReactElemen
         </div>
       </div>
       {sharing ? <ShareDialog rows={[row]} onClose={() => setSharing(false)} onDone={(text, intent = "success") => { setSharing(false); setMessage({ intent, text }); void loadShares(row.ownerId); }} /> : null}
+      <VersionLabel />
     </div>
   );
 }
