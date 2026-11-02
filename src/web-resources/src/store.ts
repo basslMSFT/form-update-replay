@@ -60,7 +60,28 @@ export interface Identity {
   isAdmin: boolean;
 }
 
+export interface RecordingAccess {
+  canWrite: boolean;
+  canShare: boolean;
+  canAssign: boolean;
+  canDelete: boolean;
+}
+
 const bare = (id: string): string => id.replace(/[{}]/g, "").toLowerCase();
+
+/** Effective rights include roles, ownership and direct or team shares. */
+export async function getRecordingAccess(api: Api, id: string, userId: string): Promise<RecordingAccess> {
+  const target = encodeURIComponent(JSON.stringify({ "@odata.id": `${SET}(${bare(id)})` }));
+  const { data } = await api.request("GET", `systemusers(${bare(userId)})/Microsoft.Dynamics.CRM.RetrievePrincipalAccess(Target=@target)?@target=${target}`);
+  if (typeof data?.AccessRights !== "string") throw new Error("Dataverse did not return recording access rights.");
+  const rights = new Set(data.AccessRights.split(",").map((right: string) => right.trim()));
+  return {
+    canWrite: rights.has("WriteAccess"),
+    canShare: rights.has("ShareAccess"),
+    canAssign: rights.has("AssignAccess"),
+    canDelete: rights.has("DeleteAccess"),
+  };
+}
 
 const optionToOp = (v: number): Step["operation"] => (v === OPTION.operation.clear ? "clear" : v === OPTION.operation.addRelated ? "addRelated" : "set");
 const optionToMode = (v: number): Step["valueMode"] =>

@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { Api, Identity, RecordingRow, classify, getShares, listRecordings, recordingToPayload, replaceSteps, searchPrincipals, stepFromRow, stepToPayload } from "../src/store";
+import { Api, Identity, RecordingRow, classify, getRecordingAccess, getShares, listRecordings, recordingToPayload, replaceSteps, searchPrincipals, stepFromRow, stepToPayload } from "../src/store";
 import { OPTION, Step } from "../src/model";
 
 const me = "11111111-1111-1111-1111-111111111111";
@@ -8,6 +8,37 @@ const who: Identity = { userId: me, teamIds: [myTeam], isAdmin: false };
 
 const row = (over: Partial<RecordingRow>): RecordingRow => ({
   id: "a", name: "n", description: "", table: "incident", stepCount: 1, ownerId: "x", ownerType: "systemuser", ownerName: "X", modifiedOn: "", ...over,
+});
+
+describe("effective recording access", () => {
+  it.each([
+    ["ReadAccess", false, false, false, false],
+    ["ReadAccess, WriteAccess, AppendAccess, AppendToAccess", true, false, false, false],
+    ["ReadAccess, WriteAccess, DeleteAccess, AssignAccess, ShareAccess", true, true, true, true],
+    ["ReadAccess, ShareAccess", false, true, false, false],
+    ["None", false, false, false, false],
+  ])("maps effective rights %s without guessing from ownership or sharing", async (mask, canWrite, canShare, canAssign, canDelete) => {
+    const api: Api = {
+      async request(method, path) {
+        expect(method).toBe("GET");
+        const [endpoint, query] = path.split("?");
+        expect(endpoint).toBe(`systemusers(${me})/Microsoft.Dynamics.CRM.RetrievePrincipalAccess(Target=@target)`);
+        expect(JSON.parse(new URLSearchParams(query).get("@target")!)).toEqual({ "@odata.id": "bassllab_updaterecordings(aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa)" });
+        return { data: { AccessRights: mask }, headers: { get: () => null } };
+      },
+    };
+    expect(await getRecordingAccess(api, "{AAAAAAAA-AAAA-AAAA-AAAA-AAAAAAAAAAAA}", `{${me}}`)).toEqual({ canWrite, canShare, canAssign, canDelete });
+  });
+
+  it("reports failed checks rather than guessing that a recording is editable", async () => {
+    const api: Api = { async request() { throw new Error("403: access denied"); } };
+    await expect(getRecordingAccess(api, "recording", me)).rejects.toThrow("403: access denied");
+  });
+
+  it.each([null, {}, { AccessRights: null }, { AccessRights: 3 }])("reports an invalid access response %j", async (data) => {
+    const api: Api = { async request() { return { data, headers: { get: () => null } }; } };
+    await expect(getRecordingAccess(api, "recording", me)).rejects.toThrow("Dataverse did not return recording access rights.");
+  });
 });
 
 describe("step mapping", () => {

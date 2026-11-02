@@ -1,10 +1,10 @@
 import { KeyboardEvent, ReactElement, useCallback, useEffect, useMemo, useState } from "react";
 import {
-  Badge, Button, Input, Spinner, Tab, TabList, Table, TableBody, TableCell, TableCellLayout, TableHeader, TableHeaderCell, TableRow,
+  Badge, Button, Input, MessageBar, MessageBarBody, Spinner, Tab, TabList, Table, TableBody, TableCell, TableCellLayout, TableHeader, TableHeaderCell, TableRow,
   TableRowId, TableSelectionCell, Text, Textarea, Title2, createTableColumn, makeStyles, mergeClasses, tokens, useTableFeatures, useTableSelection,
 } from "@fluentui/react-components";
 import { ArrowLeft20Regular, ArrowSync20Regular, Delete20Regular, Dismiss16Regular, Edit20Regular, Open20Regular, PeopleTeam20Regular, Person20Regular, Search20Regular, Share20Regular } from "@fluentui/react-icons";
-import { RecordingRow, Scope, ShareEntry, getRecording, getShares, listRecordings, loadTeamIds, replaceSteps, revokeAccess, updateRecordingHeader } from "../store";
+import { RecordingAccess, RecordingRow, Scope, ShareEntry, getRecording, getRecordingAccess, getShares, listRecordings, loadTeamIds, replaceSteps, revokeAccess, updateRecordingHeader } from "../store";
 import { Step } from "../model";
 import { ColumnInfo, loadColumns } from "../compat";
 import { StepsEditor, stepsValid } from "./StepsEditor";
@@ -75,6 +75,31 @@ export function sharedLabel(row: Pick<RecordingRow, "sharedCount">): string {
 
 const COLUMNS = [createTableColumn<RecordingRow>({ columnId: "name" })];
 
+export function RecordingCommands({ picked, rights, onOpen, onAction }: {
+  picked: RecordingRow[];
+  rights: RecordingAccess[];
+  onOpen: (id: string) => void;
+  onAction: (action: Exclude<Action, null>) => void;
+}): ReactElement {
+  const s = useStyles();
+  const single = picked.length === 1 ? picked[0]! : null;
+  const checked = picked.length > 0 && rights.length === picked.length;
+  const canWrite = checked && rights.every((r) => r.canWrite);
+  const canShare = checked && rights.every((r) => r.canShare);
+  const canAssign = checked && rights.every((r) => r.canAssign);
+  const canDelete = checked && rights.every((r) => r.canDelete);
+  return (
+    <div className={s.commands} role="toolbar" aria-label={t("recordingsTitle")}>
+      <Button appearance="transparent" icon={<Open20Regular />} disabled={!single} onClick={() => single && onOpen(single.id)}>{t("open")}</Button>
+      <Button appearance="transparent" icon={<Edit20Regular />} disabled={!single || !canWrite} onClick={() => single && canWrite && onAction({ kind: "rename", rows: [single] })}>{t("rename")}</Button>
+      <Button appearance="transparent" icon={<Share20Regular />} disabled={!canShare} onClick={() => canShare && onAction({ kind: "share", rows: picked })}>{t("share")}</Button>
+      <Button appearance="transparent" icon={<PeopleTeam20Regular />} disabled={!canAssign} onClick={() => canAssign && onAction({ kind: "assign", rows: picked })}>{t("assignTeam")}</Button>
+      <Button appearance="transparent" icon={<Delete20Regular />} disabled={!canDelete} onClick={() => canDelete && onAction({ kind: "delete", rows: picked })}>{t("delete")}</Button>
+      <Text className={s.muted} style={{ marginLeft: "auto" }}>{picked.length > 0 ? t("selectedCount", picked.length) : ""}</Text>
+    </div>
+  );
+}
+
 export function Hub(): ReactElement {
   const s = useStyles();
   const { api, identity: initialIdentity } = useApp();
@@ -117,7 +142,30 @@ export function Hub(): ReactElement {
   useEffect(() => { setSelected(new Set()); }, [visible]);
 
   const picked = useMemo(() => visible.filter((r) => selection.isRowSelected(r.id)), [visible, selection]);
-  const single = picked.length === 1 ? picked[0]! : null;
+  const pickedIds = picked.map((r) => r.id).join(",");
+  const [access, setAccess] = useState<{ ids: string; rights: RecordingAccess[] } | null>(null);
+
+  useEffect(() => {
+    setAccess(null);
+    if (!pickedIds || loading) return;
+    let cancelled = false;
+    const check = async (): Promise<void> => {
+      try {
+        const rights: RecordingAccess[] = [];
+        for (const id of pickedIds.split(",")) {
+          rights.push(await getRecordingAccess(api, id, identity.userId));
+          if (cancelled) return;
+        }
+        setAccess({ ids: pickedIds, rights });
+      } catch (e) {
+        if (!cancelled) setMessage({ intent: "error", text: t("accessError", errorText(e)) });
+      }
+    };
+    void check();
+    return () => { cancelled = true; };
+  }, [api, identity.userId, pickedIds, loading]);
+
+  const rights = !loading && access?.ids === pickedIds ? access.rights : [];
 
   const done: DoneHandler = (text, intent = "success") => {
     setAction(null);
@@ -156,14 +204,9 @@ export function Hub(): ReactElement {
 
       <Notice message={message} onDismiss={() => setMessage(null)} />
 
-      <div className={s.commands} role="toolbar" aria-label={t("recordingsTitle")}>
-        <Button appearance="transparent" icon={<Open20Regular />} disabled={!single} onClick={() => single && setOpenId(single.id)}>{t("open")}</Button>
-        <Button appearance="transparent" icon={<Edit20Regular />} disabled={!single} onClick={() => single && setAction({ kind: "rename", rows: [single] })}>{t("rename")}</Button>
-        <Button appearance="transparent" icon={<Share20Regular />} disabled={picked.length === 0} onClick={() => setAction({ kind: "share", rows: picked })}>{t("share")}</Button>
-        <Button appearance="transparent" icon={<PeopleTeam20Regular />} disabled={picked.length === 0} onClick={() => setAction({ kind: "assign", rows: picked })}>{t("assignTeam")}</Button>
-        <Button appearance="transparent" icon={<Delete20Regular />} disabled={picked.length === 0} onClick={() => setAction({ kind: "delete", rows: picked })}>{t("delete")}</Button>
-        <Text className={s.muted} style={{ marginLeft: "auto" }}>{picked.length > 0 ? t("selectedCount", picked.length) : ""}</Text>
-      </div>
+      <RecordingCommands picked={picked} rights={rights} onOpen={setOpenId} onAction={setAction} />
+
+      {rights.some((r) => !r.canWrite) ? <MessageBar intent="info"><MessageBarBody>{t("readOnlySelection")}</MessageBarBody></MessageBar> : null}
 
       {loading ? <Spinner label={t("loading")} /> : visible.length === 0 ? (
         <Text className={s.muted}>{t("empty")}</Text>
@@ -237,6 +280,23 @@ function Detail({ id, onBack }: { id: string; onBack: () => void }): ReactElemen
   const [message, setMessage] = useState<Msg | null>(null);
   const [saving, setSaving] = useState(false);
   const [sharing, setSharing] = useState(false);
+  const [access, setAccess] = useState<RecordingAccess | null>(null);
+  const [accessError, setAccessError] = useState(false);
+
+  useEffect(() => {
+    let cancelled = false;
+    setAccess(null);
+    setAccessError(false);
+    getRecordingAccess(api, id, identity.userId)
+      .then((rights) => { if (!cancelled) setAccess(rights); })
+      .catch((e) => {
+        if (!cancelled) {
+          setAccessError(true);
+          setMessage({ intent: "error", text: t("accessError", errorText(e)) });
+        }
+      });
+    return () => { cancelled = true; };
+  }, [api, id, identity.userId]);
 
   const loadShares = useCallback(async (ownerId: string) => {
     try {
@@ -279,6 +339,10 @@ function Detail({ id, onBack }: { id: string; onBack: () => void }): ReactElemen
   }, [api, id, xrm, loadShares]);
 
   const save = async (): Promise<void> => {
+    if (!access?.canWrite) {
+      setMessage({ intent: "error", text: t("recordingReadOnly") });
+      return;
+    }
     setSaving(true);
     try {
       await updateRecordingHeader(api, id, { name: name.trim(), description });
@@ -304,7 +368,8 @@ function Detail({ id, onBack }: { id: string; onBack: () => void }): ReactElemen
 
   if (!row) return <div className={s.root}>{message ? <Notice message={message} onDismiss={() => setMessage(null)} /> : <Spinner label={t("loading")} />}</div>;
 
-  const canManageSharing = row.ownerId === identity.userId || identity.isAdmin;
+  const canManageSharing = access?.canShare === true;
+  const readOnly = !access?.canWrite;
 
   return (
     <div className={s.root}>
@@ -313,17 +378,20 @@ function Detail({ id, onBack }: { id: string; onBack: () => void }): ReactElemen
         <div className={s.hero}>
           <Title2>{row.name}</Title2>
           <Text className={s.muted}>{row.table} · {steps.length} {t("colSteps").toLowerCase()} · {t("colOwner")}: {row.ownerId === identity.userId ? t("you") : row.ownerName}</Text>
+          {access && readOnly ? <div><Badge appearance="tint" color="informative">{t("readOnly")}</Badge></div> : null}
         </div>
         <Notice message={message} onDismiss={() => setMessage(null)} />
+        {!access && !accessError ? <Spinner size="tiny" label={t("checkingAccess")} /> : null}
+        {access && readOnly ? <MessageBar intent="info"><MessageBarBody>{t("recordingReadOnly")}</MessageBarBody></MessageBar> : null}
         <div className={s.columns}>
           <div className={s.main}>
             <div className={s.panel}>
-              <Field label={t("fieldName")} required><Input value={name} onChange={(_, d) => setName(d.value)} /></Field>
-              <Field label={t("fieldDescription")}><Textarea value={description} onChange={(_, d) => setDescription(d.value)} /></Field>
+              <Field label={t("fieldName")} required><Input value={name} readOnly={readOnly || saving} onChange={(_, d) => setName(d.value)} /></Field>
+              <Field label={t("fieldDescription")}><Textarea value={description} readOnly={readOnly || saving} onChange={(_, d) => setDescription(d.value)} /></Field>
             </div>
             <div className={s.section}><Text weight="semibold" size={500}>{t("stepsTitle")}</Text><Badge appearance="filled" color="brand" shape="circular">{steps.length}</Badge></div>
-            <StepsEditor steps={steps} onChange={setSteps} labels={labels} optionLabels={optionLabels} columns={columns} />
-            <div><Button appearance="primary" disabled={saving || !name.trim() || !stepsValid(steps)} onClick={() => void save()}>{t("save")}</Button></div>
+            <StepsEditor steps={steps} onChange={setSteps} labels={labels} optionLabels={optionLabels} columns={columns} readOnly={readOnly || saving} />
+            <div><Button appearance="primary" disabled={readOnly || saving || !name.trim() || !stepsValid(steps)} onClick={() => void save()}>{t("save")}</Button></div>
           </div>
 
           <div className={s.side}>

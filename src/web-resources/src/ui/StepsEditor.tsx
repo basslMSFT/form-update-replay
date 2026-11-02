@@ -1,5 +1,5 @@
 import { ReactElement } from "react";
-import { Badge, Button, Input, Select, Text, Textarea, makeStyles, tokens } from "@fluentui/react-components";
+import { Badge, Button, Input, Select, Text, Textarea, makeStyles, mergeClasses, tokens } from "@fluentui/react-components";
 import { Add20Regular, ArrowDown20Regular, ArrowUp20Regular, Delete20Regular } from "@fluentui/react-icons";
 import { RELATED_TEXT_MAX, RelatedSpec, Step, StoredValue } from "../model";
 import { RelatedKind, newRelated, relatedKindOf, relatedValid } from "../related";
@@ -38,6 +38,7 @@ const useStyles = makeStyles({
   muted: { color: tokens.colorNeutralForeground3 },
   addRow: { display: "flex", flexWrap: "wrap", gap: tokens.spacingHorizontalS },
   value: { overflowWrap: "anywhere" },
+  fieldset: { border: 0, padding: 0, margin: 0, minWidth: 0 },
 });
 
 interface Props {
@@ -48,6 +49,7 @@ interface Props {
   optionLabels?: Record<string, Record<string, string>>;
   /** Columns of the table; enables "Copy from column" with only the compatible ones offered. */
   columns?: ColumnInfo[];
+  readOnly?: boolean;
 }
 
 /** Every "copy" step needs a source column and every "calculate" step a complete calculation before the recording can be saved. */
@@ -56,7 +58,7 @@ export function stepsValid(steps: Step[]): boolean {
 }
 
 /** Editable list of recorded changes, used both when reviewing a new recording and when editing a saved one. */
-export function StepsEditor({ steps, onChange, fc, labels, optionLabels, columns }: Props): ReactElement {
+export function StepsEditor({ steps, onChange, fc, labels, optionLabels, columns, readOnly = false }: Props): ReactElement {
   const s = useStyles();
   const update = (i: number, patch: Partial<Step>): void => onChange(steps.map((x, j) => (j === i ? { ...x, ...patch } : x)));
   const remove = (i: number): void => onChange(steps.filter((_, j) => j !== i).map((x, j) => ({ ...x, sortOrder: (j + 1) * 10 })));
@@ -71,7 +73,7 @@ export function StepsEditor({ steps, onChange, fc, labels, optionLabels, columns
   };
 
   return (
-    <div className={s.list} role="list" aria-label={t("stepsTitle")}>
+    <fieldset className={mergeClasses(s.list, s.fieldset)} disabled={readOnly} role="list" aria-label={t("stepsTitle")}>
       {steps.map((step, i) => {
         const sources = columns ? copyCandidates(columns.find((c) => c.name === step.column), columns) : [];
         // Always offered so it is discoverable; the list says when no column of a matching type exists.
@@ -153,7 +155,7 @@ export function StepsEditor({ steps, onChange, fc, labels, optionLabels, columns
         <Button size="small" icon={<Add20Regular />} onClick={() => addRelated("note")}>{t("relatedAddNote")}</Button>
         <Button size="small" icon={<Add20Regular />} onClick={() => addRelated("task")}>{t("relatedAddTask")}</Button>
       </div>
-    </div>
+    </fieldset>
   );
 }
 

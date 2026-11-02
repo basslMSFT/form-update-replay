@@ -85,6 +85,12 @@ Things to know:
 - **Why not role depth?** The roles give own-record access (User level) on purpose, so recordings stay private until shared. Business-unit depth only reaches the unit and its children (never a parent unit), and would make every recording visible to everyone in the unit. Sharing to default teams lets the owner decide per recording and also reach higher units.
 - Shared recordings can be viewed and, with the edit option, changed by those users. Only the owner (or an admin) can delete them.
 
+### Read-only recordings
+
+Manage recordings checks the signed-in user's effective Dataverse access, including roles and direct or team shares. A recording shared without **Also allow editing** opens with a **Read-only** label and explanation. Its name, description and steps cannot be edited; Save, adding notes/tasks and reordering or removing steps are disabled. Replaying remains available on forms and grids.
+
+In the management grid, Rename requires write access. Share, Assign to team and Delete each require their corresponding right on every selected recording; a mixed selection never applies an action to only some of the rows. A read-only selection is called out above the grid. Actions stay disabled while access is being checked, and a failed check shows an error rather than enabling editing. Refresh the list or reopen the recording after permissions change. Dataverse still enforces access when an action is submitted.
+
 ## Notes and tasks
 
 Steps that add a note or a task are created through the Web API as the user who replays. They need the create right for notes (annotation) or tasks and the append rights on the record, which standard sales and service roles usually include; a custom role without them gets a clear error per record.
