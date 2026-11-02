@@ -4,10 +4,13 @@ All notable changes to this solution will be documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/), and this project adheres to [Semantic Versioning](https://semver.org/).
 
-## [Unreleased]
+## [3.1.3] - 2026-11-02
 
 ### Fixed
 - **Read-only shared recordings no longer look editable.** Manage recordings checks effective Dataverse record access, shows a read-only label and explanation, and prevents changing the name, description or steps and saving without write access. The recording grid disables Rename, Share, Assign to team and Delete when any selected recording lacks the corresponding right. Direct, team and business-unit shares use the same access check; replay is unchanged.
+
+### Notes
+- Installs over 3.1.x and 3.0.x. No security-role or sharing changes are required.
 
 ## [3.1.2] - 2026-10-23
 
